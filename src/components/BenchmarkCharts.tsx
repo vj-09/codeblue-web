@@ -647,15 +647,6 @@ export default function BenchmarkCharts() {
         {/* Leaderboard Tab */}
         {activeTab === 'leaderboard' && (
           <div className="space-y-6">
-            {/* Failure Insights Section */}
-            <div className="mb-8">
-              <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                <Target className="w-5 h-5 text-emerald-400" />
-                Insights
-              </h2>
-              <FailureInsights />
-            </div>
-
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-400">Sort by:</span>
               {(['score_correctness', 'score_efficiency', 'avgReward'] as const).map(key => (
@@ -775,6 +766,15 @@ export default function BenchmarkCharts() {
                   )}
                 </div>
               ))}
+            </div>
+
+            {/* Insights Section - At Bottom */}
+            <div className="mt-8 pt-8 border-t border-white/10">
+              <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <Target className="w-5 h-5 text-emerald-400" />
+                Insights
+              </h2>
+              <FailureInsights />
             </div>
           </div>
         )}
