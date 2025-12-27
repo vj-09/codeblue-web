@@ -170,9 +170,9 @@ def main():
         road_rollouts = load_road_rollouts(model_key)
         all_rollouts = bank_rollouts + road_rollouts
 
-        # Convert to examples format
+        # Convert to examples format - include ALL rollouts (25 tasks × 3 rollouts = 75)
         examples = []
-        for rollout in all_rollouts[:20]:  # Limit examples
+        for rollout in all_rollouts:
             ex = transform_rollout_to_example(rollout, tasks, example_id)
             examples.append(ex)
             example_id += 1
