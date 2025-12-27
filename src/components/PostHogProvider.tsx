@@ -1,38 +1,25 @@
 'use client';
 
 import posthog from 'posthog-js';
-import { PostHogProvider as PHProvider } from 'posthog-js/react';
-import { useEffect } from 'react';
+import { PostHogProvider as PHProvider, usePostHog } from 'posthog-js/react';
+import { useEffect, useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
-
-// Initialize PostHog only on client side and not on localhost
-const isLocalhost = typeof window !== 'undefined' &&
-  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-
-if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_POSTHOG_KEY && !isLocalhost) {
-  posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
-    api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
-    person_profiles: 'identified_only',
-    capture_pageview: false, // We'll capture manually for better control
-    capture_pageleave: true,
-    autocapture: true, // Auto-capture clicks, inputs, etc.
-  });
-}
 
 // Page view tracker component
 function PostHogPageView() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const posthogClient = usePostHog();
 
   useEffect(() => {
-    if (pathname && posthog) {
+    if (pathname && posthogClient) {
       let url = window.origin + pathname;
       if (searchParams.toString()) {
         url = url + '?' + searchParams.toString();
       }
-      posthog.capture('$pageview', { $current_url: url });
+      posthogClient.capture('$pageview', { $current_url: url });
     }
-  }, [pathname, searchParams]);
+  }, [pathname, searchParams, posthogClient]);
 
   return null;
 }
@@ -95,6 +82,30 @@ export const analytics = {
 };
 
 export default function PostHogProvider({ children }: { children: React.ReactNode }) {
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  useEffect(() => {
+    // Only initialize on client side, not localhost
+    const isLocalhost = window.location.hostname === 'localhost' ||
+                        window.location.hostname === '127.0.0.1';
+
+    const posthogKey = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+
+    if (posthogKey && !isLocalhost && !posthog.__loaded) {
+      posthog.init(posthogKey, {
+        api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
+        person_profiles: 'identified_only',
+        capture_pageview: false,
+        capture_pageleave: true,
+        autocapture: true,
+        loaded: (ph) => {
+          setIsInitialized(true);
+          console.log('PostHog initialized successfully');
+        }
+      });
+    }
+  }, []);
+
   return (
     <PHProvider client={posthog}>
       <PostHogPageView />
