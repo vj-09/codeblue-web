@@ -8,8 +8,8 @@ interface FeedbackModalProps {
   onClose: () => void;
 }
 
-// Replace with your Google Apps Script Web App URL after deployment
-const GOOGLE_SCRIPT_URL = process.env.NEXT_PUBLIC_FEEDBACK_URL || '';
+// Google Apps Script Web App URL
+const GOOGLE_SCRIPT_URL = process.env.NEXT_PUBLIC_FEEDBACK_URL || 'https://script.google.com/macros/s/AKfycbw-Di2fd5BPywdpjwuJzTbZLKceXoeV4q19jZgcFQJSFGcGS-mafqUejl6X_5f6gfvfmA/exec';
 
 export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
   const [formData, setFormData] = useState({
