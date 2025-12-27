@@ -74,10 +74,10 @@ export default function Home() {
         {/* Quick Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16 max-w-3xl mx-auto">
           {[
-            { value: "25", label: "Hard Tasks" },
-            { value: "675", label: "Eval Runs" },
-            { value: "9", label: "Models Tested" },
-            { value: "2", label: "Datasets" },
+            { value: "10M+", label: "Data Operations" },
+            { value: "200K+", label: "Dataset Rows" },
+            { value: "1,050", label: "Model Attempts" },
+            { value: "61.3%", label: "Best Accuracy" },
           ].map((stat, i) => (
             <div key={i} className="p-4 rounded-xl bg-black/20 border border-white/10">
               <p className="text-2xl font-bold text-emerald-400 font-mono">{stat.value}</p>
