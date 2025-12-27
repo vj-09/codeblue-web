@@ -6,18 +6,16 @@ import { X, Send, Loader2, CheckCircle } from 'lucide-react';
 interface FeedbackModalProps {
   isOpen: boolean;
   onClose: () => void;
-  defaultType?: 'feedback' | 'collab';
 }
 
 // Google Apps Script Web App URL
 const GOOGLE_SCRIPT_URL = process.env.NEXT_PUBLIC_FEEDBACK_URL || 'https://script.google.com/macros/s/AKfycbw-Di2fd5BPywdpjwuJzTbZLKceXoeV4q19jZgcFQJSFGcGS-mafqUejl6X_5f6gfvfmA/exec';
 
-export default function FeedbackModal({ isOpen, onClose, defaultType = 'feedback' }: FeedbackModalProps) {
-  const isCollab = defaultType === 'collab';
+export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    type: isCollab ? 'collab' : 'feedback',
+    type: 'feedback',
     message: '',
   });
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -78,9 +76,7 @@ export default function FeedbackModal({ isOpen, onClose, defaultType = 'feedback
       <div className="relative w-full max-w-md bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-700">
-          <h2 className="text-lg font-semibold text-white">
-            {isCollab ? 'Work With Us' : 'Send Feedback'}
-          </h2>
+          <h2 className="text-lg font-semibold text-white">Send Feedback</h2>
           <button
             onClick={onClose}
             className="p-1 rounded-lg hover:bg-gray-800 transition-colors"
@@ -131,21 +127,11 @@ export default function FeedbackModal({ isOpen, onClose, defaultType = 'feedback
                 onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                 className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-emerald-500 transition-colors"
               >
-                {isCollab ? (
-                  <>
-                    <option value="collab">Partnership Inquiry</option>
-                    <option value="consulting">Consulting / Services</option>
-                    <option value="integration">Integration Support</option>
-                    <option value="enterprise">Enterprise License</option>
-                  </>
-                ) : (
-                  <>
-                    <option value="feedback">General Feedback</option>
-                    <option value="bug">Bug Report</option>
-                    <option value="feature">Feature Request</option>
-                    <option value="question">Question</option>
-                  </>
-                )}
+                <option value="feedback">General Feedback</option>
+                <option value="bug">Bug Report</option>
+                <option value="feature">Feature Request</option>
+                <option value="question">Question</option>
+                <option value="collab">Work With Us / Partnership</option>
               </select>
             </div>
 
@@ -157,7 +143,7 @@ export default function FeedbackModal({ isOpen, onClose, defaultType = 'feedback
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 rows={4}
                 className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors resize-none"
-                placeholder={isCollab ? "Tell us about your project or how we can help..." : "Your feedback, bug report, or question..."}
+                placeholder="Your feedback, bug report, or question..."
                 required
               />
             </div>
@@ -181,7 +167,7 @@ export default function FeedbackModal({ isOpen, onClose, defaultType = 'feedback
               ) : (
                 <>
                   <Send className="w-5 h-5" />
-                  {isCollab ? 'Send Inquiry' : 'Send Feedback'}
+                  Send Feedback
                 </>
               )}
             </button>
