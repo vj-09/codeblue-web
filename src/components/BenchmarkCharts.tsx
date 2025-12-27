@@ -14,6 +14,7 @@ import ScenarioBuilder from './ScenarioBuilder';
 import FailureInsights from './FailureInsights';
 import ModelRace from './ModelRace';
 import ABTestSimulator from './ABTestSimulator';
+import DeepMetrics from './DeepMetrics';
 
 // Types
 interface ModelData {
@@ -67,9 +68,10 @@ const providerColors: Record<string, string> = {
   'ensemble': '#14B8A6',
 };
 
-// Tab definitions - consolidated from 8 to 4
+// Tab definitions
 const tabs = [
   { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
+  { id: 'metrics', label: 'Metrics', icon: BarChart3 },
   { id: 'arena', label: 'Arena', icon: Swords },
   { id: 'examples', label: 'Trajectories', icon: Play },
 ];
@@ -774,6 +776,20 @@ export default function BenchmarkCharts() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Metrics Tab - Deep Analysis */}
+        {activeTab === 'metrics' && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-emerald-400" />
+                Deep Metrics Analysis
+              </h2>
+              <span className="text-xs text-gray-500">Final 25 Benchmark Results</span>
+            </div>
+            <DeepMetrics />
           </div>
         )}
 
