@@ -112,7 +112,7 @@ export default function BenchmarkCharts() {
   );
   const [selectedExample, setSelectedExample] = useState<ModelData['examples'][0] | null>(null);
   const [expandedModel, setExpandedModel] = useState<string | null>(null);
-  const [sortBy, setSortBy] = useState<'score_correctness' | 'bank' | 'road'>('score_correctness');
+  const [sortBy, setSortBy] = useState<'score_correctness' | 'score_efficiency' | 'avgReward'>('score_correctness');
   const [quadrantX, setQuadrantX] = useState('score_efficiency');
   const [quadrantY, setQuadrantY] = useState('score_correctness');
 
@@ -197,11 +197,11 @@ export default function BenchmarkCharts() {
       if (sortBy === 'score_correctness') {
         return (b.metrics.score_correctness || 0) - (a.metrics.score_correctness || 0);
       }
-      if (sortBy === 'bank') {
-        return (b.modes.bank?.metrics.score_correctness || 0) - (a.modes.bank?.metrics.score_correctness || 0);
+      if (sortBy === 'score_efficiency') {
+        return (b.metrics.score_efficiency || 0) - (a.metrics.score_efficiency || 0);
       }
-      if (sortBy === 'road') {
-        return (b.modes.road?.metrics.score_correctness || 0) - (a.modes.road?.metrics.score_correctness || 0);
+      if (sortBy === 'avgReward') {
+        return b.avgReward - a.avgReward;
       }
       return 0;
     });
@@ -582,7 +582,7 @@ export default function BenchmarkCharts() {
 
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-400">Sort by:</span>
-              {(['score_correctness', 'bank', 'road'] as const).map(key => (
+              {(['score_correctness', 'score_efficiency', 'avgReward'] as const).map(key => (
                 <button
                   key={key}
                   onClick={() => setSortBy(key)}
@@ -590,7 +590,7 @@ export default function BenchmarkCharts() {
                     sortBy === key ? 'bg-emerald-500/20 text-emerald-400' : 'text-gray-500 hover:text-white'
                   }`}
                 >
-                  {key === 'score_correctness' ? 'Overall' : key === 'bank' ? 'Bank (19)' : 'Road (6)'}
+                  {key === 'score_correctness' ? 'Accuracy' : key === 'score_efficiency' ? 'Efficiency' : 'Reward'}
                 </button>
               ))}
             </div>
