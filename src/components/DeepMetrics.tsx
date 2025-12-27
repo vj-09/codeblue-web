@@ -52,7 +52,7 @@ const enrichedModels = rawData.map(m => ({
   ...m,
   costPerCorrect: m.correct > 0 ? (m.cost * 75) / m.correct : 999,
   speedScore: Math.max(0, 100 - m.time / 2),
-  consistencyScore: (m.perfect / 13) * 100, // normalized to Claude's 13
+  consistencyScore: (m.perfect / 13) * 100,
   consistencyColor: m.perfect >= 10 ? '#22C55E' : m.perfect >= 5 ? '#F59E0B' : '#EF4444',
   speedTier: m.time < 30 ? 'fast' : m.time < 60 ? 'medium' : 'slow',
   costTier: m.cost < 0.10 ? 'cheap' : m.cost < 0.30 ? 'mid' : 'expensive',
@@ -70,7 +70,7 @@ const CustomScatterLabel = (props: any) => {
   const { x, y, value } = props;
   if (typeof x !== 'number' || typeof y !== 'number') return null;
   return (
-    <text x={x} y={y - 14} fill="#fff" fontSize={10} textAnchor="middle" fontWeight="600">
+    <text x={x} y={y - 10} fill="#fff" fontSize={8} textAnchor="middle" fontWeight="600">
       {value}
     </text>
   );
@@ -78,7 +78,7 @@ const CustomScatterLabel = (props: any) => {
 
 // Get quadrant zone for a model
 const getQuadrantZone = (cost: number, acc: number) => {
-  if (cost < COST_THRESHOLD && acc >= ACC_THRESHOLD) return { zone: 'VALUE PICK', color: '#22C55E' };
+  if (cost < COST_THRESHOLD && acc >= ACC_THRESHOLD) return { zone: 'VALUE', color: '#22C55E' };
   if (cost >= COST_THRESHOLD && acc >= ACC_THRESHOLD) return { zone: 'PREMIUM', color: '#D97706' };
   if (cost < COST_THRESHOLD && acc < ACC_THRESHOLD) return { zone: 'BUDGET', color: '#6B7280' };
   return { zone: 'AVOID', color: '#EF4444' };
@@ -87,21 +87,21 @@ const getQuadrantZone = (cost: number, acc: number) => {
 type AxisKey = 'cost' | 'total' | 'time' | 'correct' | 'L5' | 'L6' | 'perfect';
 type SizeKey = 'speedScore' | 'correct' | 'perfect' | 'costPerCorrect';
 
-const axisOptions: { value: AxisKey; label: string }[] = [
-  { value: 'cost', label: 'Cost ($)' },
-  { value: 'total', label: 'Accuracy (%)' },
-  { value: 'time', label: 'Time (s)' },
-  { value: 'correct', label: 'Correct (#)' },
-  { value: 'L5', label: 'L5 Hard (%)' },
-  { value: 'L6', label: 'L6 Harder (%)' },
-  { value: 'perfect', label: 'Perfect Tasks' },
+const axisOptions: { value: AxisKey; label: string; shortLabel: string }[] = [
+  { value: 'cost', label: 'Cost ($)', shortLabel: 'Cost' },
+  { value: 'total', label: 'Accuracy (%)', shortLabel: 'Acc' },
+  { value: 'time', label: 'Time (s)', shortLabel: 'Time' },
+  { value: 'correct', label: 'Correct (#)', shortLabel: 'Correct' },
+  { value: 'L5', label: 'L5 Hard (%)', shortLabel: 'L5' },
+  { value: 'L6', label: 'L6 Harder (%)', shortLabel: 'L6' },
+  { value: 'perfect', label: 'Perfect Tasks', shortLabel: 'Perfect' },
 ];
 
-const sizeOptions: { value: SizeKey; label: string }[] = [
-  { value: 'speedScore', label: 'Speed' },
-  { value: 'correct', label: 'Correct Answers' },
-  { value: 'perfect', label: 'Perfect Tasks' },
-  { value: 'costPerCorrect', label: 'Value (inverted)' },
+const sizeOptions: { value: SizeKey; label: string; shortLabel: string }[] = [
+  { value: 'speedScore', label: 'Speed', shortLabel: 'Speed' },
+  { value: 'correct', label: 'Correct Answers', shortLabel: 'Correct' },
+  { value: 'perfect', label: 'Perfect Tasks', shortLabel: 'Perfect' },
+  { value: 'costPerCorrect', label: 'Value (inverted)', shortLabel: 'Value' },
 ];
 
 export default function DeepMetrics() {
@@ -130,8 +130,8 @@ export default function DeepMetrics() {
     { metric: 'Accuracy', Claude: 100, Qwen3: (qwenData.total / claudeData.total) * 100, avg: 30 },
     { metric: 'Value', Claude: (qwenData.costPerCorrect / claudeData.costPerCorrect) * 100, Qwen3: 100, avg: 50 },
     { metric: 'Speed', Claude: (qwenData.time / claudeData.time) * 100, Qwen3: 100, avg: 60 },
-    { metric: 'Consistency', Claude: 100, Qwen3: (qwenData.perfect / claudeData.perfect) * 100, avg: 25 },
-    { metric: 'L6 Hard', Claude: 100, Qwen3: (qwenData.L6 / claudeData.L6) * 100, avg: 20 },
+    { metric: 'Consist.', Claude: 100, Qwen3: (qwenData.perfect / claudeData.perfect) * 100, avg: 25 },
+    { metric: 'L6', Claude: 100, Qwen3: (qwenData.L6 / claudeData.L6) * 100, avg: 20 },
   ], [claudeData, qwenData]);
 
   const tabs = [
@@ -143,91 +143,90 @@ export default function DeepMetrics() {
 
   const vizOptions = [
     { id: 1, label: '3D Bubble' },
-    { id: 2, label: 'Consistency Map' },
-    { id: 3, label: 'Quadrant Zones' },
+    { id: 2, label: 'Consistency' },
+    { id: 3, label: 'Quadrants' },
   ];
 
   return (
-    <div className="space-y-6">
-      {/* HERO: Leader Spotlight */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-900/30 via-black/60 to-purple-900/30 border border-orange-500/20 p-6">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/5 rounded-full blur-3xl" />
+    <div className="space-y-4 sm:space-y-6">
+      {/* HERO: Leader Spotlight - Mobile Optimized */}
+      <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-orange-900/30 via-black/60 to-purple-900/30 border border-orange-500/20 p-4 sm:p-6">
+        <div className="absolute top-0 right-0 w-32 sm:w-64 h-32 sm:h-64 bg-orange-500/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-24 sm:w-48 h-24 sm:h-48 bg-purple-500/5 rounded-full blur-3xl" />
 
-        <div className="relative grid md:grid-cols-2 gap-6">
+        <div className="relative grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           {/* Claude - The Leader */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 rounded-full bg-orange-500 animate-pulse" />
-              <span className="text-orange-400 text-xs font-medium uppercase tracking-wider">Performance Leader</span>
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-orange-500 animate-pulse" />
+              <span className="text-orange-400 text-[10px] sm:text-xs font-medium uppercase tracking-wider">Performance Leader</span>
             </div>
-            <h2 className="text-3xl font-bold text-white">Claude Opus 4.5</h2>
-            <div className="grid grid-cols-3 gap-4">
+            <h2 className="text-xl sm:text-3xl font-bold text-white">Claude Opus 4.5</h2>
+            <div className="grid grid-cols-3 gap-2 sm:gap-4">
               <div>
-                <div className="text-3xl font-bold text-orange-400">{claudeData.total}%</div>
-                <div className="text-xs text-gray-500">Accuracy</div>
+                <div className="text-xl sm:text-3xl font-bold text-orange-400">{claudeData.total}%</div>
+                <div className="text-[10px] sm:text-xs text-gray-500">Accuracy</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-orange-300">{claudeData.perfect}</div>
-                <div className="text-xs text-gray-500">Perfect Tasks</div>
+                <div className="text-xl sm:text-3xl font-bold text-orange-300">{claudeData.perfect}</div>
+                <div className="text-[10px] sm:text-xs text-gray-500">Perfect</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-orange-200">{claudeData.L6}%</div>
-                <div className="text-xs text-gray-500">L6 Hardest</div>
+                <div className="text-xl sm:text-3xl font-bold text-orange-200">{claudeData.L6}%</div>
+                <div className="text-[10px] sm:text-xs text-gray-500">L6 Hard</div>
               </div>
             </div>
-            <div className="flex gap-2">
-              <span className="px-2 py-1 rounded text-xs bg-orange-500/20 text-orange-300 border border-orange-500/30">Most Accurate</span>
-              <span className="px-2 py-1 rounded text-xs bg-orange-500/20 text-orange-300 border border-orange-500/30">Most Consistent</span>
-              <span className="px-2 py-1 rounded text-xs bg-orange-500/20 text-orange-300 border border-orange-500/30">Best on Hard Tasks</span>
+            <div className="flex flex-wrap gap-1 sm:gap-2">
+              <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-[10px] sm:text-xs bg-orange-500/20 text-orange-300 border border-orange-500/30">Most Accurate</span>
+              <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-[10px] sm:text-xs bg-orange-500/20 text-orange-300 border border-orange-500/30">Most Consistent</span>
             </div>
           </div>
 
           {/* Qwen - Best Value */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 rounded-full bg-purple-500" />
-              <span className="text-purple-400 text-xs font-medium uppercase tracking-wider">Best Value</span>
+          <div className="space-y-3 sm:space-y-4 pt-3 sm:pt-0 border-t sm:border-t-0 border-white/10">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-purple-500" />
+              <span className="text-purple-400 text-[10px] sm:text-xs font-medium uppercase tracking-wider">Best Value</span>
             </div>
-            <h2 className="text-3xl font-bold text-white">Qwen3 Max</h2>
-            <div className="grid grid-cols-3 gap-4">
+            <h2 className="text-xl sm:text-3xl font-bold text-white">Qwen3 Max</h2>
+            <div className="grid grid-cols-3 gap-2 sm:gap-4">
               <div>
-                <div className="text-3xl font-bold text-purple-400">{qwenData.total}%</div>
-                <div className="text-xs text-gray-500">Accuracy</div>
+                <div className="text-xl sm:text-3xl font-bold text-purple-400">{qwenData.total}%</div>
+                <div className="text-[10px] sm:text-xs text-gray-500">Accuracy</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-purple-300">${qwenData.cost}</div>
-                <div className="text-xs text-gray-500">Per Task</div>
+                <div className="text-xl sm:text-3xl font-bold text-purple-300">${qwenData.cost}</div>
+                <div className="text-[10px] sm:text-xs text-gray-500">Per Task</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-emerald-400">${qwenData.costPerCorrect.toFixed(2)}</div>
-                <div className="text-xs text-gray-500">Per Correct</div>
+                <div className="text-xl sm:text-3xl font-bold text-emerald-400">${qwenData.costPerCorrect.toFixed(2)}</div>
+                <div className="text-[10px] sm:text-xs text-gray-500">Per Correct</div>
               </div>
             </div>
-            <div className="flex gap-2">
-              <span className="px-2 py-1 rounded text-xs bg-purple-500/20 text-purple-300 border border-purple-500/30">7x Cheaper than Claude</span>
-              <span className="px-2 py-1 rounded text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Best $/Accuracy Ratio</span>
+            <div className="flex flex-wrap gap-1 sm:gap-2">
+              <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-[10px] sm:text-xs bg-purple-500/20 text-purple-300 border border-purple-500/30">7x Cheaper</span>
+              <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-[10px] sm:text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Best ROI</span>
             </div>
           </div>
         </div>
 
-        {/* Quick comparison bar */}
-        <div className="mt-6 pt-4 border-t border-white/5">
-          <div className="flex items-center justify-between text-xs text-gray-400">
-            <span>Claude leads by <span className="text-orange-400 font-bold">+14.6%</span> accuracy</span>
-            <span>Qwen costs <span className="text-purple-400 font-bold">86%</span> less per task</span>
-            <span>9 models tested • 675 total rollouts</span>
+        {/* Quick comparison bar - Mobile */}
+        <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-white/5">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0 text-[10px] sm:text-xs text-gray-400">
+            <span>Claude: <span className="text-orange-400 font-bold">+14.6%</span> acc</span>
+            <span>Qwen: <span className="text-purple-400 font-bold">86%</span> cheaper</span>
+            <span className="hidden sm:inline">9 models • 675 rollouts</span>
           </div>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-1 flex-wrap">
+      {/* Tabs - Scrollable on mobile */}
+      <div className="flex gap-1 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
         {tabs.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+            className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 ${
               activeTab === tab.id
                 ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
                 : 'bg-black/40 text-gray-500 hover:text-gray-300 border border-white/5'
@@ -242,56 +241,55 @@ export default function DeepMetrics() {
       {activeTab === 'overview' && (
         <div className="space-y-4">
           {/* Leader Comparison Radar */}
-          <div className="p-4 rounded-xl bg-black/40 border border-white/5">
-            <h3 className="text-sm font-medium text-gray-300 mb-1">Leader Comparison: Claude vs Qwen3</h3>
-            <p className="text-xs text-gray-600 mb-4">Normalized scores (100 = best in category)</p>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="h-72">
+          <div className="p-3 sm:p-4 rounded-xl bg-black/40 border border-white/5">
+            <h3 className="text-xs sm:text-sm font-medium text-gray-300 mb-1">Claude vs Qwen3</h3>
+            <p className="text-[10px] sm:text-xs text-gray-600 mb-3 sm:mb-4">Normalized (100 = best)</p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="h-56 sm:h-72">
                 <ResponsiveContainer width="100%" height="100%">
-                  <RadarChart data={leaderRadar}>
+                  <RadarChart data={leaderRadar} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
                     <PolarGrid stroke="#374151" />
-                    <PolarAngleAxis dataKey="metric" tick={{ fill: '#9CA3AF', fontSize: 11 }} />
-                    <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: '#6B7280', fontSize: 9 }} />
-                    <Radar name="Claude Opus 4.5" dataKey="Claude" stroke="#D97706" fill="#D97706" fillOpacity={0.3} strokeWidth={2} />
-                    <Radar name="Qwen3 Max" dataKey="Qwen3" stroke="#7C3AED" fill="#7C3AED" fillOpacity={0.3} strokeWidth={2} />
-                    <Legend wrapperStyle={{ fontSize: 10 }} />
+                    <PolarAngleAxis dataKey="metric" tick={{ fill: '#9CA3AF', fontSize: 9 }} />
+                    <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: '#6B7280', fontSize: 8 }} />
+                    <Radar name="Claude" dataKey="Claude" stroke="#D97706" fill="#D97706" fillOpacity={0.3} strokeWidth={2} />
+                    <Radar name="Qwen3" dataKey="Qwen3" stroke="#7C3AED" fill="#7C3AED" fillOpacity={0.3} strokeWidth={2} />
+                    <Legend wrapperStyle={{ fontSize: 9 }} />
                   </RadarChart>
                 </ResponsiveContainer>
               </div>
-              <div className="space-y-3">
-                <div className="p-3 rounded-lg bg-orange-500/10 border border-orange-500/20">
+              <div className="space-y-2 sm:space-y-3">
+                <div className="p-2 sm:p-3 rounded-lg bg-orange-500/10 border border-orange-500/20">
                   <div className="flex justify-between items-center">
-                    <span className="text-orange-400 font-medium">Claude Opus 4.5</span>
-                    <span className="text-xs text-gray-500">Premium Choice</span>
+                    <span className="text-orange-400 font-medium text-xs sm:text-sm">Claude Opus 4.5</span>
+                    <span className="text-[10px] sm:text-xs text-gray-500">Premium</span>
                   </div>
-                  <p className="text-xs text-gray-400 mt-1">Dominates accuracy, consistency, and hard tasks. Worth the premium for mission-critical work.</p>
+                  <p className="text-[10px] sm:text-xs text-gray-400 mt-1">Best for mission-critical work.</p>
                 </div>
-                <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                <div className="p-2 sm:p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
                   <div className="flex justify-between items-center">
-                    <span className="text-purple-400 font-medium">Qwen3 Max</span>
-                    <span className="text-xs text-gray-500">Value Champion</span>
+                    <span className="text-purple-400 font-medium text-xs sm:text-sm">Qwen3 Max</span>
+                    <span className="text-[10px] sm:text-xs text-gray-500">Value</span>
                   </div>
-                  <p className="text-xs text-gray-400 mt-1">76% of Claude&apos;s accuracy at 13% of the cost. Best ROI for high-volume workloads.</p>
+                  <p className="text-[10px] sm:text-xs text-gray-400 mt-1">76% accuracy at 13% cost.</p>
                 </div>
-                <div className="p-3 rounded-lg bg-gray-800/50 border border-gray-700/30">
-                  <div className="text-xs text-gray-500">Recommendation</div>
-                  <p className="text-xs text-gray-300 mt-1">Use <span className="text-orange-400">Claude</span> for complex L6 tasks, <span className="text-purple-400">Qwen3</span> for bulk L5 processing.</p>
+                <div className="p-2 sm:p-3 rounded-lg bg-gray-800/50 border border-gray-700/30">
+                  <p className="text-[10px] sm:text-xs text-gray-300"><span className="text-orange-400">Claude</span> for L6, <span className="text-purple-400">Qwen3</span> for bulk.</p>
                 </div>
               </div>
             </div>
           </div>
 
           {/* All Models Quick View */}
-          <div className="p-4 rounded-xl bg-black/40 border border-white/5">
-            <h3 className="text-sm font-medium text-gray-300 mb-3">All Models at a Glance</h3>
-            <div className="h-64">
+          <div className="p-3 sm:p-4 rounded-xl bg-black/40 border border-white/5">
+            <h3 className="text-xs sm:text-sm font-medium text-gray-300 mb-2 sm:mb-3">All Models</h3>
+            <div className="h-52 sm:h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={enrichedModels} layout="vertical">
+                <BarChart data={enrichedModels} layout="vertical" margin={{ left: 0, right: 10 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
-                  <XAxis type="number" domain={[0, 70]} stroke="#6B7280" fontSize={10} />
-                  <YAxis type="category" dataKey="shortName" width={70} tick={{ fill: '#9CA3AF', fontSize: 10 }} />
+                  <XAxis type="number" domain={[0, 70]} stroke="#6B7280" fontSize={9} />
+                  <YAxis type="category" dataKey="shortName" width={55} tick={{ fill: '#9CA3AF', fontSize: 9 }} />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#111827', border: '1px solid #374151', fontSize: 11 }}
+                    contentStyle={{ backgroundColor: '#111827', border: '1px solid #374151', fontSize: 10 }}
                     formatter={(value) => [`${value}%`, 'Accuracy']}
                   />
                   <Bar dataKey="total" fill="#6366F1">
@@ -306,17 +304,18 @@ export default function DeepMetrics() {
         </div>
       )}
 
-      {/* EXPLORE TAB - Interactive Visualizations */}
+      {/* EXPLORE TAB */}
       {activeTab === 'explore' && (
-        <div className="space-y-4">
-          {/* Viz Selector + Filters */}
-          <div className="flex flex-wrap items-center gap-4 p-3 rounded-lg bg-black/30 border border-white/5">
-            <div className="flex gap-2">
+        <div className="space-y-3 sm:space-y-4">
+          {/* Viz Selector + Filters - Mobile optimized */}
+          <div className="flex flex-col gap-3 p-2 sm:p-3 rounded-lg bg-black/30 border border-white/5">
+            {/* Viz buttons */}
+            <div className="flex gap-1 sm:gap-2 overflow-x-auto scrollbar-hide">
               {vizOptions.map(opt => (
                 <button
                   key={opt.id}
                   onClick={() => setVizOption(opt.id)}
-                  className={`px-3 py-1.5 rounded text-xs font-medium transition-all ${
+                  className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded text-[10px] sm:text-xs font-medium transition-all whitespace-nowrap flex-shrink-0 ${
                     vizOption === opt.id
                       ? 'bg-blue-500/30 text-blue-300 border border-blue-500/40'
                       : 'bg-black/40 text-gray-500 hover:text-gray-300 border border-white/5'
@@ -327,92 +326,88 @@ export default function DeepMetrics() {
               ))}
             </div>
 
-            <div className="h-4 w-px bg-gray-700" />
-
-            {/* Dynamic Axis Controls for 3D Bubble */}
+            {/* Axis Controls for 3D Bubble - Stacked on mobile */}
             {vizOption === 1 && (
-              <div className="flex flex-wrap items-center gap-3 text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-500">X:</span>
+              <div className="grid grid-cols-3 gap-2 text-[10px] sm:text-xs">
+                <div>
+                  <span className="text-gray-500 block mb-1">X Axis</span>
                   <select
                     value={xAxis}
                     onChange={(e) => setXAxis(e.target.value as AxisKey)}
-                    className="bg-black/60 border border-gray-700 rounded px-2 py-1 text-gray-300"
+                    className="w-full bg-black/60 border border-gray-700 rounded px-1.5 sm:px-2 py-1 text-gray-300 text-[10px] sm:text-xs"
                   >
-                    {axisOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                    {axisOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.shortLabel}</option>)}
                   </select>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-500">Y:</span>
+                <div>
+                  <span className="text-gray-500 block mb-1">Y Axis</span>
                   <select
                     value={yAxis}
                     onChange={(e) => setYAxis(e.target.value as AxisKey)}
-                    className="bg-black/60 border border-gray-700 rounded px-2 py-1 text-gray-300"
+                    className="w-full bg-black/60 border border-gray-700 rounded px-1.5 sm:px-2 py-1 text-gray-300 text-[10px] sm:text-xs"
                   >
-                    {axisOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                    {axisOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.shortLabel}</option>)}
                   </select>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-500">Size:</span>
+                <div>
+                  <span className="text-gray-500 block mb-1">Size</span>
                   <select
                     value={bubbleSize}
                     onChange={(e) => setBubbleSize(e.target.value as SizeKey)}
-                    className="bg-black/60 border border-gray-700 rounded px-2 py-1 text-gray-300"
+                    className="w-full bg-black/60 border border-gray-700 rounded px-1.5 sm:px-2 py-1 text-gray-300 text-[10px] sm:text-xs"
                   >
-                    {sizeOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                    {sizeOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.shortLabel}</option>)}
                   </select>
                 </div>
               </div>
             )}
 
-            <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer ml-auto">
+            {/* Filter checkbox */}
+            <label className="flex items-center gap-2 text-[10px] sm:text-xs text-gray-400 cursor-pointer">
               <input
                 type="checkbox"
                 checked={showOnlyTop}
                 onChange={(e) => setShowOnlyTop(e.target.checked)}
-                className="rounded border-gray-600 bg-black/60"
+                className="rounded border-gray-600 bg-black/60 w-3 h-3"
               />
-              Show only top performers (&gt;30%)
+              Top performers only (&gt;30%)
             </label>
           </div>
 
-          {/* OPTION 1: Dynamic 3D Bubble */}
+          {/* OPTION 1: 3D Bubble */}
           {vizOption === 1 && (
-            <div className="p-4 rounded-xl bg-black/40 border border-white/5">
-              <h3 className="text-sm font-medium text-gray-300 mb-1">3D Bubble Explorer</h3>
-              <p className="text-xs text-gray-600 mb-4">
-                X: {axisOptions.find(a => a.value === xAxis)?.label} | Y: {axisOptions.find(a => a.value === yAxis)?.label} | Size: {sizeOptions.find(s => s.value === bubbleSize)?.label}
+            <div className="p-3 sm:p-4 rounded-xl bg-black/40 border border-white/5">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-300 mb-1">3D Bubble Explorer</h3>
+              <p className="text-[10px] sm:text-xs text-gray-600 mb-3">
+                X: {axisOptions.find(a => a.value === xAxis)?.shortLabel} | Y: {axisOptions.find(a => a.value === yAxis)?.shortLabel} | Size: {sizeOptions.find(s => s.value === bubbleSize)?.shortLabel}
               </p>
-              <div className="h-96">
+              <div className="h-64 sm:h-96">
                 <ResponsiveContainer width="100%" height="100%">
-                  <ScatterChart margin={{ top: 30, right: 40, bottom: 50, left: 60 }}>
+                  <ScatterChart margin={{ top: 20, right: 20, bottom: 40, left: 40 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
                     <XAxis
                       type="number"
                       dataKey={xAxis}
                       stroke="#6B7280"
-                      fontSize={10}
-                      tickFormatter={(v) => xAxis === 'cost' ? `$${v.toFixed(2)}` : `${v}`}
-                      label={{ value: axisOptions.find(a => a.value === xAxis)?.label, position: 'bottom', fill: '#6B7280', fontSize: 10, dy: 15 }}
+                      fontSize={8}
+                      tickFormatter={(v) => xAxis === 'cost' ? `$${v.toFixed(1)}` : `${v}`}
                     />
                     <YAxis
                       type="number"
                       dataKey={yAxis}
                       stroke="#6B7280"
-                      fontSize={10}
-                      label={{ value: axisOptions.find(a => a.value === yAxis)?.label, angle: -90, position: 'insideLeft', fill: '#6B7280', fontSize: 10 }}
+                      fontSize={8}
                     />
-                    <ZAxis type="number" dataKey={bubbleSize} range={[100, 800]} />
+                    <ZAxis type="number" dataKey={bubbleSize} range={[60, 400]} />
                     <Tooltip
                       content={({ active, payload }) => {
                         if (active && payload && payload.length) {
                           const d = payload[0].payload;
                           return (
-                            <div className="bg-gray-900 p-3 rounded-lg border border-gray-700 text-xs">
+                            <div className="bg-gray-900 p-2 rounded-lg border border-gray-700 text-[10px]">
                               <p className="font-bold text-white">{d.name}</p>
-                              <p className="text-blue-400">{axisOptions.find(a => a.value === xAxis)?.label}: {xAxis === 'cost' ? `$${d[xAxis].toFixed(2)}` : d[xAxis]}</p>
-                              <p className="text-emerald-400">{axisOptions.find(a => a.value === yAxis)?.label}: {d[yAxis]}{yAxis !== 'correct' && yAxis !== 'perfect' ? '%' : ''}</p>
-                              <p className="text-purple-400">{sizeOptions.find(s => s.value === bubbleSize)?.label}: {typeof d[bubbleSize] === 'number' ? d[bubbleSize].toFixed(1) : d[bubbleSize]}</p>
+                              <p className="text-blue-400">{axisOptions.find(a => a.value === xAxis)?.shortLabel}: {xAxis === 'cost' ? `$${d[xAxis].toFixed(2)}` : d[xAxis]}</p>
+                              <p className="text-emerald-400">{axisOptions.find(a => a.value === yAxis)?.shortLabel}: {d[yAxis]}</p>
                             </div>
                           );
                         }
@@ -428,57 +423,41 @@ export default function DeepMetrics() {
                   </ScatterChart>
                 </ResponsiveContainer>
               </div>
-              <div className="mt-3 flex flex-wrap gap-2 justify-center">
-                {filteredModels.map(m => (
-                  <div key={m.model} className="flex items-center gap-1.5 text-xs px-2 py-1 rounded bg-black/30">
-                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: m.color }} />
+              {/* Legend - compact on mobile */}
+              <div className="mt-2 flex flex-wrap gap-1 justify-center">
+                {filteredModels.slice(0, 5).map(m => (
+                  <div key={m.model} className="flex items-center gap-1 text-[9px] sm:text-xs px-1.5 py-0.5 rounded bg-black/30">
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: m.color }} />
                     <span className="text-gray-400">{m.shortName}</span>
-                    {m.isLeader && <span className="text-orange-400 text-[10px]">★</span>}
-                    {m.isBestValue && <span className="text-purple-400 text-[10px]">$</span>}
                   </div>
                 ))}
+                {filteredModels.length > 5 && <span className="text-gray-500 text-[9px]">+{filteredModels.length - 5}</span>}
               </div>
             </div>
           )}
 
-          {/* OPTION 2: Consistency Map (Bubble + Color) */}
+          {/* OPTION 2: Consistency Map */}
           {vizOption === 2 && (
-            <div className="p-4 rounded-xl bg-black/40 border border-white/5">
-              <h3 className="text-sm font-medium text-gray-300 mb-1">Consistency Map</h3>
-              <p className="text-xs text-gray-600 mb-4">X: Cost | Y: Accuracy | Size: Correct Answers | Color: Consistency (green = reliable)</p>
-              <div className="h-96">
+            <div className="p-3 sm:p-4 rounded-xl bg-black/40 border border-white/5">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-300 mb-1">Consistency Map</h3>
+              <p className="text-[10px] sm:text-xs text-gray-600 mb-3">Size: Correct | Color: Consistency</p>
+              <div className="h-64 sm:h-96">
                 <ResponsiveContainer width="100%" height="100%">
-                  <ScatterChart margin={{ top: 30, right: 40, bottom: 50, left: 60 }}>
+                  <ScatterChart margin={{ top: 20, right: 20, bottom: 40, left: 40 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
-                    <XAxis
-                      type="number"
-                      dataKey="cost"
-                      domain={[0, 1]}
-                      stroke="#6B7280"
-                      fontSize={10}
-                      tickFormatter={(v) => `$${v.toFixed(2)}`}
-                      label={{ value: 'Cost per Task ($)', position: 'bottom', fill: '#6B7280', fontSize: 10, dy: 15 }}
-                    />
-                    <YAxis
-                      type="number"
-                      dataKey="total"
-                      domain={[0, 70]}
-                      stroke="#6B7280"
-                      fontSize={10}
-                      label={{ value: 'Accuracy %', angle: -90, position: 'insideLeft', fill: '#6B7280', fontSize: 10 }}
-                    />
-                    <ZAxis type="number" dataKey="correct" range={[80, 600]} />
+                    <XAxis type="number" dataKey="cost" domain={[0, 1]} stroke="#6B7280" fontSize={8} tickFormatter={(v) => `$${v.toFixed(1)}`} />
+                    <YAxis type="number" dataKey="total" domain={[0, 70]} stroke="#6B7280" fontSize={8} />
+                    <ZAxis type="number" dataKey="correct" range={[60, 400]} />
                     <Tooltip
                       content={({ active, payload }) => {
                         if (active && payload && payload.length) {
                           const d = payload[0].payload;
                           return (
-                            <div className="bg-gray-900 p-3 rounded-lg border border-gray-700 text-xs">
+                            <div className="bg-gray-900 p-2 rounded-lg border border-gray-700 text-[10px]">
                               <p className="font-bold text-white">{d.name}</p>
-                              <p className="text-blue-400">Cost: ${d.cost.toFixed(2)}</p>
-                              <p className="text-emerald-400">Accuracy: {d.total}%</p>
+                              <p className="text-emerald-400">Acc: {d.total}%</p>
                               <p className="text-orange-400">Correct: {d.correct}/75</p>
-                              <p style={{ color: d.consistencyColor }}>Perfect Tasks: {d.perfect}/25</p>
+                              <p style={{ color: d.consistencyColor }}>Perfect: {d.perfect}/25</p>
                             </div>
                           );
                         }
@@ -494,62 +473,41 @@ export default function DeepMetrics() {
                   </ScatterChart>
                 </ResponsiveContainer>
               </div>
-              <div className="mt-3 flex gap-4 justify-center text-xs">
-                <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-emerald-500" /> Reliable (10+ perfect)</div>
-                <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-amber-500" /> Mixed (5-9 perfect)</div>
-                <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-red-500" /> Unreliable (&lt;5 perfect)</div>
+              <div className="mt-2 flex flex-wrap gap-2 sm:gap-4 justify-center text-[9px] sm:text-xs">
+                <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-emerald-500" /> Reliable</div>
+                <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-amber-500" /> Mixed</div>
+                <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-red-500" /> Unreliable</div>
               </div>
             </div>
           )}
 
           {/* OPTION 3: Quadrant Zones */}
           {vizOption === 3 && (
-            <div className="p-4 rounded-xl bg-black/40 border border-white/5">
-              <h3 className="text-sm font-medium text-gray-300 mb-1">Quadrant Decision Map</h3>
-              <p className="text-xs text-gray-600 mb-4">
-                Thresholds: Cost ${COST_THRESHOLD} | Accuracy {ACC_THRESHOLD}% | Dot color = Speed tier
-              </p>
-              <div className="h-96">
+            <div className="p-3 sm:p-4 rounded-xl bg-black/40 border border-white/5">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-300 mb-1">Quadrant Map</h3>
+              <p className="text-[10px] sm:text-xs text-gray-600 mb-3">Cost ${COST_THRESHOLD} | Acc {ACC_THRESHOLD}%</p>
+              <div className="h-64 sm:h-96">
                 <ResponsiveContainer width="100%" height="100%">
-                  <ScatterChart margin={{ top: 30, right: 40, bottom: 50, left: 60 }}>
-                    {/* Quadrant zone backgrounds */}
+                  <ScatterChart margin={{ top: 20, right: 20, bottom: 40, left: 40 }}>
                     <ReferenceArea x1={0} x2={COST_THRESHOLD} y1={ACC_THRESHOLD} y2={70} fill="#22C55E" fillOpacity={0.08} />
                     <ReferenceArea x1={COST_THRESHOLD} x2={1} y1={ACC_THRESHOLD} y2={70} fill="#D97706" fillOpacity={0.08} />
                     <ReferenceArea x1={0} x2={COST_THRESHOLD} y1={0} y2={ACC_THRESHOLD} fill="#6B7280" fillOpacity={0.08} />
                     <ReferenceArea x1={COST_THRESHOLD} x2={1} y1={0} y2={ACC_THRESHOLD} fill="#EF4444" fillOpacity={0.08} />
-
                     <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
-                    <XAxis
-                      type="number"
-                      dataKey="cost"
-                      domain={[0, 1]}
-                      stroke="#6B7280"
-                      fontSize={10}
-                      tickFormatter={(v) => `$${v.toFixed(2)}`}
-                      label={{ value: 'Cost per Task ($)', position: 'bottom', fill: '#6B7280', fontSize: 10, dy: 15 }}
-                    />
-                    <YAxis
-                      type="number"
-                      dataKey="total"
-                      domain={[0, 70]}
-                      stroke="#6B7280"
-                      fontSize={10}
-                      label={{ value: 'Accuracy %', angle: -90, position: 'insideLeft', fill: '#6B7280', fontSize: 10 }}
-                    />
-                    <ReferenceLine x={COST_THRESHOLD} stroke="#fff" strokeWidth={2} strokeDasharray="8 4" />
-                    <ReferenceLine y={ACC_THRESHOLD} stroke="#fff" strokeWidth={2} strokeDasharray="8 4" />
-
+                    <XAxis type="number" dataKey="cost" domain={[0, 1]} stroke="#6B7280" fontSize={8} tickFormatter={(v) => `$${v.toFixed(1)}`} />
+                    <YAxis type="number" dataKey="total" domain={[0, 70]} stroke="#6B7280" fontSize={8} />
+                    <ReferenceLine x={COST_THRESHOLD} stroke="#fff" strokeWidth={1} strokeDasharray="4 4" />
+                    <ReferenceLine y={ACC_THRESHOLD} stroke="#fff" strokeWidth={1} strokeDasharray="4 4" />
                     <Tooltip
                       content={({ active, payload }) => {
                         if (active && payload && payload.length) {
                           const d = payload[0].payload;
                           const zone = getQuadrantZone(d.cost, d.total);
                           return (
-                            <div className="bg-gray-900 p-3 rounded-lg border border-gray-700 text-xs">
+                            <div className="bg-gray-900 p-2 rounded-lg border border-gray-700 text-[10px]">
                               <p className="font-bold text-white">{d.name}</p>
                               <p style={{ color: zone.color }} className="font-medium">{zone.zone}</p>
-                              <p className="text-gray-400 mt-1">Cost: ${d.cost.toFixed(2)} | Acc: {d.total}%</p>
-                              <p className="text-gray-400">Speed: {d.time.toFixed(0)}s ({d.speedTier})</p>
+                              <p className="text-gray-400">${d.cost.toFixed(2)} | {d.total}%</p>
                             </div>
                           );
                         }
@@ -559,59 +517,51 @@ export default function DeepMetrics() {
                     <Scatter data={filteredModels}>
                       {filteredModels.map((entry, index) => {
                         const speedColor = entry.speedTier === 'fast' ? '#22C55E' : entry.speedTier === 'medium' ? '#F59E0B' : '#EF4444';
-                        return <Cell key={index} fill={speedColor} stroke="#fff" strokeWidth={2} />;
+                        return <Cell key={index} fill={speedColor} stroke="#fff" strokeWidth={1} />;
                       })}
                       <LabelList dataKey="shortName" content={CustomScatterLabel} />
                     </Scatter>
                   </ScatterChart>
                 </ResponsiveContainer>
               </div>
-              <div className="mt-4 grid grid-cols-4 gap-2 text-xs">
-                <div className="p-2 rounded text-center bg-emerald-500/10 border border-emerald-500/20">
-                  <div className="text-emerald-400 font-bold">VALUE PICK</div>
-                  <div className="text-gray-500">Cheap + Accurate</div>
-                  <div className="text-emerald-300 text-[10px] mt-1">Qwen3, Mistral-L</div>
+              {/* Quadrant labels - 2x2 grid on mobile */}
+              <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2 text-[9px] sm:text-xs">
+                <div className="p-1.5 sm:p-2 rounded text-center bg-emerald-500/10 border border-emerald-500/20">
+                  <div className="text-emerald-400 font-bold">VALUE</div>
+                  <div className="text-gray-500 hidden sm:block">Cheap + Good</div>
                 </div>
-                <div className="p-2 rounded text-center bg-orange-500/10 border border-orange-500/20">
+                <div className="p-1.5 sm:p-2 rounded text-center bg-orange-500/10 border border-orange-500/20">
                   <div className="text-orange-400 font-bold">PREMIUM</div>
-                  <div className="text-gray-500">High Cost, High Acc</div>
-                  <div className="text-orange-300 text-[10px] mt-1">Claude Opus</div>
+                  <div className="text-gray-500 hidden sm:block">Pricey + Good</div>
                 </div>
-                <div className="p-2 rounded text-center bg-gray-500/10 border border-gray-500/20">
+                <div className="p-1.5 sm:p-2 rounded text-center bg-gray-500/10 border border-gray-500/20">
                   <div className="text-gray-400 font-bold">BUDGET</div>
-                  <div className="text-gray-500">Cheap but Weak</div>
-                  <div className="text-gray-300 text-[10px] mt-1">Llama, DeepSeek</div>
+                  <div className="text-gray-500 hidden sm:block">Cheap + Weak</div>
                 </div>
-                <div className="p-2 rounded text-center bg-red-500/10 border border-red-500/20">
+                <div className="p-1.5 sm:p-2 rounded text-center bg-red-500/10 border border-red-500/20">
                   <div className="text-red-400 font-bold">AVOID</div>
-                  <div className="text-gray-500">Pricey + Weak</div>
-                  <div className="text-red-300 text-[10px] mt-1">Gemini Pro, Intellect</div>
+                  <div className="text-gray-500 hidden sm:block">Pricey + Weak</div>
                 </div>
-              </div>
-              <div className="mt-3 flex justify-center gap-4 text-xs">
-                <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-emerald-500" /> Fast (&lt;30s)</div>
-                <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-amber-500" /> Medium (30-60s)</div>
-                <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-red-500" /> Slow (&gt;60s)</div>
               </div>
             </div>
           )}
         </div>
       )}
 
-      {/* RELIABILITY TAB - Engaging Format */}
+      {/* RELIABILITY TAB */}
       {activeTab === 'reliability' && (
-        <div className="space-y-4">
-          {/* View Selector */}
-          <div className="flex gap-2">
+        <div className="space-y-3 sm:space-y-4">
+          {/* View Selector - Scrollable */}
+          <div className="flex gap-1 sm:gap-2 overflow-x-auto scrollbar-hide">
             {[
-              { id: 'scatter', label: 'Success vs Failure' },
-              { id: 'breakdown', label: 'Outcome Breakdown' },
-              { id: 'comparison', label: 'Consistency Battle' },
+              { id: 'scatter', label: 'Success/Fail' },
+              { id: 'breakdown', label: 'Breakdown' },
+              { id: 'comparison', label: 'Consistency' },
             ].map(v => (
               <button
                 key={v.id}
                 onClick={() => setReliabilityView(v.id as typeof reliabilityView)}
-                className={`px-3 py-1.5 rounded text-xs font-medium transition-all ${
+                className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded text-[10px] sm:text-xs font-medium transition-all whitespace-nowrap flex-shrink-0 ${
                   reliabilityView === v.id
                     ? 'bg-blue-500/30 text-blue-300 border border-blue-500/40'
                     : 'bg-black/40 text-gray-500 hover:text-gray-300 border border-white/5'
@@ -622,32 +572,18 @@ export default function DeepMetrics() {
             ))}
           </div>
 
-          {/* Success vs Failure Scatter */}
+          {/* Scatter */}
           {reliabilityView === 'scatter' && (
-            <div className="p-4 rounded-xl bg-black/40 border border-white/5">
-              <h3 className="text-sm font-medium text-gray-300 mb-1">Success Rate vs Failure Rate</h3>
-              <p className="text-xs text-gray-600 mb-4">Upper-left = best (high success, low failure). Size = partial answers.</p>
-              <div className="h-96">
+            <div className="p-3 sm:p-4 rounded-xl bg-black/40 border border-white/5">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-300 mb-1">Success vs Failure Rate</h3>
+              <p className="text-[10px] sm:text-xs text-gray-600 mb-3">Upper-left = best</p>
+              <div className="h-64 sm:h-96">
                 <ResponsiveContainer width="100%" height="100%">
-                  <ScatterChart margin={{ top: 30, right: 40, bottom: 50, left: 60 }}>
+                  <ScatterChart margin={{ top: 20, right: 20, bottom: 40, left: 40 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
-                    <XAxis
-                      type="number"
-                      dataKey="failureRate"
-                      domain={[0, 100]}
-                      stroke="#6B7280"
-                      fontSize={10}
-                      label={{ value: 'Failure Rate %', position: 'bottom', fill: '#EF4444', fontSize: 10, dy: 15 }}
-                    />
-                    <YAxis
-                      type="number"
-                      dataKey="successRate"
-                      domain={[0, 70]}
-                      stroke="#6B7280"
-                      fontSize={10}
-                      label={{ value: 'Success Rate %', angle: -90, position: 'insideLeft', fill: '#22C55E', fontSize: 10 }}
-                    />
-                    <ZAxis type="number" dataKey="partial" range={[80, 400]} />
+                    <XAxis type="number" dataKey="failureRate" domain={[0, 100]} stroke="#6B7280" fontSize={8} />
+                    <YAxis type="number" dataKey="successRate" domain={[0, 70]} stroke="#6B7280" fontSize={8} />
+                    <ZAxis type="number" dataKey="partial" range={[60, 300]} />
                     <ReferenceLine x={50} stroke="#6B7280" strokeDasharray="4 4" />
                     <ReferenceLine y={30} stroke="#6B7280" strokeDasharray="4 4" />
                     <Tooltip
@@ -655,11 +591,10 @@ export default function DeepMetrics() {
                         if (active && payload && payload.length) {
                           const d = payload[0].payload;
                           return (
-                            <div className="bg-gray-900 p-3 rounded-lg border border-gray-700 text-xs">
+                            <div className="bg-gray-900 p-2 rounded-lg border border-gray-700 text-[10px]">
                               <p className="font-bold text-white">{d.name}</p>
-                              <p className="text-emerald-400">Success: {d.correct}/75 ({d.successRate.toFixed(1)}%)</p>
-                              <p className="text-red-400">Failures: {d.wrong}/75 ({d.failureRate.toFixed(1)}%)</p>
-                              <p className="text-amber-400">Partials: {d.partial}/75</p>
+                              <p className="text-emerald-400">Success: {d.successRate.toFixed(0)}%</p>
+                              <p className="text-red-400">Fail: {d.failureRate.toFixed(0)}%</p>
                             </div>
                           );
                         }
@@ -678,17 +613,16 @@ export default function DeepMetrics() {
             </div>
           )}
 
-          {/* Outcome Breakdown - Pie Charts */}
+          {/* Pie Breakdown - 2 cols on mobile */}
           {reliabilityView === 'breakdown' && (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
               {enrichedModels.slice(0, 6).map(m => (
-                <div key={m.model} className="p-4 rounded-xl bg-black/40 border border-white/5">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: m.color }} />
-                    <span className="text-sm font-medium text-white">{m.shortName}</span>
-                    {m.isLeader && <span className="text-orange-400 text-xs">★ Leader</span>}
+                <div key={m.model} className="p-2 sm:p-4 rounded-xl bg-black/40 border border-white/5">
+                  <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-2">
+                    <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full" style={{ backgroundColor: m.color }} />
+                    <span className="text-[10px] sm:text-sm font-medium text-white truncate">{m.shortName}</span>
                   </div>
-                  <div className="h-32">
+                  <div className="h-20 sm:h-32">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
@@ -700,15 +634,14 @@ export default function DeepMetrics() {
                           dataKey="value"
                           cx="50%"
                           cy="50%"
-                          innerRadius={25}
-                          outerRadius={45}
+                          innerRadius={15}
+                          outerRadius={30}
                           strokeWidth={0}
                         />
-                        <Tooltip contentStyle={{ backgroundColor: '#111827', border: '1px solid #374151', fontSize: 10 }} />
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
-                  <div className="flex justify-around text-xs mt-2">
+                  <div className="flex justify-around text-[9px] sm:text-xs">
                     <span className="text-emerald-500">{m.correct}</span>
                     <span className="text-amber-500">{m.partial}</span>
                     <span className="text-red-500">{m.wrong}</span>
@@ -720,29 +653,15 @@ export default function DeepMetrics() {
 
           {/* Consistency Battle */}
           {reliabilityView === 'comparison' && (
-            <div className="p-4 rounded-xl bg-black/40 border border-white/5">
-              <h3 className="text-sm font-medium text-gray-300 mb-1">Consistency Battle: Perfect vs Zero Tasks</h3>
-              <p className="text-xs text-gray-600 mb-4">How many tasks did each model ace (3/3) vs completely fail (0/3)?</p>
-              <div className="h-80">
+            <div className="p-3 sm:p-4 rounded-xl bg-black/40 border border-white/5">
+              <h3 className="text-xs sm:text-sm font-medium text-gray-300 mb-1">Perfect vs Zero Tasks</h3>
+              <p className="text-[10px] sm:text-xs text-gray-600 mb-3">Upper-left = most consistent</p>
+              <div className="h-64 sm:h-80">
                 <ResponsiveContainer width="100%" height="100%">
-                  <ScatterChart margin={{ top: 30, right: 40, bottom: 50, left: 60 }}>
+                  <ScatterChart margin={{ top: 20, right: 20, bottom: 40, left: 40 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
-                    <XAxis
-                      type="number"
-                      dataKey="zero"
-                      domain={[0, 25]}
-                      stroke="#6B7280"
-                      fontSize={10}
-                      label={{ value: 'Zero Tasks (0/3 correct)', position: 'bottom', fill: '#EF4444', fontSize: 10, dy: 15 }}
-                    />
-                    <YAxis
-                      type="number"
-                      dataKey="perfect"
-                      domain={[0, 15]}
-                      stroke="#6B7280"
-                      fontSize={10}
-                      label={{ value: 'Perfect Tasks (3/3 correct)', angle: -90, position: 'insideLeft', fill: '#22C55E', fontSize: 10 }}
-                    />
+                    <XAxis type="number" dataKey="zero" domain={[0, 25]} stroke="#6B7280" fontSize={8} />
+                    <YAxis type="number" dataKey="perfect" domain={[0, 15]} stroke="#6B7280" fontSize={8} />
                     <ReferenceLine x={10} stroke="#EF4444" strokeDasharray="4 4" strokeOpacity={0.5} />
                     <ReferenceLine y={5} stroke="#22C55E" strokeDasharray="4 4" strokeOpacity={0.5} />
                     <Tooltip
@@ -750,11 +669,10 @@ export default function DeepMetrics() {
                         if (active && payload && payload.length) {
                           const d = payload[0].payload;
                           return (
-                            <div className="bg-gray-900 p-3 rounded-lg border border-gray-700 text-xs">
+                            <div className="bg-gray-900 p-2 rounded-lg border border-gray-700 text-[10px]">
                               <p className="font-bold text-white">{d.name}</p>
-                              <p className="text-emerald-400">Perfect (3/3): {d.perfect} tasks</p>
-                              <p className="text-red-400">Zero (0/3): {d.zero} tasks</p>
-                              <p className="text-gray-400">Mixed: {25 - d.perfect - d.zero} tasks</p>
+                              <p className="text-emerald-400">Perfect: {d.perfect}</p>
+                              <p className="text-red-400">Zero: {d.zero}</p>
                             </div>
                           );
                         }
@@ -770,9 +688,6 @@ export default function DeepMetrics() {
                   </ScatterChart>
                 </ResponsiveContainer>
               </div>
-              <div className="mt-4 text-center text-xs text-gray-500">
-                Upper-left quadrant = most consistent (many perfect, few zeros). Claude leads with 13 perfect tasks.
-              </div>
             </div>
           )}
         </div>
@@ -780,100 +695,94 @@ export default function DeepMetrics() {
 
       {/* INSIGHTS TAB */}
       {activeTab === 'insights' && (
-        <div className="space-y-4">
-          {/* Key Findings */}
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl bg-gradient-to-br from-orange-900/20 to-black/40 border border-orange-500/20">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-orange-400 text-lg">★</span>
-                <h3 className="text-sm font-medium text-orange-400">Finding #1: Claude Dominates Hard Tasks</h3>
+        <div className="space-y-3 sm:space-y-4">
+          {/* Key Findings - Stack on mobile */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
+            <div className="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-orange-900/20 to-black/40 border border-orange-500/20">
+              <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                <span className="text-orange-400 text-sm sm:text-lg">★</span>
+                <h3 className="text-[11px] sm:text-sm font-medium text-orange-400">Claude Dominates Hard Tasks</h3>
               </div>
-              <p className="text-xs text-gray-400 mb-3">Claude Opus 4.5 achieves 56.7% on L6 (hardest) tasks, while most competitors struggle below 40%.</p>
-              <div className="flex items-center gap-4 text-xs">
-                <div><span className="text-orange-400 font-bold">56.7%</span> L6</div>
-                <div><span className="text-gray-500">vs</span></div>
-                <div><span className="text-purple-400">33.3%</span> Qwen3</div>
-                <div><span className="text-red-400">0%</span> Gemini Pro</div>
-              </div>
-            </div>
-
-            <div className="p-4 rounded-xl bg-gradient-to-br from-purple-900/20 to-black/40 border border-purple-500/20">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-purple-400 text-lg">$</span>
-                <h3 className="text-sm font-medium text-purple-400">Finding #2: Qwen3 is 7x Better Value</h3>
-              </div>
-              <p className="text-xs text-gray-400 mb-3">At $0.26/correct vs Claude&apos;s $1.45/correct, Qwen3 Max delivers exceptional ROI for high-volume work.</p>
-              <div className="flex items-center gap-4 text-xs">
-                <div><span className="text-purple-400 font-bold">$0.26</span>/correct</div>
-                <div><span className="text-gray-500">vs</span></div>
-                <div><span className="text-orange-400">$1.45</span>/correct</div>
+              <p className="text-[10px] sm:text-xs text-gray-400 mb-2">56.7% on L6 tasks vs &lt;40% competitors.</p>
+              <div className="flex items-center gap-2 sm:gap-4 text-[10px] sm:text-xs">
+                <span className="text-orange-400 font-bold">56.7%</span>
+                <span className="text-gray-500">vs</span>
+                <span className="text-purple-400">33%</span>
+                <span className="text-red-400">0%</span>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-gradient-to-br from-red-900/20 to-black/40 border border-red-500/20">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-red-400 text-lg">!</span>
-                <h3 className="text-sm font-medium text-red-400">Finding #3: Avoid Gemini 3 Pro</h3>
+            <div className="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-purple-900/20 to-black/40 border border-purple-500/20">
+              <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                <span className="text-purple-400 text-sm sm:text-lg">$</span>
+                <h3 className="text-[11px] sm:text-sm font-medium text-purple-400">Qwen3 is 7x Better Value</h3>
               </div>
-              <p className="text-xs text-gray-400 mb-3">Despite $0.35/task cost, Gemini 3 Pro scores 0% on L6 tasks and 28% overall - poor value proposition.</p>
-              <div className="flex items-center gap-4 text-xs">
-                <div><span className="text-red-400 font-bold">$1.25</span>/correct</div>
-                <div><span className="text-gray-500">92s avg</span></div>
-                <div><span className="text-red-400">0% L6</span></div>
+              <p className="text-[10px] sm:text-xs text-gray-400 mb-2">$0.26/correct vs Claude $1.45.</p>
+              <div className="flex items-center gap-2 sm:gap-4 text-[10px] sm:text-xs">
+                <span className="text-purple-400 font-bold">$0.26</span>
+                <span className="text-gray-500">vs</span>
+                <span className="text-orange-400">$1.45</span>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-900/20 to-black/40 border border-emerald-500/20">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-emerald-400 text-lg">✓</span>
-                <h3 className="text-sm font-medium text-emerald-400">Finding #4: Consistency Matters</h3>
+            <div className="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-red-900/20 to-black/40 border border-red-500/20">
+              <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                <span className="text-red-400 text-sm sm:text-lg">!</span>
+                <h3 className="text-[11px] sm:text-sm font-medium text-red-400">Avoid Gemini 3 Pro</h3>
               </div>
-              <p className="text-xs text-gray-400 mb-3">Claude achieves 13 perfect tasks (3/3 correct) vs next best of 7. Reliability is as important as accuracy.</p>
-              <div className="flex items-center gap-4 text-xs">
-                <div><span className="text-emerald-400 font-bold">13</span> perfect</div>
-                <div><span className="text-amber-400">8</span> zeros</div>
-                <div><span className="text-gray-500">= 52% consistent</span></div>
+              <p className="text-[10px] sm:text-xs text-gray-400 mb-2">$0.35/task but 0% on L6.</p>
+              <div className="flex items-center gap-2 sm:gap-4 text-[10px] sm:text-xs">
+                <span className="text-red-400 font-bold">$1.25</span>
+                <span className="text-gray-500">92s</span>
+                <span className="text-red-400">0% L6</span>
+              </div>
+            </div>
+
+            <div className="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-emerald-900/20 to-black/40 border border-emerald-500/20">
+              <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                <span className="text-emerald-400 text-sm sm:text-lg">✓</span>
+                <h3 className="text-[11px] sm:text-sm font-medium text-emerald-400">Consistency Matters</h3>
+              </div>
+              <p className="text-[10px] sm:text-xs text-gray-400 mb-2">Claude: 13 perfect vs next best 7.</p>
+              <div className="flex items-center gap-2 sm:gap-4 text-[10px] sm:text-xs">
+                <span className="text-emerald-400 font-bold">13</span>
+                <span className="text-amber-400">8 zeros</span>
+                <span className="text-gray-500">52%</span>
               </div>
             </div>
           </div>
 
-          {/* Recommendation Matrix */}
-          <div className="p-4 rounded-xl bg-black/40 border border-white/5">
-            <h3 className="text-sm font-medium text-gray-300 mb-4">Recommendation Matrix</h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs">
+          {/* Recommendation Matrix - Scrollable on mobile */}
+          <div className="p-3 sm:p-4 rounded-xl bg-black/40 border border-white/5">
+            <h3 className="text-xs sm:text-sm font-medium text-gray-300 mb-3 sm:mb-4">Recommendations</h3>
+            <div className="overflow-x-auto -mx-3 px-3">
+              <table className="w-full text-[10px] sm:text-xs min-w-[400px]">
                 <thead>
                   <tr className="text-gray-500 border-b border-gray-800">
-                    <th className="text-left py-2 px-3">Use Case</th>
-                    <th className="text-center py-2 px-3">Recommended</th>
-                    <th className="text-center py-2 px-3">Alternative</th>
-                    <th className="text-left py-2 px-3">Rationale</th>
+                    <th className="text-left py-2 px-2">Use Case</th>
+                    <th className="text-center py-2 px-2">Pick</th>
+                    <th className="text-center py-2 px-2">Alt</th>
+                    <th className="text-left py-2 px-2 hidden sm:table-cell">Why</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr className="border-b border-gray-800/50">
-                    <td className="py-3 px-3 text-white">Mission-critical analysis</td>
-                    <td className="py-3 px-3 text-center"><span className="px-2 py-1 rounded bg-orange-500/20 text-orange-400">Claude</span></td>
-                    <td className="py-3 px-3 text-center"><span className="text-gray-500">-</span></td>
-                    <td className="py-3 px-3 text-gray-400">Highest accuracy + consistency</td>
+                    <td className="py-2 px-2 text-white">Critical</td>
+                    <td className="py-2 px-2 text-center"><span className="px-1.5 py-0.5 rounded bg-orange-500/20 text-orange-400">Claude</span></td>
+                    <td className="py-2 px-2 text-center text-gray-500">-</td>
+                    <td className="py-2 px-2 text-gray-400 hidden sm:table-cell">Best accuracy</td>
                   </tr>
                   <tr className="border-b border-gray-800/50">
-                    <td className="py-3 px-3 text-white">High-volume processing</td>
-                    <td className="py-3 px-3 text-center"><span className="px-2 py-1 rounded bg-purple-500/20 text-purple-400">Qwen3</span></td>
-                    <td className="py-3 px-3 text-center"><span className="px-2 py-1 rounded bg-red-500/20 text-red-400">Mistral-L</span></td>
-                    <td className="py-3 px-3 text-gray-400">Best cost/accuracy ratio</td>
+                    <td className="py-2 px-2 text-white">Volume</td>
+                    <td className="py-2 px-2 text-center"><span className="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400">Qwen3</span></td>
+                    <td className="py-2 px-2 text-center"><span className="px-1.5 py-0.5 rounded bg-red-500/20 text-red-400">Mistral</span></td>
+                    <td className="py-2 px-2 text-gray-400 hidden sm:table-cell">Best ROI</td>
                   </tr>
                   <tr className="border-b border-gray-800/50">
-                    <td className="py-3 px-3 text-white">Budget-constrained</td>
-                    <td className="py-3 px-3 text-center"><span className="px-2 py-1 rounded bg-cyan-500/20 text-cyan-400">Llama-4</span></td>
-                    <td className="py-3 px-3 text-center"><span className="px-2 py-1 rounded bg-pink-500/20 text-pink-400">Mistral-S</span></td>
-                    <td className="py-3 px-3 text-gray-400">$0.08/task, fastest response</td>
-                  </tr>
-                  <tr className="border-b border-gray-800/50">
-                    <td className="py-3 px-3 text-white">L6 complex reasoning</td>
-                    <td className="py-3 px-3 text-center"><span className="px-2 py-1 rounded bg-orange-500/20 text-orange-400">Claude</span></td>
-                    <td className="py-3 px-3 text-center"><span className="px-2 py-1 rounded bg-pink-500/20 text-pink-400">Mistral-S</span></td>
-                    <td className="py-3 px-3 text-gray-400">Only 2 models &gt;50% on L6</td>
+                    <td className="py-2 px-2 text-white">Budget</td>
+                    <td className="py-2 px-2 text-center"><span className="px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-400">Llama</span></td>
+                    <td className="py-2 px-2 text-center"><span className="px-1.5 py-0.5 rounded bg-pink-500/20 text-pink-400">Mistral-S</span></td>
+                    <td className="py-2 px-2 text-gray-400 hidden sm:table-cell">$0.08/task</td>
                   </tr>
                 </tbody>
               </table>
@@ -882,8 +791,8 @@ export default function DeepMetrics() {
         </div>
       )}
 
-      <div className="text-center text-gray-600 text-xs">
-        CodeBlue Final 25 Benchmark • 9 Models • 25 Tasks • 675 Total Rollouts
+      <div className="text-center text-gray-600 text-[10px] sm:text-xs py-2">
+        CodeBlue • 9 Models • 25 Tasks • 675 Rollouts
       </div>
     </div>
   );
