@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Database, ArrowLeft, TrendingUp, ArrowUpRight, ArrowDownRight, Minus, Zap, Clock, Target, DollarSign } from 'lucide-react';
+import ThemeToggle from '@/components/ThemeToggle';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Legend, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 
 // Fine-tuning results data
@@ -73,25 +74,25 @@ function MetricCard({ label, baseline, finetuned, format = 'percent', icon: Icon
   };
 
   return (
-    <div className="p-4 rounded-xl bg-black/30 border border-white/10">
+    <div className="p-4 rounded-xl theme-card border light-shadow">
       <div className="flex items-center gap-2 mb-3">
-        <Icon className="w-4 h-4 text-gray-400" />
-        <span className="text-sm text-gray-400">{label}</span>
+        <Icon className="w-4 h-4 theme-text-muted" />
+        <span className="text-sm theme-text-secondary">{label}</span>
       </div>
       <div className="flex items-end justify-between">
         <div>
-          <p className="text-xs text-gray-500 mb-1">Baseline</p>
-          <p className="text-lg font-mono text-gray-400">{formatValue(baseline)}</p>
+          <p className="text-xs theme-text-muted mb-1">Baseline</p>
+          <p className="text-lg font-mono theme-text-secondary">{formatValue(baseline)}</p>
         </div>
         <div className="text-center px-3">
-          <div className={`flex items-center gap-1 text-sm font-medium ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
+          <div className={`flex items-center gap-1 text-sm font-medium ${isPositive ? 'text-emerald-500' : 'text-red-500'}`}>
             {isPositive ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
             {displayImprovement.toFixed(1)}%
           </div>
         </div>
         <div className="text-right">
-          <p className="text-xs text-gray-500 mb-1">Fine-tuned</p>
-          <p className="text-lg font-mono text-emerald-400">{formatValue(finetuned)}</p>
+          <p className="text-xs theme-text-muted mb-1">Fine-tuned</p>
+          <p className="text-lg font-mono text-emerald-500">{formatValue(finetuned)}</p>
         </div>
       </div>
     </div>
@@ -111,15 +112,15 @@ export default function FinetunePage() {
   const overallImprovement = ((finetuneData.metrics.finetuned.totalReward - finetuneData.metrics.baseline.totalReward) / finetuneData.metrics.baseline.totalReward) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-gray-100">
+    <div className="theme-page">
       {/* Grid background */}
-      <div className="fixed inset-0 opacity-[0.02]" style={{
+      <div className="fixed inset-0 theme-grid-bg" style={{
         backgroundImage: `linear-gradient(rgba(59, 130, 246, 0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(59, 130, 246, 0.5) 1px, transparent 1px)`,
         backgroundSize: '40px 40px'
       }} />
 
       {/* Header */}
-      <header className="relative border-b border-blue-500/20 bg-black/40 backdrop-blur-xl">
+      <header className="relative border-b theme-header border-blue-500/20">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -129,18 +130,21 @@ export default function FinetunePage() {
                 </div>
                 <div>
                   <h1 className="text-lg font-bold tracking-tight">
-                    <span className="text-emerald-400">Code</span>
-                    <span className="text-white">Blue</span>
+                    <span className="text-emerald-500">Code</span>
+                    <span className="theme-text-primary">Blue</span>
                   </h1>
                 </div>
               </Link>
-              <span className="text-gray-600">|</span>
-              <span className="text-blue-400 font-medium">Fine-tuning Gains</span>
+              <span className="theme-text-muted">|</span>
+              <span className="text-blue-500 font-medium">Fine-tuning Gains</span>
             </div>
-            <Link href="/" className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
-              <ArrowLeft className="w-4 h-4" />
-              Back to Home
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link href="/" className="flex items-center gap-2 text-sm theme-text-secondary hover:text-blue-500 transition-colors">
+                <ArrowLeft className="w-4 h-4" />
+                Back to Home
+              </Link>
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </header>
@@ -148,16 +152,16 @@ export default function FinetunePage() {
       <main className="relative max-w-7xl mx-auto px-6 py-8">
         {/* Hero */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-sm mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-500 text-sm mb-4">
             <TrendingUp className="w-4 h-4" />
             Environment-Driven Improvement
           </div>
           <h1 className="text-4xl font-bold mb-4">
-            <span className="text-emerald-400">+{overallImprovement.toFixed(0)}%</span>
-            <span className="text-white"> Performance Gain</span>
+            <span className="text-emerald-500">+{overallImprovement.toFixed(0)}%</span>
+            <span className="theme-text-primary"> Performance Gain</span>
           </h1>
-          <p className="text-gray-400 max-w-2xl mx-auto">
-            See how fine-tuning <span className="text-white font-medium">{finetuneData.model}</span> on CodeBlue&apos;s analytics tasks
+          <p className="theme-text-secondary max-w-2xl mx-auto">
+            See how fine-tuning <span className="theme-text-primary font-medium">{finetuneData.model}</span> on CodeBlue&apos;s analytics tasks
             dramatically improves performance across all difficulty levels.
           </p>
         </div>
@@ -199,8 +203,8 @@ export default function FinetunePage() {
               onClick={() => setActiveTab(tab)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 activeTab === tab
-                  ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-blue-500/20 text-blue-500 border border-blue-500/30'
+                  : 'theme-text-secondary hover:text-blue-500 hover:bg-blue-500/5'
               }`}
             >
               {tab === 'overview' ? 'Overview' : tab === 'categories' ? 'By Category' : 'Training Curve'}
@@ -211,10 +215,10 @@ export default function FinetunePage() {
         {/* Tab Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Chart Area */}
-          <div className="lg:col-span-2 p-6 rounded-2xl bg-black/30 border border-white/10">
+          <div className="lg:col-span-2 p-6 rounded-2xl theme-card border light-shadow">
             {activeTab === 'overview' && (
               <>
-                <h3 className="text-lg font-bold text-white mb-4">Performance Comparison</h3>
+                <h3 className="text-lg font-bold theme-text-primary mb-4">Performance Comparison</h3>
                 <div className="h-80">
                   <ResponsiveContainer width="100%" height="100%">
                     <RadarChart data={radarData}>
@@ -236,7 +240,7 @@ export default function FinetunePage() {
 
             {activeTab === 'categories' && (
               <>
-                <h3 className="text-lg font-bold text-white mb-4">Improvement by Difficulty Level</h3>
+                <h3 className="text-lg font-bold theme-text-primary mb-4">Improvement by Difficulty Level</h3>
                 <div className="h-80">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={finetuneData.byCategory} layout="vertical">
@@ -258,7 +262,7 @@ export default function FinetunePage() {
 
             {activeTab === 'training' && (
               <>
-                <h3 className="text-lg font-bold text-white mb-4">Training Progress</h3>
+                <h3 className="text-lg font-bold theme-text-primary mb-4">Training Progress</h3>
                 <div className="h-80">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={finetuneData.trainingCurve}>
@@ -283,66 +287,66 @@ export default function FinetunePage() {
           {/* Side Panel */}
           <div className="space-y-6">
             {/* Model Info */}
-            <div className="p-6 rounded-2xl bg-black/30 border border-white/10">
-              <h3 className="text-lg font-bold text-white mb-4">Model Details</h3>
+            <div className="p-6 rounded-2xl theme-card border light-shadow">
+              <h3 className="text-lg font-bold theme-text-primary mb-4">Model Details</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Base Model</span>
-                  <span className="text-white font-mono text-sm">{finetuneData.model}</span>
+                  <span className="theme-text-secondary">Base Model</span>
+                  <span className="theme-text-primary font-mono text-sm">{finetuneData.model}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Parameters</span>
-                  <span className="text-white font-mono text-sm">7B</span>
+                  <span className="theme-text-secondary">Parameters</span>
+                  <span className="theme-text-primary font-mono text-sm">7B</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Architecture</span>
-                  <span className="text-white font-mono text-sm">Transformer</span>
+                  <span className="theme-text-secondary">Architecture</span>
+                  <span className="theme-text-primary font-mono text-sm">Transformer</span>
                 </div>
               </div>
             </div>
 
             {/* Training Config */}
-            <div className="p-6 rounded-2xl bg-black/30 border border-white/10">
-              <h3 className="text-lg font-bold text-white mb-4">Training Config</h3>
+            <div className="p-6 rounded-2xl theme-card border light-shadow">
+              <h3 className="text-lg font-bold theme-text-primary mb-4">Training Config</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Dataset</span>
-                  <span className="text-white">{finetuneData.trainingDetails.examples.toLocaleString()} examples</span>
+                  <span className="theme-text-secondary">Dataset</span>
+                  <span className="theme-text-primary">{finetuneData.trainingDetails.examples.toLocaleString()} examples</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Epochs</span>
-                  <span className="text-white">{finetuneData.trainingDetails.epochs}</span>
+                  <span className="theme-text-secondary">Epochs</span>
+                  <span className="theme-text-primary">{finetuneData.trainingDetails.epochs}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Learning Rate</span>
-                  <span className="text-white font-mono">{finetuneData.trainingDetails.learningRate}</span>
+                  <span className="theme-text-secondary">Learning Rate</span>
+                  <span className="theme-text-primary font-mono">{finetuneData.trainingDetails.learningRate}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Batch Size</span>
-                  <span className="text-white">{finetuneData.trainingDetails.batchSize}</span>
+                  <span className="theme-text-secondary">Batch Size</span>
+                  <span className="theme-text-primary">{finetuneData.trainingDetails.batchSize}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Training Time</span>
-                  <span className="text-white">{finetuneData.trainingDetails.trainingTime}</span>
+                  <span className="theme-text-secondary">Training Time</span>
+                  <span className="theme-text-primary">{finetuneData.trainingDetails.trainingTime}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Hardware</span>
-                  <span className="text-white">{finetuneData.trainingDetails.gpu}</span>
+                  <span className="theme-text-secondary">Hardware</span>
+                  <span className="theme-text-primary">{finetuneData.trainingDetails.gpu}</span>
                 </div>
               </div>
             </div>
 
             {/* Biggest Gains */}
-            <div className="p-6 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-transparent border border-emerald-500/20">
-              <h3 className="text-lg font-bold text-white mb-4">Biggest Gains</h3>
+            <div className="p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/20 light-shadow">
+              <h3 className="text-lg font-bold theme-text-primary mb-4">Biggest Gains</h3>
               <div className="space-y-3">
                 {finetuneData.byCategory
                   .sort((a, b) => b.improvement - a.improvement)
                   .slice(0, 3)
                   .map((cat, i) => (
                     <div key={cat.category} className="flex items-center justify-between">
-                      <span className="text-gray-400 text-sm">{cat.category}</span>
-                      <span className="text-emerald-400 font-bold">+{cat.improvement.toFixed(0)}%</span>
+                      <span className="theme-text-secondary text-sm">{cat.category}</span>
+                      <span className="text-emerald-500 font-bold">+{cat.improvement.toFixed(0)}%</span>
                     </div>
                   ))}
               </div>
@@ -351,9 +355,9 @@ export default function FinetunePage() {
         </div>
 
         {/* Bottom CTA */}
-        <div className="mt-12 p-8 rounded-2xl bg-gradient-to-r from-blue-500/20 to-emerald-500/20 border border-blue-500/30 text-center">
-          <h2 className="text-2xl font-bold text-white mb-2">Want these gains for your model?</h2>
-          <p className="text-gray-400 mb-6">
+        <div className="mt-12 p-8 rounded-2xl bg-gradient-to-r from-blue-500/10 to-emerald-500/10 border border-blue-500/30 text-center light-shadow">
+          <h2 className="text-2xl font-bold theme-text-primary mb-2">Want these gains for your model?</h2>
+          <p className="theme-text-secondary mb-6">
             Our environment and dataset are open-source. Fine-tune your own model on CodeBlue tasks.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -366,7 +370,7 @@ export default function FinetunePage() {
             </a>
             <Link
               href="/benchmark"
-              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-300 font-semibold hover:bg-white/10 transition-colors"
+              className="flex items-center gap-2 px-6 py-3 rounded-xl theme-card border theme-text-secondary font-semibold hover:border-blue-500/50 transition-colors"
             >
               See Leaderboard
             </Link>

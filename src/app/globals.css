@@ -16,6 +16,23 @@
   --table-header: #1f2937;
   --table-row-alt: rgba(31, 41, 55, 0.5);
   --shadow: rgba(0, 0, 0, 0.3);
+
+  /* Page backgrounds */
+  --page-bg: linear-gradient(to bottom right, #030712, #111827, #030712);
+  --header-bg: rgba(0, 0, 0, 0.4);
+  --header-border: rgba(16, 185, 129, 0.2);
+
+  /* Text colors */
+  --text-primary: #ffffff;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+
+  /* Card styles */
+  --card-bg-solid: rgba(0, 0, 0, 0.2);
+  --card-bg-hover: rgba(255, 255, 255, 0.05);
+
+  /* Grid background opacity */
+  --grid-opacity: 0.02;
 }
 
 /* Light theme */
@@ -33,6 +50,23 @@
   --table-header: #f1f5f9;
   --table-row-alt: rgba(241, 245, 249, 0.5);
   --shadow: rgba(0, 0, 0, 0.1);
+
+  /* Page backgrounds */
+  --page-bg: linear-gradient(to bottom right, #f8fafc, #ffffff, #f8fafc);
+  --header-bg: rgba(255, 255, 255, 0.8);
+  --header-border: rgba(16, 185, 129, 0.3);
+
+  /* Text colors */
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+
+  /* Card styles */
+  --card-bg-solid: rgba(255, 255, 255, 0.8);
+  --card-bg-hover: rgba(0, 0, 0, 0.02);
+
+  /* Grid background opacity */
+  --grid-opacity: 0.03;
 }
 
 @theme inline {
@@ -66,4 +100,51 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--muted);
+}
+
+/* Theme-aware utility classes */
+.theme-page {
+  background: var(--page-bg);
+  color: var(--foreground);
+  min-height: 100vh;
+}
+
+.theme-header {
+  background: var(--header-bg);
+  border-color: var(--header-border);
+  backdrop-filter: blur(12px);
+}
+
+.theme-text-primary {
+  color: var(--text-primary);
+}
+
+.theme-text-secondary {
+  color: var(--text-secondary);
+}
+
+.theme-text-muted {
+  color: var(--text-muted);
+}
+
+.theme-card {
+  background: var(--card-bg-solid);
+  border-color: var(--card-border);
+}
+
+.theme-card:hover {
+  background: var(--card-bg-hover);
+}
+
+.theme-grid-bg {
+  opacity: var(--grid-opacity);
+}
+
+/* Light mode specific overrides */
+[data-theme="light"] .light-border {
+  border-color: var(--card-border);
+}
+
+[data-theme="light"] .light-shadow {
+  box-shadow: 0 4px 6px -1px var(--shadow), 0 2px 4px -2px var(--shadow);
 }

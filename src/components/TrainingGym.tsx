@@ -14,6 +14,7 @@ import {
     Zap
 } from 'lucide-react';
 import benchmarkDataRaw from '@/data/benchmark-data.json';
+import ThemeToggle from '@/components/ThemeToggle';
 
 // --- Types ---
 interface Example {
@@ -675,7 +676,7 @@ export default function TrainingGym() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-white p-6">
+        <div className="theme-page p-6">
             <div className="max-w-7xl mx-auto">
                 <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center gap-3">
@@ -683,15 +684,18 @@ export default function TrainingGym() {
                             <Trophy className="w-6 h-6 text-white" />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">CodeBlue Gym</h1>
-                            <p className="text-gray-400">Train your agentic intuition</p>
+                            <h1 className="text-3xl font-bold theme-text-primary">CodeBlue Gym</h1>
+                            <p className="theme-text-secondary">Train your agentic intuition</p>
                         </div>
                     </div>
-                    {highScore > 0 && (
-                        <div className="px-4 py-2 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-yellow-400 font-mono">
-                            High Score: {highScore}
-                        </div>
-                    )}
+                    <div className="flex items-center gap-3">
+                        {highScore > 0 && (
+                            <div className="px-4 py-2 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-yellow-500 font-mono">
+                                High Score: {highScore}
+                            </div>
+                        )}
+                        <ThemeToggle />
+                    </div>
                 </div>
 
                 {mode === 'menu' && (

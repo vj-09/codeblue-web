@@ -15,6 +15,7 @@ import FailureInsights from './FailureInsights';
 import ModelRace from './ModelRace';
 import ABTestSimulator from './ABTestSimulator';
 import DeepMetrics from './DeepMetrics';
+import ThemeToggle from './ThemeToggle';
 import { useTheme } from '@/context/ThemeContext';
 
 // Types
@@ -453,6 +454,7 @@ export default function BenchmarkCharts() {
                 <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span className="hidden sm:inline">Home</span>
               </Link>
+              <ThemeToggle />
             </div>
           </div>
         </div>
@@ -467,8 +469,10 @@ export default function BenchmarkCharts() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                 activeTab === tab.id
-                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-emerald-500/20 text-emerald-500 border border-emerald-500/30'
+                  : isDark
+                    ? 'text-gray-400 hover:text-white hover:bg-white/5'
+                    : 'text-gray-500 hover:text-emerald-600 hover:bg-emerald-50'
               }`}
             >
               <tab.icon className="w-4 h-4" />

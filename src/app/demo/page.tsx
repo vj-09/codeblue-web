@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Database, ArrowLeft, Upload, Play, MessageSquare, Code, CheckCircle, ChevronRight, FileSpreadsheet, Sparkles } from 'lucide-react';
+import ThemeToggle from '@/components/ThemeToggle';
+import { useTheme } from '@/context/ThemeContext';
 
 // Pre-computed demo examples
 const demoExamples = [
@@ -203,15 +205,15 @@ export default function DemoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-gray-100">
+    <div className="theme-page">
       {/* Grid background */}
-      <div className="fixed inset-0 opacity-[0.02]" style={{
+      <div className="fixed inset-0 theme-grid-bg" style={{
         backgroundImage: `linear-gradient(rgba(168, 85, 247, 0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(168, 85, 247, 0.5) 1px, transparent 1px)`,
         backgroundSize: '40px 40px'
       }} />
 
       {/* Header */}
-      <header className="relative border-b border-purple-500/20 bg-black/40 backdrop-blur-xl">
+      <header className="relative border-b theme-header border-purple-500/20">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -221,18 +223,21 @@ export default function DemoPage() {
                 </div>
                 <div>
                   <h1 className="text-lg font-bold tracking-tight">
-                    <span className="text-emerald-400">Code</span>
-                    <span className="text-white">Blue</span>
+                    <span className="text-emerald-500">Code</span>
+                    <span className="theme-text-primary">Blue</span>
                   </h1>
                 </div>
               </Link>
-              <span className="text-gray-600">|</span>
-              <span className="text-purple-400 font-medium">CSV Analytics Demo</span>
+              <span className="theme-text-muted">|</span>
+              <span className="text-purple-500 font-medium">CSV Analytics Demo</span>
             </div>
-            <Link href="/" className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
-              <ArrowLeft className="w-4 h-4" />
-              Back to Home
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link href="/" className="flex items-center gap-2 text-sm theme-text-secondary hover:text-purple-500 transition-colors">
+                <ArrowLeft className="w-4 h-4" />
+                Back to Home
+              </Link>
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </header>
@@ -240,15 +245,15 @@ export default function DemoPage() {
       <main className="relative max-w-7xl mx-auto px-6 py-8">
         {/* Hero */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-sm mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-500 text-sm mb-4">
             <Sparkles className="w-4 h-4" />
             Interactive Demo
           </div>
           <h1 className="text-4xl font-bold mb-4">
-            <span className="text-white">Natural Language </span>
-            <span className="text-purple-400">CSV Analytics</span>
+            <span className="theme-text-primary">Natural Language </span>
+            <span className="text-purple-500">CSV Analytics</span>
           </h1>
-          <p className="text-gray-400 max-w-2xl mx-auto">
+          <p className="theme-text-secondary max-w-2xl mx-auto">
             See how our fine-tuned model analyzes data through multi-turn conversations.
             Select an example and watch the agent work through the problem.
           </p>
@@ -262,8 +267,8 @@ export default function DemoPage() {
               onClick={() => selectExample(example)}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all flex-shrink-0 ${
                 selectedExample.id === example.id
-                  ? 'bg-purple-500/20 border-purple-500/40 text-white'
-                  : 'bg-black/20 border-white/10 text-gray-400 hover:border-white/20 hover:text-white'
+                  ? 'bg-purple-500/20 border-purple-500/40 theme-text-primary'
+                  : 'theme-card border theme-text-secondary hover:border-purple-500/30'
               }`}
             >
               <FileSpreadsheet className="w-5 h-5" />
@@ -279,23 +284,23 @@ export default function DemoPage() {
           {/* Left: Data Preview */}
           <div className="space-y-6">
             {/* CSV Preview */}
-            <div className="p-6 rounded-2xl bg-black/30 border border-white/10">
+            <div className="p-6 rounded-2xl theme-card border light-shadow">
               <div className="flex items-center gap-2 mb-4">
-                <FileSpreadsheet className="w-5 h-5 text-purple-400" />
-                <h3 className="text-lg font-bold text-white">Data Preview</h3>
+                <FileSpreadsheet className="w-5 h-5 text-purple-500" />
+                <h3 className="text-lg font-bold theme-text-primary">Data Preview</h3>
               </div>
-              <pre className="text-sm text-gray-300 bg-black/50 p-4 rounded-lg overflow-x-auto font-mono">
+              <pre className="text-sm theme-text-secondary bg-black/20 dark:bg-black/50 p-4 rounded-lg overflow-x-auto font-mono">
                 {selectedExample.csvPreview}
               </pre>
             </div>
 
             {/* Query */}
-            <div className="p-6 rounded-2xl bg-black/30 border border-white/10">
+            <div className="p-6 rounded-2xl theme-card border light-shadow">
               <div className="flex items-center gap-2 mb-4">
-                <MessageSquare className="w-5 h-5 text-purple-400" />
-                <h3 className="text-lg font-bold text-white">Query</h3>
+                <MessageSquare className="w-5 h-5 text-purple-500" />
+                <h3 className="text-lg font-bold theme-text-primary">Query</h3>
               </div>
-              <p className="text-gray-300 bg-purple-500/10 p-4 rounded-lg border border-purple-500/20">
+              <p className="theme-text-secondary bg-purple-500/10 p-4 rounded-lg border border-purple-500/20">
                 &ldquo;{selectedExample.query}&rdquo;
               </p>
 
@@ -304,7 +309,7 @@ export default function DemoPage() {
                 disabled={isPlaying}
                 className={`mt-4 w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-colors ${
                   isPlaying
-                    ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                    ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
                     : 'bg-purple-500 text-white hover:bg-purple-600'
                 }`}
               >
@@ -315,20 +320,20 @@ export default function DemoPage() {
           </div>
 
           {/* Right: Conversation */}
-          <div className="p-6 rounded-2xl bg-black/30 border border-white/10">
+          <div className="p-6 rounded-2xl theme-card border light-shadow">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-purple-400" />
-                <h3 className="text-lg font-bold text-white">Agent Response</h3>
+                <Sparkles className="w-5 h-5 text-purple-500" />
+                <h3 className="text-lg font-bold theme-text-primary">Agent Response</h3>
               </div>
               {visibleMessages === selectedExample.conversation.length && (
-                <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded">Complete</span>
+                <span className="text-xs text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded">Complete</span>
               )}
             </div>
 
             <div className="min-h-[400px] space-y-2">
               {visibleMessages === 0 ? (
-                <div className="flex items-center justify-center h-[400px] text-gray-500">
+                <div className="flex items-center justify-center h-[400px] theme-text-muted">
                   <div className="text-center">
                     <Sparkles className="w-12 h-12 mx-auto mb-4 opacity-20" />
                     <p>Click &ldquo;Run Analysis&rdquo; to see the agent work</p>
@@ -341,8 +346,8 @@ export default function DemoPage() {
               )}
 
               {isPlaying && (
-                <div className="flex items-center gap-2 text-purple-400 text-sm animate-pulse">
-                  <div className="w-2 h-2 rounded-full bg-purple-400"></div>
+                <div className="flex items-center gap-2 text-purple-500 text-sm animate-pulse">
+                  <div className="w-2 h-2 rounded-full bg-purple-500"></div>
                   Processing...
                 </div>
               )}
@@ -351,22 +356,22 @@ export default function DemoPage() {
         </div>
 
         {/* Coming Soon Banner */}
-        <div className="mt-12 p-8 rounded-2xl bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30">
+        <div className="mt-12 p-8 rounded-2xl bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30 light-shadow">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <Upload className="w-5 h-5 text-purple-400" />
-                <span className="text-purple-400 font-medium">Coming Soon</span>
+                <Upload className="w-5 h-5 text-purple-500" />
+                <span className="text-purple-500 font-medium">Coming Soon</span>
               </div>
-              <h2 className="text-2xl font-bold text-white mb-2">Upload Your Own CSV</h2>
-              <p className="text-gray-400">
+              <h2 className="text-2xl font-bold theme-text-primary mb-2">Upload Your Own CSV</h2>
+              <p className="theme-text-secondary">
                 Live inference is coming soon. Upload your data and get instant analytics powered by our fine-tuned model.
               </p>
             </div>
             <div className="flex items-center gap-4">
               <Link
                 href="/finetune"
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-300 font-semibold hover:bg-white/10 transition-colors"
+                className="flex items-center gap-2 px-6 py-3 rounded-xl theme-card border theme-text-secondary font-semibold hover:border-purple-500/50 transition-colors"
               >
                 View Fine-tuning Results
               </Link>
