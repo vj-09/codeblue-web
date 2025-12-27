@@ -113,6 +113,12 @@ export default function BenchmarkCharts() {
   const [selectedExample, setSelectedExample] = useState<ModelData['examples'][0] | null>(null);
   const [expandedModel, setExpandedModel] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'score_correctness' | 'score_efficiency' | 'avgReward'>('score_correctness');
+
+  // Trajectory filter state
+  const [trajFilter, setTrajFilter] = useState<'all' | 'passed' | 'failed' | 'partial'>('all');
+  const [trajModelFilter, setTrajModelFilter] = useState<string>('all');
+  const [trajTaskFilter, setTrajTaskFilter] = useState<string>('all');
+  const [trajInsight, setTrajInsight] = useState<'none' | 'hardest' | 'unique' | 'inconsistent' | 'improving'>('none');
   const [quadrantX, setQuadrantX] = useState('score_efficiency');
   const [quadrantY, setQuadrantY] = useState('score_correctness');
 
@@ -333,6 +339,73 @@ export default function BenchmarkCharts() {
   // Calculate quadrant averages
   const xAvg = useMemo(() => quadrantData.reduce((sum, d) => sum + d.x, 0) / quadrantData.length, [quadrantData]);
   const yAvg = useMemo(() => quadrantData.reduce((sum, d) => sum + d.y, 0) / quadrantData.length, [quadrantData]);
+
+  // Deep insights computation
+  const trajectoryInsights = useMemo(() => {
+    // Get all tasks and their results across models
+    const taskResults: Record<string, { model: string; examples: typeof benchmarkData.models[0]['examples'] }[]> = {};
+
+    benchmarkData.models.forEach(model => {
+      model.examples.filter(ex => ex.info).forEach(ex => {
+        const tid = ex.info!.task_id;
+        if (!taskResults[tid]) taskResults[tid] = [];
+        const modelEntry = taskResults[tid].find(r => r.model === model.model);
+        if (modelEntry) {
+          modelEntry.examples.push(ex);
+        } else {
+          taskResults[tid].push({ model: model.model, examples: [ex] });
+        }
+      });
+    });
+
+    // Compute insights
+    const hardestTasks: string[] = []; // All models failed all rollouts
+    const uniqueStrengths: { task: string; model: string }[] = []; // Only 1 model passed
+    const inconsistentTasks: string[] = []; // High variance across rollouts
+    const improvingModels: { model: string; task: string }[] = []; // Run 3 better than Run 1
+
+    Object.entries(taskResults).forEach(([taskId, results]) => {
+      // Count models that passed at least once
+      const modelsWithPass = results.filter(r =>
+        r.examples.some(ex => ex.score_correctness >= 0.8)
+      );
+
+      // Hardest: no model passed any rollout
+      if (modelsWithPass.length === 0) {
+        hardestTasks.push(taskId);
+      }
+
+      // Unique: exactly 1 model passed
+      if (modelsWithPass.length === 1) {
+        uniqueStrengths.push({ task: taskId, model: modelsWithPass[0].model });
+      }
+
+      // Inconsistent: some rollouts pass, some fail for same model
+      results.forEach(r => {
+        if (r.examples.length >= 3) {
+          const passed = r.examples.filter(ex => ex.score_correctness >= 0.8).length;
+          if (passed > 0 && passed < r.examples.length) {
+            if (!inconsistentTasks.includes(taskId)) inconsistentTasks.push(taskId);
+          }
+          // Improving: Run 3 passed but Run 1 failed
+          if (r.examples[2]?.score_correctness >= 0.8 && r.examples[0]?.score_correctness < 0.8) {
+            improvingModels.push({ model: r.model, task: taskId });
+          }
+        }
+      });
+    });
+
+    return { hardestTasks, uniqueStrengths, inconsistentTasks, improvingModels, taskResults };
+  }, []);
+
+  // Get unique tasks for filter
+  const allTasks = useMemo(() => {
+    const tasks = new Set<string>();
+    benchmarkData.models.forEach(m => m.examples.forEach(ex => {
+      if (ex.info?.task_id) tasks.add(ex.info.task_id);
+    }));
+    return [...tasks].sort();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-gray-100">
@@ -930,11 +1003,124 @@ export default function BenchmarkCharts() {
         {activeTab === 'examples' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="p-6 rounded-2xl bg-black/30 border border-white/10">
-              <h3 className="text-lg font-bold text-white mb-2">Select Example</h3>
-              <p className="text-xs text-gray-500 mb-4">{benchmarkData.models.length} models × 25 tasks × 3 rollouts</p>
-              <div className="space-y-2 max-h-[600px] overflow-y-auto">
+              <h3 className="text-lg font-bold text-white mb-2">Explore Runs</h3>
+
+              {/* Insight Stats */}
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/20">
+                  <div className="text-lg font-bold text-red-400">{trajectoryInsights.hardestTasks.length}</div>
+                  <div className="text-xs text-gray-500">Unsolved Tasks</div>
+                </div>
+                <div className="p-2 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                  <div className="text-lg font-bold text-purple-400">{trajectoryInsights.uniqueStrengths.length}</div>
+                  <div className="text-xs text-gray-500">Unique Passes</div>
+                </div>
+                <div className="p-2 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                  <div className="text-lg font-bold text-yellow-400">{trajectoryInsights.inconsistentTasks.length}</div>
+                  <div className="text-xs text-gray-500">Inconsistent</div>
+                </div>
+                <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                  <div className="text-lg font-bold text-emerald-400">{trajectoryInsights.improvingModels.length}</div>
+                  <div className="text-xs text-gray-500">Improving Runs</div>
+                </div>
+              </div>
+
+              {/* Layer 1: Result Filter */}
+              <div className="mb-3">
+                <div className="text-xs text-gray-500 mb-1">Filter by Result:</div>
+                <div className="flex flex-wrap gap-1">
+                  {[
+                    { key: 'all', label: 'All', color: 'gray' },
+                    { key: 'passed', label: '✓ Passed', color: 'emerald' },
+                    { key: 'failed', label: '✗ Failed', color: 'red' },
+                    { key: 'partial', label: '~ Partial', color: 'yellow' },
+                  ].map(f => (
+                    <button
+                      key={f.key}
+                      onClick={() => setTrajFilter(f.key as typeof trajFilter)}
+                      className={`px-2 py-1 rounded text-xs ${
+                        trajFilter === f.key
+                          ? `bg-${f.color}-500/20 text-${f.color}-400 border border-${f.color}-500/30`
+                          : 'bg-gray-800 text-gray-400 hover:text-white'
+                      }`}
+                      style={trajFilter === f.key ? {
+                        backgroundColor: f.color === 'emerald' ? 'rgba(16,185,129,0.2)' :
+                                         f.color === 'red' ? 'rgba(239,68,68,0.2)' :
+                                         f.color === 'yellow' ? 'rgba(234,179,8,0.2)' : 'rgba(107,114,128,0.2)',
+                        color: f.color === 'emerald' ? '#10B981' :
+                               f.color === 'red' ? '#EF4444' :
+                               f.color === 'yellow' ? '#EAB308' : '#9CA3AF'
+                      } : {}}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Layer 2: Deep Insights */}
+              <div className="mb-3">
+                <div className="text-xs text-gray-500 mb-1">Deep Insights:</div>
+                <div className="flex flex-wrap gap-1">
+                  {[
+                    { key: 'none', label: 'None', count: 0 },
+                    { key: 'hardest', label: '🔥 Unsolved', count: trajectoryInsights.hardestTasks.length },
+                    { key: 'unique', label: '⭐ Unique Pass', count: trajectoryInsights.uniqueStrengths.length },
+                    { key: 'inconsistent', label: '🎲 Inconsistent', count: trajectoryInsights.inconsistentTasks.length },
+                    { key: 'improving', label: '📈 Improving', count: trajectoryInsights.improvingModels.length },
+                  ].map(f => (
+                    <button
+                      key={f.key}
+                      onClick={() => setTrajInsight(f.key as typeof trajInsight)}
+                      className={`px-2 py-1 rounded text-xs ${
+                        trajInsight === f.key
+                          ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                          : 'bg-gray-800 text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      {f.label} {f.count > 0 && `(${f.count})`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Layer 3: Model & Task Filters */}
+              <div className="grid grid-cols-2 gap-2 mb-3">
+                <div>
+                  <div className="text-xs text-gray-500 mb-1">Model:</div>
+                  <select
+                    value={trajModelFilter}
+                    onChange={(e) => setTrajModelFilter(e.target.value)}
+                    className="w-full px-2 py-1 rounded text-xs bg-gray-800 text-white border border-gray-700"
+                  >
+                    <option value="all">All Models</option>
+                    {benchmarkData.models.map(m => (
+                      <option key={m.model} value={m.model}>{m.name.split('-').slice(0, 2).join('-')}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500 mb-1">Task:</div>
+                  <select
+                    value={trajTaskFilter}
+                    onChange={(e) => setTrajTaskFilter(e.target.value)}
+                    className="w-full px-2 py-1 rounded text-xs bg-gray-800 text-white border border-gray-700"
+                  >
+                    <option value="all">All Tasks</option>
+                    {allTasks.map(t => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Results List */}
+              <div className="space-y-2 max-h-[400px] overflow-y-auto">
                 {benchmarkData.models.flatMap(model => {
-                  // Group examples by task_id to show rollout numbers
+                  // Apply model filter
+                  if (trajModelFilter !== 'all' && model.model !== trajModelFilter) return [];
+
+                  // Group examples by task_id
                   const taskGroups: Record<string, typeof model.examples> = {};
                   model.examples.filter(ex => ex.info).forEach(ex => {
                     const tid = ex.info!.task_id;
@@ -942,32 +1128,52 @@ export default function BenchmarkCharts() {
                     taskGroups[tid].push(ex);
                   });
 
-                  return Object.entries(taskGroups).flatMap(([taskId, exs]) =>
-                    exs.map((ex, rolloutIdx) => (
-                      <button
-                        key={`${model.model}-${taskId}-${rolloutIdx}`}
-                        onClick={() => setSelectedExample(ex)}
-                        className={`w-full p-3 rounded-lg text-left text-sm transition-all ${
-                          selectedExample === ex
-                            ? 'bg-emerald-500/20 border border-emerald-500/30'
-                            : 'bg-black/20 border border-white/10 hover:border-white/20'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-white font-mono text-xs">{ex.info!.task_id}</span>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-500">Run {rolloutIdx + 1}</span>
-                            <span className={`text-xs px-2 py-0.5 rounded ${
-                              ex.score_correctness > 0.5 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
-                            }`}>
-                              {ex.score_correctness > 0.5 ? '✓' : '✗'}
-                            </span>
+                  return Object.entries(taskGroups).flatMap(([taskId, exs]) => {
+                    // Apply task filter
+                    if (trajTaskFilter !== 'all' && taskId !== trajTaskFilter) return [];
+
+                    // Apply insight filter
+                    if (trajInsight === 'hardest' && !trajectoryInsights.hardestTasks.includes(taskId)) return [];
+                    if (trajInsight === 'unique' && !trajectoryInsights.uniqueStrengths.some(u => u.task === taskId && u.model === model.model)) return [];
+                    if (trajInsight === 'inconsistent' && !trajectoryInsights.inconsistentTasks.includes(taskId)) return [];
+                    if (trajInsight === 'improving' && !trajectoryInsights.improvingModels.some(u => u.task === taskId && u.model === model.model)) return [];
+
+                    return exs.map((ex, rolloutIdx) => {
+                      // Apply result filter
+                      const isPassed = ex.score_correctness >= 0.8;
+                      const isPartial = ex.score_correctness > 0 && ex.score_correctness < 0.8;
+                      if (trajFilter === 'passed' && !isPassed) return null;
+                      if (trajFilter === 'failed' && (isPassed || isPartial)) return null;
+                      if (trajFilter === 'partial' && !isPartial) return null;
+
+                      return (
+                        <button
+                          key={`${model.model}-${taskId}-${rolloutIdx}`}
+                          onClick={() => setSelectedExample(ex)}
+                          className={`w-full p-2 rounded-lg text-left text-xs transition-all ${
+                            selectedExample === ex
+                              ? 'bg-emerald-500/20 border border-emerald-500/30'
+                              : 'bg-black/20 border border-white/10 hover:border-white/20'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-white font-mono">{taskId}</span>
+                            <div className="flex items-center gap-1">
+                              <span className="text-gray-500">R{rolloutIdx + 1}</span>
+                              <span className={`px-1.5 py-0.5 rounded text-xs ${
+                                isPassed ? 'bg-emerald-500/20 text-emerald-400' :
+                                isPartial ? 'bg-yellow-500/20 text-yellow-400' :
+                                'bg-red-500/20 text-red-400'
+                              }`}>
+                                {isPassed ? '✓' : isPartial ? '~' : '✗'}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                        <div className="text-xs text-gray-500">{model.name.split('-').slice(0, 2).join('-')} - {ex.info!.level}</div>
-                      </button>
-                    ))
-                  );
+                          <div className="text-gray-500 mt-0.5">{model.name.split('-').slice(0, 2).join('-')}</div>
+                        </button>
+                      );
+                    }).filter(Boolean);
+                  });
                 })}
               </div>
             </div>
