@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { analytics } from '@/components/PostHogProvider';
 
 type Theme = 'light' | 'dark';
 
@@ -35,7 +36,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme, mounted]);
 
   const toggleTheme = () => {
-    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    analytics.themeToggled(newTheme);
   };
 
   // Prevent flash of wrong theme

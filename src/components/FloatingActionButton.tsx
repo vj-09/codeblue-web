@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { MessageCircle, Github, X, ExternalLink, MessageSquare } from 'lucide-react';
 import FeedbackModal from './FeedbackModal';
+import { analytics } from './PostHogProvider';
 
 export default function FloatingActionButton() {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,6 +12,11 @@ export default function FloatingActionButton() {
   const handleFeedbackClick = () => {
     setIsOpen(false);
     setShowFeedback(true);
+    analytics.feedbackOpened();
+  };
+
+  const handleGithubClick = () => {
+    analytics.githubClicked('fab');
   };
 
   return (
@@ -43,6 +49,7 @@ export default function FloatingActionButton() {
               href="https://github.com/vj-09/codeblue-env"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={handleGithubClick}
               className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-gray-700 hover:bg-gray-600 text-white shadow-lg transition-all duration-200"
               style={{
                 transitionDelay: isOpen ? '50ms' : '0ms',

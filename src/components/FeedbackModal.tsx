@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { X, Send, Loader2, CheckCircle } from 'lucide-react';
+import { analytics } from './PostHogProvider';
 
 interface FeedbackModalProps {
   isOpen: boolean;
@@ -49,6 +50,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
 
       // no-cors mode doesn't give us response, assume success
       setStatus('success');
+      analytics.feedbackSubmitted(formData.type);
       setFormData({ name: '', email: '', type: 'feedback', message: '' });
 
       // Close after 2 seconds
