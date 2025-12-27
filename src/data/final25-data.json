@@ -1,0 +1,4465 @@
+{
+  "generated": "2025-12-27T16:43:47.333756",
+  "version": "v2.0-corrected",
+  "summary": {
+    "total_tasks": 25,
+    "bank_tasks": 19,
+    "road_tasks": 6,
+    "models_complete": 9,
+    "models_partial": 5,
+    "templates": 14,
+    "levels": [
+      "L4",
+      "L5",
+      "L6"
+    ]
+  },
+  "models": [
+    {
+      "model": "anthropic--claude-opus-4.5",
+      "provider": "anthropic",
+      "name": "claude-opus-4.5",
+      "displayName": "Claude Opus 4.5",
+      "color": "#8B5CF6",
+      "bank": {
+        "correct": 34,
+        "total": 57,
+        "partial": 2,
+        "pct": 59.6
+      },
+      "road": {
+        "correct": 12,
+        "total": 18,
+        "partial": 0,
+        "pct": 66.7
+      },
+      "combined": {
+        "correct": 46,
+        "total": 75,
+        "partial": 2,
+        "pct": 61.3
+      },
+      "avgReward": 0.5776,
+      "hasBank": true,
+      "hasRoad": true,
+      "complete": true,
+      "rollouts": [
+        {
+          "task_id": "bank_hard_001",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.04,
+          "reward": 0.9277777778,
+          "answer": "2.44",
+          "expected": 2.44
+        },
+        {
+          "task_id": "bank_hard_001",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.04,
+          "reward": 0.9277777778,
+          "answer": "2.44",
+          "expected": 2.44
+        },
+        {
+          "task_id": "bank_hard_001",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.05,
+          "reward": 0.9416666667000001,
+          "answer": "2.44",
+          "expected": 2.44
+        },
+        {
+          "task_id": "bank_hard_030",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "['blue-collar', 'entrepreneur']",
+          "expected": [
+            "blue-collar",
+            "entrepreneur"
+          ]
+        },
+        {
+          "task_id": "bank_hard_030",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "['blue-collar', 'entrepreneur']",
+          "expected": [
+            "blue-collar",
+            "entrepreneur"
+          ]
+        },
+        {
+          "task_id": "bank_hard_030",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "['blue-collar', 'entrepreneur']",
+          "expected": [
+            "blue-collar",
+            "entrepreneur"
+          ]
+        },
+        {
+          "task_id": "bank_hard_021",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "24.62",
+          "expected": 24.62
+        },
+        {
+          "task_id": "bank_hard_021",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "24.62",
+          "expected": 24.62
+        },
+        {
+          "task_id": "bank_hard_021",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "24.62",
+          "expected": 24.62
+        },
+        {
+          "task_id": "bank_hard_019",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.02,
+          "reward": 0.9,
+          "answer": "7.04",
+          "expected": 7.04
+        },
+        {
+          "task_id": "bank_hard_019",
+          "dataset": "bank",
+          "score_correctness": 0.2,
+          "score_efficiency": 0.04,
+          "reward": 0.3277777778,
+          "answer": "7.04",
+          "expected": 7.04
+        },
+        {
+          "task_id": "bank_hard_019",
+          "dataset": "bank",
+          "score_correctness": 0.2,
+          "score_efficiency": 0.01,
+          "reward": 0.28611111110000004,
+          "answer": "7.04",
+          "expected": 7.04
+        },
+        {
+          "task_id": "bank_hard_028",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.04,
+          "reward": 0.9277777778,
+          "answer": "0.84",
+          "expected": 0.84
+        },
+        {
+          "task_id": "bank_hard_028",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.04,
+          "reward": 0.9277777778,
+          "answer": "0.84",
+          "expected": 0.84
+        },
+        {
+          "task_id": "bank_hard_028",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.04,
+          "reward": 0.9277777778,
+          "answer": "0.84",
+          "expected": 0.84
+        }
+      ]
+    },
+    {
+      "model": "qwen--qwen3-max",
+      "provider": "qwen",
+      "name": "qwen3-max",
+      "displayName": "Qwen3 Max",
+      "color": "#10B981",
+      "bank": {
+        "correct": 23,
+        "total": 57,
+        "partial": 8,
+        "pct": 40.4
+      },
+      "road": {
+        "correct": 12,
+        "total": 18,
+        "partial": 0,
+        "pct": 66.7
+      },
+      "combined": {
+        "correct": 35,
+        "total": 75,
+        "partial": 8,
+        "pct": 46.7
+      },
+      "avgReward": 0.4728,
+      "hasBank": true,
+      "hasRoad": true,
+      "complete": true,
+      "rollouts": [
+        {
+          "task_id": "bank_hard_038",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.07,
+          "reward": 0.9694444444000001,
+          "answer": "16.09",
+          "expected": 16.09
+        },
+        {
+          "task_id": "bank_hard_038",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.02,
+          "reward": 0.9,
+          "answer": "16.09",
+          "expected": 16.09
+        },
+        {
+          "task_id": "bank_hard_038",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.06,
+          "reward": 0.9555555556,
+          "answer": "16.09",
+          "expected": 16.09
+        },
+        {
+          "task_id": "bank_hard_044",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.05,
+          "reward": 0.9416666667000001,
+          "answer": "38.98",
+          "expected": 38.98
+        },
+        {
+          "task_id": "bank_hard_044",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.08,
+          "reward": 0.98,
+          "answer": "38.98",
+          "expected": 38.98
+        },
+        {
+          "task_id": "bank_hard_044",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.08,
+          "reward": 0.98,
+          "answer": "38.98",
+          "expected": 38.98
+        },
+        {
+          "task_id": "bank_hard_028",
+          "dataset": "bank",
+          "score_correctness": 0.2,
+          "score_efficiency": 0.0,
+          "reward": 0.2,
+          "answer": "0.84",
+          "expected": 0.84
+        },
+        {
+          "task_id": "bank_hard_028",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.05,
+          "reward": 0.9416666667000001,
+          "answer": "0.84",
+          "expected": 0.84
+        },
+        {
+          "task_id": "bank_hard_028",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.06,
+          "reward": 0.9555555556,
+          "answer": "0.84",
+          "expected": 0.84
+        },
+        {
+          "task_id": "bank_hard_012",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.08,
+          "reward": 0.98,
+          "answer": "8.27",
+          "expected": 8.27
+        },
+        {
+          "task_id": "bank_hard_012",
+          "dataset": "bank",
+          "score_correctness": 0.2,
+          "score_efficiency": 0.0,
+          "reward": 0.2,
+          "answer": "8.27",
+          "expected": 8.27
+        },
+        {
+          "task_id": "bank_hard_012",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.08,
+          "reward": 0.98,
+          "answer": "8.27",
+          "expected": 8.27
+        },
+        {
+          "task_id": "bank_hard_026",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'job': 'unemployed', 'mean': 40.97, 'std': 9.74, 'volatility': 0.2377}, {'job': 'self-employed', 'mean': 40.42, 'std': 9.46, 'volatility': 0.234}, {'job': 'admin.', 'mean': 39.68, 'std': 9.23, 'volatility': 0.2326}, {'job': 'services', 'mean': 38.94, 'std': 8.86, 'volatility': 0.2275}, {'job': 'management', 'mean': 40.2, 'std': 9.13, 'volatility': 0.2271}]",
+          "expected": [
+            {
+              "job": "unemployed",
+              "mean": 40.97,
+              "std": 9.74,
+              "volatility": 0.2377
+            },
+            {
+              "job": "self-employed",
+              "mean": 40.42,
+              "std": 9.46,
+              "volatility": 0.234
+            },
+            {
+              "job": "admin.",
+              "mean": 39.68,
+              "std": 9.23,
+              "volatility": 0.2326
+            },
+            {
+              "job": "services",
+              "mean": 38.94,
+              "std": 8.86,
+              "volatility": 0.2275
+            },
+            {
+              "job": "management",
+              "mean": 40.2,
+              "std": 9.13,
+              "volatility": 0.2271
+            }
+          ]
+        },
+        {
+          "task_id": "bank_hard_026",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'job': 'unemployed', 'mean': 40.97, 'std': 9.74, 'volatility': 0.2377}, {'job': 'self-employed', 'mean': 40.42, 'std': 9.46, 'volatility': 0.234}, {'job': 'admin.', 'mean': 39.68, 'std': 9.23, 'volatility': 0.2326}, {'job': 'services', 'mean': 38.94, 'std': 8.86, 'volatility': 0.2275}, {'job': 'management', 'mean': 40.2, 'std': 9.13, 'volatility': 0.2271}]",
+          "expected": [
+            {
+              "job": "unemployed",
+              "mean": 40.97,
+              "std": 9.74,
+              "volatility": 0.2377
+            },
+            {
+              "job": "self-employed",
+              "mean": 40.42,
+              "std": 9.46,
+              "volatility": 0.234
+            },
+            {
+              "job": "admin.",
+              "mean": 39.68,
+              "std": 9.23,
+              "volatility": 0.2326
+            },
+            {
+              "job": "services",
+              "mean": 38.94,
+              "std": 8.86,
+              "volatility": 0.2275
+            },
+            {
+              "job": "management",
+              "mean": 40.2,
+              "std": 9.13,
+              "volatility": 0.2271
+            }
+          ]
+        },
+        {
+          "task_id": "bank_hard_026",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'job': 'unemployed', 'mean': 40.97, 'std': 9.74, 'volatility': 0.2377}, {'job': 'self-employed', 'mean': 40.42, 'std': 9.46, 'volatility': 0.234}, {'job': 'admin.', 'mean': 39.68, 'std': 9.23, 'volatility': 0.2326}, {'job': 'services', 'mean': 38.94, 'std': 8.86, 'volatility': 0.2275}, {'job': 'management', 'mean': 40.2, 'std': 9.13, 'volatility': 0.2271}]",
+          "expected": [
+            {
+              "job": "unemployed",
+              "mean": 40.97,
+              "std": 9.74,
+              "volatility": 0.2377
+            },
+            {
+              "job": "self-employed",
+              "mean": 40.42,
+              "std": 9.46,
+              "volatility": 0.234
+            },
+            {
+              "job": "admin.",
+              "mean": 39.68,
+              "std": 9.23,
+              "volatility": 0.2326
+            },
+            {
+              "job": "services",
+              "mean": 38.94,
+              "std": 8.86,
+              "volatility": 0.2275
+            },
+            {
+              "job": "management",
+              "mean": 40.2,
+              "std": 9.13,
+              "volatility": 0.2271
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "model": "google--gemini-2.5-pro",
+      "provider": "google",
+      "name": "gemini-2.5-pro",
+      "displayName": "Gemini 2.5 Pro",
+      "color": "#3B82F6",
+      "bank": {
+        "correct": 0,
+        "total": 0,
+        "partial": 0,
+        "pct": 0
+      },
+      "road": {
+        "correct": 8,
+        "total": 18,
+        "partial": 0,
+        "pct": 44.4
+      },
+      "combined": {
+        "correct": 8,
+        "total": 18,
+        "partial": 0,
+        "pct": 44.4
+      },
+      "avgReward": 0.422,
+      "hasBank": false,
+      "hasRoad": true,
+      "complete": false,
+      "rollouts": [
+        {
+          "task_id": "road_hard_021",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'weather': 'foggy', 'count': 181463, 'avg_accident_risk': 0.3863}, {'weather': 'rainy', 'count': 156985, 'avg_accident_risk': 0.3615}, {'weather': 'clear', 'count': 179306, 'avg_accident_risk': 0.3101}]",
+          "expected": [
+            {
+              "weather": "foggy",
+              "count": 181463,
+              "avg_accident_risk": 0.3863
+            },
+            {
+              "weather": "rainy",
+              "count": 156985,
+              "avg_accident_risk": 0.3615
+            },
+            {
+              "weather": "clear",
+              "count": 179306,
+              "avg_accident_risk": 0.3101
+            }
+          ]
+        },
+        {
+          "task_id": "road_hard_021",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'weather': 'foggy', 'count': 181463, 'avg_accident_risk': 0.3863}, {'weather': 'rainy', 'count': 156985, 'avg_accident_risk': 0.3615}, {'weather': 'clear', 'count': 179306, 'avg_accident_risk': 0.3101}]",
+          "expected": [
+            {
+              "weather": "foggy",
+              "count": 181463,
+              "avg_accident_risk": 0.3863
+            },
+            {
+              "weather": "rainy",
+              "count": 156985,
+              "avg_accident_risk": 0.3615
+            },
+            {
+              "weather": "clear",
+              "count": 179306,
+              "avg_accident_risk": 0.3101
+            }
+          ]
+        },
+        {
+          "task_id": "road_hard_021",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'weather': 'foggy', 'count': 181463, 'avg_accident_risk': 0.3863}, {'weather': 'rainy', 'count': 156985, 'avg_accident_risk': 0.3615}, {'weather': 'clear', 'count': 179306, 'avg_accident_risk': 0.3101}]",
+          "expected": [
+            {
+              "weather": "foggy",
+              "count": 181463,
+              "avg_accident_risk": 0.3863
+            },
+            {
+              "weather": "rainy",
+              "count": 156985,
+              "avg_accident_risk": 0.3615
+            },
+            {
+              "weather": "clear",
+              "count": 179306,
+              "avg_accident_risk": 0.3101
+            }
+          ]
+        },
+        {
+          "task_id": "road_hard_014",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'lighting': 'dim', 'count': 183826, 'total_num_reported_accidents': 211283, 'avg_num_reported_accidents': 1.15}, {'lighting': 'daylight', 'count': 178015, 'total_num_reported_accidents': 207579, 'avg_num_reported_accidents': 1.17}, {'lighting': 'night', 'count': 155913, 'total_num_reported_accidents': 196214, 'avg_num_reported_accidents': 1.26}]",
+          "expected": [
+            {
+              "lighting": "dim",
+              "count": 183826,
+              "total_num_reported_accidents": 211283,
+              "avg_num_reported_accidents": 1.15
+            },
+            {
+              "lighting": "daylight",
+              "count": 178015,
+              "total_num_reported_accidents": 207579,
+              "avg_num_reported_accidents": 1.17
+            },
+            {
+              "lighting": "night",
+              "count": 155913,
+              "total_num_reported_accidents": 196214,
+              "avg_num_reported_accidents": 1.26
+            }
+          ]
+        },
+        {
+          "task_id": "road_hard_014",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'lighting': 'dim', 'count': 183826, 'total_num_reported_accidents': 211283, 'avg_num_reported_accidents': 1.15}, {'lighting': 'daylight', 'count': 178015, 'total_num_reported_accidents': 207579, 'avg_num_reported_accidents': 1.17}, {'lighting': 'night', 'count': 155913, 'total_num_reported_accidents': 196214, 'avg_num_reported_accidents': 1.26}]",
+          "expected": [
+            {
+              "lighting": "dim",
+              "count": 183826,
+              "total_num_reported_accidents": 211283,
+              "avg_num_reported_accidents": 1.15
+            },
+            {
+              "lighting": "daylight",
+              "count": 178015,
+              "total_num_reported_accidents": 207579,
+              "avg_num_reported_accidents": 1.17
+            },
+            {
+              "lighting": "night",
+              "count": 155913,
+              "total_num_reported_accidents": 196214,
+              "avg_num_reported_accidents": 1.26
+            }
+          ]
+        },
+        {
+          "task_id": "road_hard_014",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'lighting': 'dim', 'count': 183826, 'total_num_reported_accidents': 211283, 'avg_num_reported_accidents': 1.15}, {'lighting': 'daylight', 'count': 178015, 'total_num_reported_accidents': 207579, 'avg_num_reported_accidents': 1.17}, {'lighting': 'night', 'count': 155913, 'total_num_reported_accidents': 196214, 'avg_num_reported_accidents': 1.26}]",
+          "expected": [
+            {
+              "lighting": "dim",
+              "count": 183826,
+              "total_num_reported_accidents": 211283,
+              "avg_num_reported_accidents": 1.15
+            },
+            {
+              "lighting": "daylight",
+              "count": 178015,
+              "total_num_reported_accidents": 207579,
+              "avg_num_reported_accidents": 1.17
+            },
+            {
+              "lighting": "night",
+              "count": 155913,
+              "total_num_reported_accidents": 196214,
+              "avg_num_reported_accidents": 1.26
+            }
+          ]
+        },
+        {
+          "task_id": "road_hard_007",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "-0.17",
+          "expected": -0.17
+        },
+        {
+          "task_id": "road_hard_007",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "-0.17",
+          "expected": -0.17
+        },
+        {
+          "task_id": "road_hard_007",
+          "dataset": "road",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.05,
+          "reward": 0.9416666667,
+          "answer": "-0.17",
+          "expected": -0.17
+        },
+        {
+          "task_id": "road_hard_004",
+          "dataset": "road",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.06,
+          "reward": 0.9555555556,
+          "answer": "-0.01",
+          "expected": -0.01
+        },
+        {
+          "task_id": "road_hard_004",
+          "dataset": "road",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.06,
+          "reward": 0.9555555556,
+          "answer": "-0.01",
+          "expected": -0.01
+        },
+        {
+          "task_id": "road_hard_004",
+          "dataset": "road",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.04,
+          "reward": 0.9277777778,
+          "answer": "-0.01",
+          "expected": -0.01
+        },
+        {
+          "task_id": "road_hard_002",
+          "dataset": "road",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.01,
+          "reward": 0.8861111111,
+          "answer": "0.41",
+          "expected": 0.41
+        },
+        {
+          "task_id": "road_hard_002",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "0.41",
+          "expected": 0.41
+        },
+        {
+          "task_id": "road_hard_002",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "0.41",
+          "expected": 0.41
+        }
+      ]
+    },
+    {
+      "model": "qwen--qwen3-235b-a22b-thinking-2507",
+      "provider": "qwen",
+      "name": "qwen3-235b-a22b-thinking-2507",
+      "displayName": "Qwen3 235B A22B Thinking 2507",
+      "color": "#10B981",
+      "bank": {
+        "correct": 25,
+        "total": 57,
+        "partial": 3,
+        "pct": 43.9
+      },
+      "road": {
+        "correct": 0,
+        "total": 0,
+        "partial": 0,
+        "pct": 0
+      },
+      "combined": {
+        "correct": 25,
+        "total": 57,
+        "partial": 3,
+        "pct": 43.9
+      },
+      "avgReward": 0.4498,
+      "hasBank": true,
+      "hasRoad": false,
+      "complete": false,
+      "rollouts": [
+        {
+          "task_id": "bank_hard_031",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'month': 'feb', 'mean': 6.05, 'std': 5.46, 'volatility': 0.9025}, {'month': 'sep', 'mean': 11.67, 'std': 8.04, 'volatility': 0.6889}, {'month': 'mar', 'mean': 13.45, 'std': 9.18, 'volatility': 0.6825}, {'month': 'jun', 'mean': 11.32, 'std': 7.33, 'volatility': 0.6475}, {'month': 'dec', 'mean': 14.19, 'std': 8.83, 'volatility': 0.6223}]",
+          "expected": [
+            {
+              "month": "feb",
+              "mean": 6.05,
+              "std": 5.46,
+              "volatility": 0.9025
+            },
+            {
+              "month": "sep",
+              "mean": 11.67,
+              "std": 8.04,
+              "volatility": 0.6889
+            },
+            {
+              "month": "mar",
+              "mean": 13.45,
+              "std": 9.18,
+              "volatility": 0.6825
+            },
+            {
+              "month": "jun",
+              "mean": 11.32,
+              "std": 7.33,
+              "volatility": 0.6475
+            },
+            {
+              "month": "dec",
+              "mean": 14.19,
+              "std": 8.83,
+              "volatility": 0.6223
+            }
+          ]
+        },
+        {
+          "task_id": "bank_hard_031",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'month': 'feb', 'mean': 6.05, 'std': 5.46, 'volatility': 0.9025}, {'month': 'sep', 'mean': 11.67, 'std': 8.04, 'volatility': 0.6889}, {'month': 'mar', 'mean': 13.45, 'std': 9.18, 'volatility': 0.6825}, {'month': 'jun', 'mean': 11.32, 'std': 7.33, 'volatility': 0.6475}, {'month': 'dec', 'mean': 14.19, 'std': 8.83, 'volatility': 0.6223}]",
+          "expected": [
+            {
+              "month": "feb",
+              "mean": 6.05,
+              "std": 5.46,
+              "volatility": 0.9025
+            },
+            {
+              "month": "sep",
+              "mean": 11.67,
+              "std": 8.04,
+              "volatility": 0.6889
+            },
+            {
+              "month": "mar",
+              "mean": 13.45,
+              "std": 9.18,
+              "volatility": 0.6825
+            },
+            {
+              "month": "jun",
+              "mean": 11.32,
+              "std": 7.33,
+              "volatility": 0.6475
+            },
+            {
+              "month": "dec",
+              "mean": 14.19,
+              "std": 8.83,
+              "volatility": 0.6223
+            }
+          ]
+        },
+        {
+          "task_id": "bank_hard_031",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'month': 'feb', 'mean': 6.05, 'std': 5.46, 'volatility': 0.9025}, {'month': 'sep', 'mean': 11.67, 'std': 8.04, 'volatility': 0.6889}, {'month': 'mar', 'mean': 13.45, 'std': 9.18, 'volatility': 0.6825}, {'month': 'jun', 'mean': 11.32, 'std': 7.33, 'volatility': 0.6475}, {'month': 'dec', 'mean': 14.19, 'std': 8.83, 'volatility': 0.6223}]",
+          "expected": [
+            {
+              "month": "feb",
+              "mean": 6.05,
+              "std": 5.46,
+              "volatility": 0.9025
+            },
+            {
+              "month": "sep",
+              "mean": 11.67,
+              "std": 8.04,
+              "volatility": 0.6889
+            },
+            {
+              "month": "mar",
+              "mean": 13.45,
+              "std": 9.18,
+              "volatility": 0.6825
+            },
+            {
+              "month": "jun",
+              "mean": 11.32,
+              "std": 7.33,
+              "volatility": 0.6475
+            },
+            {
+              "month": "dec",
+              "mean": 14.19,
+              "std": 8.83,
+              "volatility": 0.6223
+            }
+          ]
+        },
+        {
+          "task_id": "bank_hard_044",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.08,
+          "reward": 0.98,
+          "answer": "38.98",
+          "expected": 38.98
+        },
+        {
+          "task_id": "bank_hard_044",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.08,
+          "reward": 0.98,
+          "answer": "38.98",
+          "expected": 38.98
+        },
+        {
+          "task_id": "bank_hard_044",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.08,
+          "reward": 0.98,
+          "answer": "38.98",
+          "expected": 38.98
+        },
+        {
+          "task_id": "bank_hard_023",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "33.53",
+          "expected": 33.53
+        },
+        {
+          "task_id": "bank_hard_023",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "33.53",
+          "expected": 33.53
+        },
+        {
+          "task_id": "bank_hard_023",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "33.53",
+          "expected": 33.53
+        },
+        {
+          "task_id": "bank_hard_021",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.07,
+          "reward": 0.9694444444000001,
+          "answer": "24.62",
+          "expected": 24.62
+        },
+        {
+          "task_id": "bank_hard_021",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.08,
+          "reward": 0.98,
+          "answer": "24.62",
+          "expected": 24.62
+        },
+        {
+          "task_id": "bank_hard_021",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.08,
+          "reward": 0.98,
+          "answer": "24.62",
+          "expected": 24.62
+        },
+        {
+          "task_id": "bank_hard_040",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.08,
+          "reward": 0.98,
+          "answer": "0.65",
+          "expected": 0.65
+        },
+        {
+          "task_id": "bank_hard_040",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "0.65",
+          "expected": 0.65
+        },
+        {
+          "task_id": "bank_hard_040",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.08,
+          "reward": 0.98,
+          "answer": "0.65",
+          "expected": 0.65
+        }
+      ]
+    },
+    {
+      "model": "mistralai--mistral-large-2512",
+      "provider": "mistralai",
+      "name": "mistral-large-2512",
+      "displayName": "Mistral Large 2512",
+      "color": "#F97316",
+      "bank": {
+        "correct": 24,
+        "total": 57,
+        "partial": 2,
+        "pct": 42.1
+      },
+      "road": {
+        "correct": 8,
+        "total": 18,
+        "partial": 0,
+        "pct": 44.4
+      },
+      "combined": {
+        "correct": 32,
+        "total": 75,
+        "partial": 2,
+        "pct": 42.7
+      },
+      "avgReward": 0.4236,
+      "hasBank": true,
+      "hasRoad": true,
+      "complete": true,
+      "rollouts": [
+        {
+          "task_id": "bank_hard_028",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "0.84",
+          "expected": 0.84
+        },
+        {
+          "task_id": "bank_hard_028",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.07,
+          "reward": 0.9694444444000001,
+          "answer": "0.84",
+          "expected": 0.84
+        },
+        {
+          "task_id": "bank_hard_028",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "0.84",
+          "expected": 0.84
+        },
+        {
+          "task_id": "bank_hard_044",
+          "dataset": "bank",
+          "score_correctness": 0.2,
+          "score_efficiency": 0.07,
+          "reward": 0.3694444444,
+          "answer": "38.98",
+          "expected": 38.98
+        },
+        {
+          "task_id": "bank_hard_044",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "38.98",
+          "expected": 38.98
+        },
+        {
+          "task_id": "bank_hard_044",
+          "dataset": "bank",
+          "score_correctness": 0.2,
+          "score_efficiency": 0.08,
+          "reward": 0.38,
+          "answer": "38.98",
+          "expected": 38.98
+        },
+        {
+          "task_id": "bank_hard_021",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.08,
+          "reward": 0.98,
+          "answer": "24.62",
+          "expected": 24.62
+        },
+        {
+          "task_id": "bank_hard_021",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.08,
+          "reward": 0.98,
+          "answer": "24.62",
+          "expected": 24.62
+        },
+        {
+          "task_id": "bank_hard_021",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.08,
+          "reward": 0.98,
+          "answer": "24.62",
+          "expected": 24.62
+        },
+        {
+          "task_id": "bank_hard_041",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.08,
+          "reward": 0.98,
+          "answer": "['blue-collar', 'services', 'entrepreneur']",
+          "expected": [
+            "blue-collar",
+            "services",
+            "entrepreneur"
+          ]
+        },
+        {
+          "task_id": "bank_hard_041",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "['blue-collar', 'services', 'entrepreneur']",
+          "expected": [
+            "blue-collar",
+            "services",
+            "entrepreneur"
+          ]
+        },
+        {
+          "task_id": "bank_hard_041",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "['blue-collar', 'services', 'entrepreneur']",
+          "expected": [
+            "blue-collar",
+            "services",
+            "entrepreneur"
+          ]
+        },
+        {
+          "task_id": "bank_hard_020",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "['oct']",
+          "expected": [
+            "oct"
+          ]
+        },
+        {
+          "task_id": "bank_hard_020",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "['oct']",
+          "expected": [
+            "oct"
+          ]
+        },
+        {
+          "task_id": "bank_hard_020",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "['oct']",
+          "expected": [
+            "oct"
+          ]
+        }
+      ]
+    },
+    {
+      "model": "meta-llama--llama-4-maverick",
+      "provider": "meta-llama",
+      "name": "llama-4-maverick",
+      "displayName": "Llama 4 Maverick",
+      "color": "#06B6D4",
+      "bank": {
+        "correct": 22,
+        "total": 57,
+        "partial": 6,
+        "pct": 38.6
+      },
+      "road": {
+        "correct": 5,
+        "total": 18,
+        "partial": 0,
+        "pct": 27.8
+      },
+      "combined": {
+        "correct": 27,
+        "total": 75,
+        "partial": 6,
+        "pct": 36.0
+      },
+      "avgReward": 0.3753,
+      "hasBank": true,
+      "hasRoad": true,
+      "complete": true,
+      "rollouts": [
+        {
+          "task_id": "bank_hard_033",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'job': 'retired', 'count': 35185, 'mean_balance': 1812.07}, {'job': 'unknown', 'count': 2917, 'mean_balance': 1678.96}, {'job': 'self-employed', 'count': 19020, 'mean_balance': 1598.27}, {'job': 'student', 'count': 11767, 'mean_balance': 1577.32}, {'job': 'management', 'count': 175541, 'mean_balance': 1510.39}, {'job': 'unemployed', 'count': 17634, 'mean_balance': 1440.57}, {'job': 'entrepreneur', 'count': 17718, 'mean_balance': 1306.75}, {'job': 'housemaid', 'count': 15912, 'mean_balance': 1281.22}, {'job': 'technician', 'count': 138107, 'mean_balance': 1071.57}, {'job': 'admin.', 'count': 81492, 'mean_balance': 1019.92}, {'job': 'blue-collar', 'count': 170498, 'mean_balance': 977.49}, {'job': 'services', 'count': 64209, 'mean_balance': 834.63}]",
+          "expected": [
+            {
+              "job": "retired",
+              "count": 35185,
+              "mean_balance": 1812.07
+            },
+            {
+              "job": "unknown",
+              "count": 2917,
+              "mean_balance": 1678.96
+            },
+            {
+              "job": "self-employed",
+              "count": 19020,
+              "mean_balance": 1598.27
+            },
+            {
+              "job": "student",
+              "count": 11767,
+              "mean_balance": 1577.32
+            },
+            {
+              "job": "management",
+              "count": 175541,
+              "mean_balance": 1510.39
+            },
+            {
+              "job": "unemployed",
+              "count": 17634,
+              "mean_balance": 1440.57
+            },
+            {
+              "job": "entrepreneur",
+              "count": 17718,
+              "mean_balance": 1306.75
+            },
+            {
+              "job": "housemaid",
+              "count": 15912,
+              "mean_balance": 1281.22
+            },
+            {
+              "job": "technician",
+              "count": 138107,
+              "mean_balance": 1071.57
+            },
+            {
+              "job": "admin.",
+              "count": 81492,
+              "mean_balance": 1019.92
+            },
+            {
+              "job": "blue-collar",
+              "count": 170498,
+              "mean_balance": 977.49
+            },
+            {
+              "job": "services",
+              "count": 64209,
+              "mean_balance": 834.63
+            }
+          ]
+        },
+        {
+          "task_id": "bank_hard_033",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'job': 'retired', 'count': 35185, 'mean_balance': 1812.07}, {'job': 'unknown', 'count': 2917, 'mean_balance': 1678.96}, {'job': 'self-employed', 'count': 19020, 'mean_balance': 1598.27}, {'job': 'student', 'count': 11767, 'mean_balance': 1577.32}, {'job': 'management', 'count': 175541, 'mean_balance': 1510.39}, {'job': 'unemployed', 'count': 17634, 'mean_balance': 1440.57}, {'job': 'entrepreneur', 'count': 17718, 'mean_balance': 1306.75}, {'job': 'housemaid', 'count': 15912, 'mean_balance': 1281.22}, {'job': 'technician', 'count': 138107, 'mean_balance': 1071.57}, {'job': 'admin.', 'count': 81492, 'mean_balance': 1019.92}, {'job': 'blue-collar', 'count': 170498, 'mean_balance': 977.49}, {'job': 'services', 'count': 64209, 'mean_balance': 834.63}]",
+          "expected": [
+            {
+              "job": "retired",
+              "count": 35185,
+              "mean_balance": 1812.07
+            },
+            {
+              "job": "unknown",
+              "count": 2917,
+              "mean_balance": 1678.96
+            },
+            {
+              "job": "self-employed",
+              "count": 19020,
+              "mean_balance": 1598.27
+            },
+            {
+              "job": "student",
+              "count": 11767,
+              "mean_balance": 1577.32
+            },
+            {
+              "job": "management",
+              "count": 175541,
+              "mean_balance": 1510.39
+            },
+            {
+              "job": "unemployed",
+              "count": 17634,
+              "mean_balance": 1440.57
+            },
+            {
+              "job": "entrepreneur",
+              "count": 17718,
+              "mean_balance": 1306.75
+            },
+            {
+              "job": "housemaid",
+              "count": 15912,
+              "mean_balance": 1281.22
+            },
+            {
+              "job": "technician",
+              "count": 138107,
+              "mean_balance": 1071.57
+            },
+            {
+              "job": "admin.",
+              "count": 81492,
+              "mean_balance": 1019.92
+            },
+            {
+              "job": "blue-collar",
+              "count": 170498,
+              "mean_balance": 977.49
+            },
+            {
+              "job": "services",
+              "count": 64209,
+              "mean_balance": 834.63
+            }
+          ]
+        },
+        {
+          "task_id": "bank_hard_033",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'job': 'retired', 'count': 35185, 'mean_balance': 1812.07}, {'job': 'unknown', 'count': 2917, 'mean_balance': 1678.96}, {'job': 'self-employed', 'count': 19020, 'mean_balance': 1598.27}, {'job': 'student', 'count': 11767, 'mean_balance': 1577.32}, {'job': 'management', 'count': 175541, 'mean_balance': 1510.39}, {'job': 'unemployed', 'count': 17634, 'mean_balance': 1440.57}, {'job': 'entrepreneur', 'count': 17718, 'mean_balance': 1306.75}, {'job': 'housemaid', 'count': 15912, 'mean_balance': 1281.22}, {'job': 'technician', 'count': 138107, 'mean_balance': 1071.57}, {'job': 'admin.', 'count': 81492, 'mean_balance': 1019.92}, {'job': 'blue-collar', 'count': 170498, 'mean_balance': 977.49}, {'job': 'services', 'count': 64209, 'mean_balance': 834.63}]",
+          "expected": [
+            {
+              "job": "retired",
+              "count": 35185,
+              "mean_balance": 1812.07
+            },
+            {
+              "job": "unknown",
+              "count": 2917,
+              "mean_balance": 1678.96
+            },
+            {
+              "job": "self-employed",
+              "count": 19020,
+              "mean_balance": 1598.27
+            },
+            {
+              "job": "student",
+              "count": 11767,
+              "mean_balance": 1577.32
+            },
+            {
+              "job": "management",
+              "count": 175541,
+              "mean_balance": 1510.39
+            },
+            {
+              "job": "unemployed",
+              "count": 17634,
+              "mean_balance": 1440.57
+            },
+            {
+              "job": "entrepreneur",
+              "count": 17718,
+              "mean_balance": 1306.75
+            },
+            {
+              "job": "housemaid",
+              "count": 15912,
+              "mean_balance": 1281.22
+            },
+            {
+              "job": "technician",
+              "count": 138107,
+              "mean_balance": 1071.57
+            },
+            {
+              "job": "admin.",
+              "count": 81492,
+              "mean_balance": 1019.92
+            },
+            {
+              "job": "blue-collar",
+              "count": 170498,
+              "mean_balance": 977.49
+            },
+            {
+              "job": "services",
+              "count": 64209,
+              "mean_balance": 834.63
+            }
+          ]
+        },
+        {
+          "task_id": "bank_hard_021",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.08,
+          "reward": 0.98,
+          "answer": "24.62",
+          "expected": 24.62
+        },
+        {
+          "task_id": "bank_hard_021",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "24.62",
+          "expected": 24.62
+        },
+        {
+          "task_id": "bank_hard_021",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.09,
+          "reward": 0.99,
+          "answer": "24.62",
+          "expected": 24.62
+        },
+        {
+          "task_id": "bank_hard_040",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.07,
+          "reward": 0.9694444444000001,
+          "answer": "0.65",
+          "expected": 0.65
+        },
+        {
+          "task_id": "bank_hard_040",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.07,
+          "reward": 0.9694444444000001,
+          "answer": "0.65",
+          "expected": 0.65
+        },
+        {
+          "task_id": "bank_hard_040",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.04,
+          "reward": 0.9277777778,
+          "answer": "0.65",
+          "expected": 0.65
+        },
+        {
+          "task_id": "bank_hard_005",
+          "dataset": "bank",
+          "score_correctness": 0.2,
+          "score_efficiency": 0.07,
+          "reward": 0.3694444444,
+          "answer": "0.59",
+          "expected": 0.59
+        },
+        {
+          "task_id": "bank_hard_005",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "0.59",
+          "expected": 0.59
+        },
+        {
+          "task_id": "bank_hard_005",
+          "dataset": "bank",
+          "score_correctness": 0.2,
+          "score_efficiency": 0.08,
+          "reward": 0.38,
+          "answer": "0.59",
+          "expected": 0.59
+        },
+        {
+          "task_id": "bank_hard_039",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.08,
+          "reward": 0.98,
+          "answer": "11.55",
+          "expected": 11.55
+        },
+        {
+          "task_id": "bank_hard_039",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "11.55",
+          "expected": 11.55
+        },
+        {
+          "task_id": "bank_hard_039",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.07,
+          "reward": 0.9694444444000001,
+          "answer": "11.55",
+          "expected": 11.55
+        }
+      ]
+    },
+    {
+      "model": "mistralai--mistral-small-3.2-24b-instruct",
+      "provider": "mistralai",
+      "name": "mistral-small-3.2-24b-instruct",
+      "displayName": "Mistral Small 3.2 24B Instruct",
+      "color": "#F97316",
+      "bank": {
+        "correct": 21,
+        "total": 57,
+        "partial": 2,
+        "pct": 36.8
+      },
+      "road": {
+        "correct": 5,
+        "total": 18,
+        "partial": 0,
+        "pct": 27.8
+      },
+      "combined": {
+        "correct": 26,
+        "total": 75,
+        "partial": 2,
+        "pct": 34.7
+      },
+      "avgReward": 0.3433,
+      "hasBank": true,
+      "hasRoad": true,
+      "complete": true,
+      "rollouts": [
+        {
+          "task_id": "bank_hard_005",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.06,
+          "reward": 0.9555555556,
+          "answer": "0.59",
+          "expected": 0.59
+        },
+        {
+          "task_id": "bank_hard_005",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.08,
+          "reward": 0.98,
+          "answer": "0.59",
+          "expected": 0.59
+        },
+        {
+          "task_id": "bank_hard_005",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.04,
+          "reward": 0.9277777778,
+          "answer": "0.59",
+          "expected": 0.59
+        },
+        {
+          "task_id": "bank_hard_026",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'job': 'unemployed', 'mean': 40.97, 'std': 9.74, 'volatility': 0.2377}, {'job': 'self-employed', 'mean': 40.42, 'std': 9.46, 'volatility': 0.234}, {'job': 'admin.', 'mean': 39.68, 'std': 9.23, 'volatility': 0.2326}, {'job': 'services', 'mean': 38.94, 'std': 8.86, 'volatility': 0.2275}, {'job': 'management', 'mean': 40.2, 'std': 9.13, 'volatility': 0.2271}]",
+          "expected": [
+            {
+              "job": "unemployed",
+              "mean": 40.97,
+              "std": 9.74,
+              "volatility": 0.2377
+            },
+            {
+              "job": "self-employed",
+              "mean": 40.42,
+              "std": 9.46,
+              "volatility": 0.234
+            },
+            {
+              "job": "admin.",
+              "mean": 39.68,
+              "std": 9.23,
+              "volatility": 0.2326
+            },
+            {
+              "job": "services",
+              "mean": 38.94,
+              "std": 8.86,
+              "volatility": 0.2275
+            },
+            {
+              "job": "management",
+              "mean": 40.2,
+              "std": 9.13,
+              "volatility": 0.2271
+            }
+          ]
+        },
+        {
+          "task_id": "bank_hard_026",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'job': 'unemployed', 'mean': 40.97, 'std': 9.74, 'volatility': 0.2377}, {'job': 'self-employed', 'mean': 40.42, 'std': 9.46, 'volatility': 0.234}, {'job': 'admin.', 'mean': 39.68, 'std': 9.23, 'volatility': 0.2326}, {'job': 'services', 'mean': 38.94, 'std': 8.86, 'volatility': 0.2275}, {'job': 'management', 'mean': 40.2, 'std': 9.13, 'volatility': 0.2271}]",
+          "expected": [
+            {
+              "job": "unemployed",
+              "mean": 40.97,
+              "std": 9.74,
+              "volatility": 0.2377
+            },
+            {
+              "job": "self-employed",
+              "mean": 40.42,
+              "std": 9.46,
+              "volatility": 0.234
+            },
+            {
+              "job": "admin.",
+              "mean": 39.68,
+              "std": 9.23,
+              "volatility": 0.2326
+            },
+            {
+              "job": "services",
+              "mean": 38.94,
+              "std": 8.86,
+              "volatility": 0.2275
+            },
+            {
+              "job": "management",
+              "mean": 40.2,
+              "std": 9.13,
+              "volatility": 0.2271
+            }
+          ]
+        },
+        {
+          "task_id": "bank_hard_026",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'job': 'unemployed', 'mean': 40.97, 'std': 9.74, 'volatility': 0.2377}, {'job': 'self-employed', 'mean': 40.42, 'std': 9.46, 'volatility': 0.234}, {'job': 'admin.', 'mean': 39.68, 'std': 9.23, 'volatility': 0.2326}, {'job': 'services', 'mean': 38.94, 'std': 8.86, 'volatility': 0.2275}, {'job': 'management', 'mean': 40.2, 'std': 9.13, 'volatility': 0.2271}]",
+          "expected": [
+            {
+              "job": "unemployed",
+              "mean": 40.97,
+              "std": 9.74,
+              "volatility": 0.2377
+            },
+            {
+              "job": "self-employed",
+              "mean": 40.42,
+              "std": 9.46,
+              "volatility": 0.234
+            },
+            {
+              "job": "admin.",
+              "mean": 39.68,
+              "std": 9.23,
+              "volatility": 0.2326
+            },
+            {
+              "job": "services",
+              "mean": 38.94,
+              "std": 8.86,
+              "volatility": 0.2275
+            },
+            {
+              "job": "management",
+              "mean": 40.2,
+              "std": 9.13,
+              "volatility": 0.2271
+            }
+          ]
+        },
+        {
+          "task_id": "bank_hard_028",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.07,
+          "reward": 0.9694444444000001,
+          "answer": "0.84",
+          "expected": 0.84
+        },
+        {
+          "task_id": "bank_hard_028",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.07,
+          "reward": 0.9694444444000001,
+          "answer": "0.84",
+          "expected": 0.84
+        },
+        {
+          "task_id": "bank_hard_028",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.08,
+          "reward": 0.98,
+          "answer": "0.84",
+          "expected": 0.84
+        },
+        {
+          "task_id": "bank_hard_031",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'month': 'feb', 'mean': 6.05, 'std': 5.46, 'volatility': 0.9025}, {'month': 'sep', 'mean': 11.67, 'std': 8.04, 'volatility': 0.6889}, {'month': 'mar', 'mean': 13.45, 'std': 9.18, 'volatility': 0.6825}, {'month': 'jun', 'mean': 11.32, 'std': 7.33, 'volatility': 0.6475}, {'month': 'dec', 'mean': 14.19, 'std': 8.83, 'volatility': 0.6223}]",
+          "expected": [
+            {
+              "month": "feb",
+              "mean": 6.05,
+              "std": 5.46,
+              "volatility": 0.9025
+            },
+            {
+              "month": "sep",
+              "mean": 11.67,
+              "std": 8.04,
+              "volatility": 0.6889
+            },
+            {
+              "month": "mar",
+              "mean": 13.45,
+              "std": 9.18,
+              "volatility": 0.6825
+            },
+            {
+              "month": "jun",
+              "mean": 11.32,
+              "std": 7.33,
+              "volatility": 0.6475
+            },
+            {
+              "month": "dec",
+              "mean": 14.19,
+              "std": 8.83,
+              "volatility": 0.6223
+            }
+          ]
+        },
+        {
+          "task_id": "bank_hard_031",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'month': 'feb', 'mean': 6.05, 'std': 5.46, 'volatility': 0.9025}, {'month': 'sep', 'mean': 11.67, 'std': 8.04, 'volatility': 0.6889}, {'month': 'mar', 'mean': 13.45, 'std': 9.18, 'volatility': 0.6825}, {'month': 'jun', 'mean': 11.32, 'std': 7.33, 'volatility': 0.6475}, {'month': 'dec', 'mean': 14.19, 'std': 8.83, 'volatility': 0.6223}]",
+          "expected": [
+            {
+              "month": "feb",
+              "mean": 6.05,
+              "std": 5.46,
+              "volatility": 0.9025
+            },
+            {
+              "month": "sep",
+              "mean": 11.67,
+              "std": 8.04,
+              "volatility": 0.6889
+            },
+            {
+              "month": "mar",
+              "mean": 13.45,
+              "std": 9.18,
+              "volatility": 0.6825
+            },
+            {
+              "month": "jun",
+              "mean": 11.32,
+              "std": 7.33,
+              "volatility": 0.6475
+            },
+            {
+              "month": "dec",
+              "mean": 14.19,
+              "std": 8.83,
+              "volatility": 0.6223
+            }
+          ]
+        },
+        {
+          "task_id": "bank_hard_031",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'month': 'feb', 'mean': 6.05, 'std': 5.46, 'volatility': 0.9025}, {'month': 'sep', 'mean': 11.67, 'std': 8.04, 'volatility': 0.6889}, {'month': 'mar', 'mean': 13.45, 'std': 9.18, 'volatility': 0.6825}, {'month': 'jun', 'mean': 11.32, 'std': 7.33, 'volatility': 0.6475}, {'month': 'dec', 'mean': 14.19, 'std': 8.83, 'volatility': 0.6223}]",
+          "expected": [
+            {
+              "month": "feb",
+              "mean": 6.05,
+              "std": 5.46,
+              "volatility": 0.9025
+            },
+            {
+              "month": "sep",
+              "mean": 11.67,
+              "std": 8.04,
+              "volatility": 0.6889
+            },
+            {
+              "month": "mar",
+              "mean": 13.45,
+              "std": 9.18,
+              "volatility": 0.6825
+            },
+            {
+              "month": "jun",
+              "mean": 11.32,
+              "std": 7.33,
+              "volatility": 0.6475
+            },
+            {
+              "month": "dec",
+              "mean": 14.19,
+              "std": 8.83,
+              "volatility": 0.6223
+            }
+          ]
+        },
+        {
+          "task_id": "bank_hard_012",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "8.27",
+          "expected": 8.27
+        },
+        {
+          "task_id": "bank_hard_012",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "8.27",
+          "expected": 8.27
+        },
+        {
+          "task_id": "bank_hard_012",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "8.27",
+          "expected": 8.27
+        }
+      ]
+    },
+    {
+      "model": "google--gemini-3-pro-preview",
+      "provider": "google",
+      "name": "gemini-3-pro-preview",
+      "displayName": "Gemini 3 Pro Preview",
+      "color": "#3B82F6",
+      "bank": {
+        "correct": 10,
+        "total": 57,
+        "partial": 14,
+        "pct": 17.5
+      },
+      "road": {
+        "correct": 11,
+        "total": 18,
+        "partial": 0,
+        "pct": 61.1
+      },
+      "combined": {
+        "correct": 21,
+        "total": 75,
+        "partial": 14,
+        "pct": 28.0
+      },
+      "avgReward": 0.2937,
+      "hasBank": true,
+      "hasRoad": true,
+      "complete": true,
+      "rollouts": [
+        {
+          "task_id": "bank_hard_038",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.05,
+          "reward": 0.9416666667000001,
+          "answer": "16.09",
+          "expected": 16.09
+        },
+        {
+          "task_id": "bank_hard_038",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.05,
+          "reward": 0.9416666667000001,
+          "answer": "16.09",
+          "expected": 16.09
+        },
+        {
+          "task_id": "bank_hard_038",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.05,
+          "reward": 0.9416666667000001,
+          "answer": "16.09",
+          "expected": 16.09
+        },
+        {
+          "task_id": "bank_hard_001",
+          "dataset": "bank",
+          "score_correctness": 0.2,
+          "score_efficiency": 0.0,
+          "reward": 0.2,
+          "answer": "2.44",
+          "expected": 2.44
+        },
+        {
+          "task_id": "bank_hard_001",
+          "dataset": "bank",
+          "score_correctness": 0.2,
+          "score_efficiency": 0.0,
+          "reward": 0.2,
+          "answer": "2.44",
+          "expected": 2.44
+        },
+        {
+          "task_id": "bank_hard_001",
+          "dataset": "bank",
+          "score_correctness": 0.2,
+          "score_efficiency": 0.0,
+          "reward": 0.2,
+          "answer": "2.44",
+          "expected": 2.44
+        },
+        {
+          "task_id": "bank_hard_031",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'month': 'feb', 'mean': 6.05, 'std': 5.46, 'volatility': 0.9025}, {'month': 'sep', 'mean': 11.67, 'std': 8.04, 'volatility': 0.6889}, {'month': 'mar', 'mean': 13.45, 'std': 9.18, 'volatility': 0.6825}, {'month': 'jun', 'mean': 11.32, 'std': 7.33, 'volatility': 0.6475}, {'month': 'dec', 'mean': 14.19, 'std': 8.83, 'volatility': 0.6223}]",
+          "expected": [
+            {
+              "month": "feb",
+              "mean": 6.05,
+              "std": 5.46,
+              "volatility": 0.9025
+            },
+            {
+              "month": "sep",
+              "mean": 11.67,
+              "std": 8.04,
+              "volatility": 0.6889
+            },
+            {
+              "month": "mar",
+              "mean": 13.45,
+              "std": 9.18,
+              "volatility": 0.6825
+            },
+            {
+              "month": "jun",
+              "mean": 11.32,
+              "std": 7.33,
+              "volatility": 0.6475
+            },
+            {
+              "month": "dec",
+              "mean": 14.19,
+              "std": 8.83,
+              "volatility": 0.6223
+            }
+          ]
+        },
+        {
+          "task_id": "bank_hard_031",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'month': 'feb', 'mean': 6.05, 'std': 5.46, 'volatility': 0.9025}, {'month': 'sep', 'mean': 11.67, 'std': 8.04, 'volatility': 0.6889}, {'month': 'mar', 'mean': 13.45, 'std': 9.18, 'volatility': 0.6825}, {'month': 'jun', 'mean': 11.32, 'std': 7.33, 'volatility': 0.6475}, {'month': 'dec', 'mean': 14.19, 'std': 8.83, 'volatility': 0.6223}]",
+          "expected": [
+            {
+              "month": "feb",
+              "mean": 6.05,
+              "std": 5.46,
+              "volatility": 0.9025
+            },
+            {
+              "month": "sep",
+              "mean": 11.67,
+              "std": 8.04,
+              "volatility": 0.6889
+            },
+            {
+              "month": "mar",
+              "mean": 13.45,
+              "std": 9.18,
+              "volatility": 0.6825
+            },
+            {
+              "month": "jun",
+              "mean": 11.32,
+              "std": 7.33,
+              "volatility": 0.6475
+            },
+            {
+              "month": "dec",
+              "mean": 14.19,
+              "std": 8.83,
+              "volatility": 0.6223
+            }
+          ]
+        },
+        {
+          "task_id": "bank_hard_031",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'month': 'feb', 'mean': 6.05, 'std': 5.46, 'volatility': 0.9025}, {'month': 'sep', 'mean': 11.67, 'std': 8.04, 'volatility': 0.6889}, {'month': 'mar', 'mean': 13.45, 'std': 9.18, 'volatility': 0.6825}, {'month': 'jun', 'mean': 11.32, 'std': 7.33, 'volatility': 0.6475}, {'month': 'dec', 'mean': 14.19, 'std': 8.83, 'volatility': 0.6223}]",
+          "expected": [
+            {
+              "month": "feb",
+              "mean": 6.05,
+              "std": 5.46,
+              "volatility": 0.9025
+            },
+            {
+              "month": "sep",
+              "mean": 11.67,
+              "std": 8.04,
+              "volatility": 0.6889
+            },
+            {
+              "month": "mar",
+              "mean": 13.45,
+              "std": 9.18,
+              "volatility": 0.6825
+            },
+            {
+              "month": "jun",
+              "mean": 11.32,
+              "std": 7.33,
+              "volatility": 0.6475
+            },
+            {
+              "month": "dec",
+              "mean": 14.19,
+              "std": 8.83,
+              "volatility": 0.6223
+            }
+          ]
+        },
+        {
+          "task_id": "bank_hard_019",
+          "dataset": "bank",
+          "score_correctness": 0.2,
+          "score_efficiency": 0.0,
+          "reward": 0.2,
+          "answer": "7.04",
+          "expected": 7.04
+        },
+        {
+          "task_id": "bank_hard_019",
+          "dataset": "bank",
+          "score_correctness": 0.2,
+          "score_efficiency": 0.0,
+          "reward": 0.2,
+          "answer": "7.04",
+          "expected": 7.04
+        },
+        {
+          "task_id": "bank_hard_019",
+          "dataset": "bank",
+          "score_correctness": 0.2,
+          "score_efficiency": 0.0,
+          "reward": 0.2,
+          "answer": "7.04",
+          "expected": 7.04
+        },
+        {
+          "task_id": "bank_hard_029",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "0.54",
+          "expected": 0.54
+        },
+        {
+          "task_id": "bank_hard_029",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "0.54",
+          "expected": 0.54
+        },
+        {
+          "task_id": "bank_hard_029",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "0.54",
+          "expected": 0.54
+        }
+      ]
+    },
+    {
+      "model": "x-ai--grok-4-fast",
+      "provider": "x-ai",
+      "name": "grok-4-fast",
+      "displayName": "Grok 4 Fast",
+      "color": "#EF4444",
+      "bank": {
+        "correct": 12,
+        "total": 57,
+        "partial": 5,
+        "pct": 21.1
+      },
+      "road": {
+        "correct": 0,
+        "total": 0,
+        "partial": 0,
+        "pct": 0
+      },
+      "combined": {
+        "correct": 12,
+        "total": 57,
+        "partial": 5,
+        "pct": 21.1
+      },
+      "avgReward": 0.2289,
+      "hasBank": true,
+      "hasRoad": false,
+      "complete": false,
+      "rollouts": [
+        {
+          "task_id": "bank_hard_023",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.08,
+          "reward": 0.98,
+          "answer": "33.53",
+          "expected": 33.53
+        },
+        {
+          "task_id": "bank_hard_023",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "33.53",
+          "expected": 33.53
+        },
+        {
+          "task_id": "bank_hard_023",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "33.53",
+          "expected": 33.53
+        },
+        {
+          "task_id": "bank_hard_001",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.08,
+          "reward": 0.98,
+          "answer": "2.44",
+          "expected": 2.44
+        },
+        {
+          "task_id": "bank_hard_001",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "2.44",
+          "expected": 2.44
+        },
+        {
+          "task_id": "bank_hard_001",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.08,
+          "reward": 0.98,
+          "answer": "2.44",
+          "expected": 2.44
+        },
+        {
+          "task_id": "bank_hard_031",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'month': 'feb', 'mean': 6.05, 'std': 5.46, 'volatility': 0.9025}, {'month': 'sep', 'mean': 11.67, 'std': 8.04, 'volatility': 0.6889}, {'month': 'mar', 'mean': 13.45, 'std': 9.18, 'volatility': 0.6825}, {'month': 'jun', 'mean': 11.32, 'std': 7.33, 'volatility': 0.6475}, {'month': 'dec', 'mean': 14.19, 'std': 8.83, 'volatility': 0.6223}]",
+          "expected": [
+            {
+              "month": "feb",
+              "mean": 6.05,
+              "std": 5.46,
+              "volatility": 0.9025
+            },
+            {
+              "month": "sep",
+              "mean": 11.67,
+              "std": 8.04,
+              "volatility": 0.6889
+            },
+            {
+              "month": "mar",
+              "mean": 13.45,
+              "std": 9.18,
+              "volatility": 0.6825
+            },
+            {
+              "month": "jun",
+              "mean": 11.32,
+              "std": 7.33,
+              "volatility": 0.6475
+            },
+            {
+              "month": "dec",
+              "mean": 14.19,
+              "std": 8.83,
+              "volatility": 0.6223
+            }
+          ]
+        },
+        {
+          "task_id": "bank_hard_031",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'month': 'feb', 'mean': 6.05, 'std': 5.46, 'volatility': 0.9025}, {'month': 'sep', 'mean': 11.67, 'std': 8.04, 'volatility': 0.6889}, {'month': 'mar', 'mean': 13.45, 'std': 9.18, 'volatility': 0.6825}, {'month': 'jun', 'mean': 11.32, 'std': 7.33, 'volatility': 0.6475}, {'month': 'dec', 'mean': 14.19, 'std': 8.83, 'volatility': 0.6223}]",
+          "expected": [
+            {
+              "month": "feb",
+              "mean": 6.05,
+              "std": 5.46,
+              "volatility": 0.9025
+            },
+            {
+              "month": "sep",
+              "mean": 11.67,
+              "std": 8.04,
+              "volatility": 0.6889
+            },
+            {
+              "month": "mar",
+              "mean": 13.45,
+              "std": 9.18,
+              "volatility": 0.6825
+            },
+            {
+              "month": "jun",
+              "mean": 11.32,
+              "std": 7.33,
+              "volatility": 0.6475
+            },
+            {
+              "month": "dec",
+              "mean": 14.19,
+              "std": 8.83,
+              "volatility": 0.6223
+            }
+          ]
+        },
+        {
+          "task_id": "bank_hard_031",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'month': 'feb', 'mean': 6.05, 'std': 5.46, 'volatility': 0.9025}, {'month': 'sep', 'mean': 11.67, 'std': 8.04, 'volatility': 0.6889}, {'month': 'mar', 'mean': 13.45, 'std': 9.18, 'volatility': 0.6825}, {'month': 'jun', 'mean': 11.32, 'std': 7.33, 'volatility': 0.6475}, {'month': 'dec', 'mean': 14.19, 'std': 8.83, 'volatility': 0.6223}]",
+          "expected": [
+            {
+              "month": "feb",
+              "mean": 6.05,
+              "std": 5.46,
+              "volatility": 0.9025
+            },
+            {
+              "month": "sep",
+              "mean": 11.67,
+              "std": 8.04,
+              "volatility": 0.6889
+            },
+            {
+              "month": "mar",
+              "mean": 13.45,
+              "std": 9.18,
+              "volatility": 0.6825
+            },
+            {
+              "month": "jun",
+              "mean": 11.32,
+              "std": 7.33,
+              "volatility": 0.6475
+            },
+            {
+              "month": "dec",
+              "mean": 14.19,
+              "std": 8.83,
+              "volatility": 0.6223
+            }
+          ]
+        },
+        {
+          "task_id": "bank_hard_044",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "38.98",
+          "expected": 38.98
+        },
+        {
+          "task_id": "bank_hard_044",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "38.98",
+          "expected": 38.98
+        },
+        {
+          "task_id": "bank_hard_044",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.08,
+          "reward": 0.98,
+          "answer": "38.98",
+          "expected": 38.98
+        },
+        {
+          "task_id": "bank_hard_038",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "16.09",
+          "expected": 16.09
+        },
+        {
+          "task_id": "bank_hard_038",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "16.09",
+          "expected": 16.09
+        },
+        {
+          "task_id": "bank_hard_038",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "16.09",
+          "expected": 16.09
+        }
+      ]
+    },
+    {
+      "model": "openai--gpt-4o-mini",
+      "provider": "openai",
+      "name": "gpt-4o-mini",
+      "displayName": "Gpt 4O Mini",
+      "color": "#F59E0B",
+      "bank": {
+        "correct": 0,
+        "total": 0,
+        "partial": 0,
+        "pct": 0
+      },
+      "road": {
+        "correct": 3,
+        "total": 18,
+        "partial": 0,
+        "pct": 16.7
+      },
+      "combined": {
+        "correct": 3,
+        "total": 18,
+        "partial": 0,
+        "pct": 16.7
+      },
+      "avgReward": 0.1515,
+      "hasBank": false,
+      "hasRoad": true,
+      "complete": false,
+      "rollouts": [
+        {
+          "task_id": "road_hard_002",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "0.41",
+          "expected": 0.41
+        },
+        {
+          "task_id": "road_hard_002",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "0.41",
+          "expected": 0.41
+        },
+        {
+          "task_id": "road_hard_002",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "0.41",
+          "expected": 0.41
+        },
+        {
+          "task_id": "road_hard_014",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'lighting': 'dim', 'count': 183826, 'total_num_reported_accidents': 211283, 'avg_num_reported_accidents': 1.15}, {'lighting': 'daylight', 'count': 178015, 'total_num_reported_accidents': 207579, 'avg_num_reported_accidents': 1.17}, {'lighting': 'night', 'count': 155913, 'total_num_reported_accidents': 196214, 'avg_num_reported_accidents': 1.26}]",
+          "expected": [
+            {
+              "lighting": "dim",
+              "count": 183826,
+              "total_num_reported_accidents": 211283,
+              "avg_num_reported_accidents": 1.15
+            },
+            {
+              "lighting": "daylight",
+              "count": 178015,
+              "total_num_reported_accidents": 207579,
+              "avg_num_reported_accidents": 1.17
+            },
+            {
+              "lighting": "night",
+              "count": 155913,
+              "total_num_reported_accidents": 196214,
+              "avg_num_reported_accidents": 1.26
+            }
+          ]
+        },
+        {
+          "task_id": "road_hard_014",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'lighting': 'dim', 'count': 183826, 'total_num_reported_accidents': 211283, 'avg_num_reported_accidents': 1.15}, {'lighting': 'daylight', 'count': 178015, 'total_num_reported_accidents': 207579, 'avg_num_reported_accidents': 1.17}, {'lighting': 'night', 'count': 155913, 'total_num_reported_accidents': 196214, 'avg_num_reported_accidents': 1.26}]",
+          "expected": [
+            {
+              "lighting": "dim",
+              "count": 183826,
+              "total_num_reported_accidents": 211283,
+              "avg_num_reported_accidents": 1.15
+            },
+            {
+              "lighting": "daylight",
+              "count": 178015,
+              "total_num_reported_accidents": 207579,
+              "avg_num_reported_accidents": 1.17
+            },
+            {
+              "lighting": "night",
+              "count": 155913,
+              "total_num_reported_accidents": 196214,
+              "avg_num_reported_accidents": 1.26
+            }
+          ]
+        },
+        {
+          "task_id": "road_hard_014",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'lighting': 'dim', 'count': 183826, 'total_num_reported_accidents': 211283, 'avg_num_reported_accidents': 1.15}, {'lighting': 'daylight', 'count': 178015, 'total_num_reported_accidents': 207579, 'avg_num_reported_accidents': 1.17}, {'lighting': 'night', 'count': 155913, 'total_num_reported_accidents': 196214, 'avg_num_reported_accidents': 1.26}]",
+          "expected": [
+            {
+              "lighting": "dim",
+              "count": 183826,
+              "total_num_reported_accidents": 211283,
+              "avg_num_reported_accidents": 1.15
+            },
+            {
+              "lighting": "daylight",
+              "count": 178015,
+              "total_num_reported_accidents": 207579,
+              "avg_num_reported_accidents": 1.17
+            },
+            {
+              "lighting": "night",
+              "count": 155913,
+              "total_num_reported_accidents": 196214,
+              "avg_num_reported_accidents": 1.26
+            }
+          ]
+        },
+        {
+          "task_id": "road_hard_007",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "-0.17",
+          "expected": -0.17
+        },
+        {
+          "task_id": "road_hard_007",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "-0.17",
+          "expected": -0.17
+        },
+        {
+          "task_id": "road_hard_007",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "-0.17",
+          "expected": -0.17
+        },
+        {
+          "task_id": "road_hard_021",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'weather': 'foggy', 'count': 181463, 'avg_accident_risk': 0.3863}, {'weather': 'rainy', 'count': 156985, 'avg_accident_risk': 0.3615}, {'weather': 'clear', 'count': 179306, 'avg_accident_risk': 0.3101}]",
+          "expected": [
+            {
+              "weather": "foggy",
+              "count": 181463,
+              "avg_accident_risk": 0.3863
+            },
+            {
+              "weather": "rainy",
+              "count": 156985,
+              "avg_accident_risk": 0.3615
+            },
+            {
+              "weather": "clear",
+              "count": 179306,
+              "avg_accident_risk": 0.3101
+            }
+          ]
+        },
+        {
+          "task_id": "road_hard_021",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'weather': 'foggy', 'count': 181463, 'avg_accident_risk': 0.3863}, {'weather': 'rainy', 'count': 156985, 'avg_accident_risk': 0.3615}, {'weather': 'clear', 'count': 179306, 'avg_accident_risk': 0.3101}]",
+          "expected": [
+            {
+              "weather": "foggy",
+              "count": 181463,
+              "avg_accident_risk": 0.3863
+            },
+            {
+              "weather": "rainy",
+              "count": 156985,
+              "avg_accident_risk": 0.3615
+            },
+            {
+              "weather": "clear",
+              "count": 179306,
+              "avg_accident_risk": 0.3101
+            }
+          ]
+        },
+        {
+          "task_id": "road_hard_021",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'weather': 'foggy', 'count': 181463, 'avg_accident_risk': 0.3863}, {'weather': 'rainy', 'count': 156985, 'avg_accident_risk': 0.3615}, {'weather': 'clear', 'count': 179306, 'avg_accident_risk': 0.3101}]",
+          "expected": [
+            {
+              "weather": "foggy",
+              "count": 181463,
+              "avg_accident_risk": 0.3863
+            },
+            {
+              "weather": "rainy",
+              "count": 156985,
+              "avg_accident_risk": 0.3615
+            },
+            {
+              "weather": "clear",
+              "count": 179306,
+              "avg_accident_risk": 0.3101
+            }
+          ]
+        },
+        {
+          "task_id": "road_hard_015",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "0.29",
+          "expected": 0.29
+        },
+        {
+          "task_id": "road_hard_015",
+          "dataset": "road",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.01,
+          "reward": 0.8861111111,
+          "answer": "0.29",
+          "expected": 0.29
+        },
+        {
+          "task_id": "road_hard_015",
+          "dataset": "road",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.02,
+          "reward": 0.9,
+          "answer": "0.29",
+          "expected": 0.29
+        }
+      ]
+    },
+    {
+      "model": "deepseek--deepseek-v3.2",
+      "provider": "deepseek",
+      "name": "deepseek-v3.2",
+      "displayName": "Deepseek V3.2",
+      "color": "#EC4899",
+      "bank": {
+        "correct": 7,
+        "total": 57,
+        "partial": 0,
+        "pct": 12.3
+      },
+      "road": {
+        "correct": 2,
+        "total": 18,
+        "partial": 0,
+        "pct": 11.1
+      },
+      "combined": {
+        "correct": 9,
+        "total": 75,
+        "partial": 0,
+        "pct": 12.0
+      },
+      "avgReward": 0.1073,
+      "hasBank": true,
+      "hasRoad": true,
+      "complete": true,
+      "rollouts": [
+        {
+          "task_id": "bank_hard_023",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.01,
+          "reward": 0.8861111111000001,
+          "answer": "33.53",
+          "expected": 33.53
+        },
+        {
+          "task_id": "bank_hard_023",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "33.53",
+          "expected": 33.53
+        },
+        {
+          "task_id": "bank_hard_023",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "33.53",
+          "expected": 33.53
+        },
+        {
+          "task_id": "bank_hard_030",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "['blue-collar', 'entrepreneur']",
+          "expected": [
+            "blue-collar",
+            "entrepreneur"
+          ]
+        },
+        {
+          "task_id": "bank_hard_030",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "['blue-collar', 'entrepreneur']",
+          "expected": [
+            "blue-collar",
+            "entrepreneur"
+          ]
+        },
+        {
+          "task_id": "bank_hard_030",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "['blue-collar', 'entrepreneur']",
+          "expected": [
+            "blue-collar",
+            "entrepreneur"
+          ]
+        },
+        {
+          "task_id": "bank_hard_020",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "['oct']",
+          "expected": [
+            "oct"
+          ]
+        },
+        {
+          "task_id": "bank_hard_020",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "['oct']",
+          "expected": [
+            "oct"
+          ]
+        },
+        {
+          "task_id": "bank_hard_020",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "['oct']",
+          "expected": [
+            "oct"
+          ]
+        },
+        {
+          "task_id": "bank_hard_029",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "0.54",
+          "expected": 0.54
+        },
+        {
+          "task_id": "bank_hard_029",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "0.54",
+          "expected": 0.54
+        },
+        {
+          "task_id": "bank_hard_029",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.01,
+          "reward": 0.8861111111000001,
+          "answer": "0.54",
+          "expected": 0.54
+        },
+        {
+          "task_id": "bank_hard_035",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "34.08",
+          "expected": 34.08
+        },
+        {
+          "task_id": "bank_hard_035",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "34.08",
+          "expected": 34.08
+        },
+        {
+          "task_id": "bank_hard_035",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "34.08",
+          "expected": 34.08
+        }
+      ]
+    },
+    {
+      "model": "prime-intellect--intellect-3",
+      "provider": "prime-intellect",
+      "name": "intellect-3",
+      "displayName": "Intellect 3",
+      "color": "#A855F7",
+      "bank": {
+        "correct": 5,
+        "total": 57,
+        "partial": 2,
+        "pct": 8.8
+      },
+      "road": {
+        "correct": 3,
+        "total": 18,
+        "partial": 0,
+        "pct": 16.7
+      },
+      "combined": {
+        "correct": 8,
+        "total": 75,
+        "partial": 2,
+        "pct": 10.7
+      },
+      "avgReward": 0.1014,
+      "hasBank": true,
+      "hasRoad": true,
+      "complete": true,
+      "rollouts": [
+        {
+          "task_id": "bank_hard_030",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "['blue-collar', 'entrepreneur']",
+          "expected": [
+            "blue-collar",
+            "entrepreneur"
+          ]
+        },
+        {
+          "task_id": "bank_hard_030",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "['blue-collar', 'entrepreneur']",
+          "expected": [
+            "blue-collar",
+            "entrepreneur"
+          ]
+        },
+        {
+          "task_id": "bank_hard_030",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "['blue-collar', 'entrepreneur']",
+          "expected": [
+            "blue-collar",
+            "entrepreneur"
+          ]
+        },
+        {
+          "task_id": "bank_hard_021",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "24.62",
+          "expected": 24.62
+        },
+        {
+          "task_id": "bank_hard_021",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "24.62",
+          "expected": 24.62
+        },
+        {
+          "task_id": "bank_hard_021",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "24.62",
+          "expected": 24.62
+        },
+        {
+          "task_id": "bank_hard_012",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "8.27",
+          "expected": 8.27
+        },
+        {
+          "task_id": "bank_hard_012",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "8.27",
+          "expected": 8.27
+        },
+        {
+          "task_id": "bank_hard_012",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "8.27",
+          "expected": 8.27
+        },
+        {
+          "task_id": "bank_hard_044",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "38.98",
+          "expected": 38.98
+        },
+        {
+          "task_id": "bank_hard_044",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "38.98",
+          "expected": 38.98
+        },
+        {
+          "task_id": "bank_hard_044",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "38.98",
+          "expected": 38.98
+        },
+        {
+          "task_id": "bank_hard_005",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "0.59",
+          "expected": 0.59
+        },
+        {
+          "task_id": "bank_hard_005",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.06,
+          "reward": 0.9555555556,
+          "answer": "0.59",
+          "expected": 0.59
+        },
+        {
+          "task_id": "bank_hard_005",
+          "dataset": "bank",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.0,
+          "reward": 0.8,
+          "answer": "0.59",
+          "expected": 0.59
+        }
+      ]
+    },
+    {
+      "model": "openai--gpt-4o",
+      "provider": "openai",
+      "name": "gpt-4o",
+      "displayName": "Gpt 4O",
+      "color": "#F59E0B",
+      "bank": {
+        "correct": 0,
+        "total": 0,
+        "partial": 0,
+        "pct": 0
+      },
+      "road": {
+        "correct": 1,
+        "total": 18,
+        "partial": 0,
+        "pct": 5.6
+      },
+      "combined": {
+        "correct": 1,
+        "total": 18,
+        "partial": 0,
+        "pct": 5.6
+      },
+      "avgReward": 0.0508,
+      "hasBank": false,
+      "hasRoad": true,
+      "complete": false,
+      "rollouts": [
+        {
+          "task_id": "road_hard_004",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "-0.01",
+          "expected": -0.01
+        },
+        {
+          "task_id": "road_hard_004",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "-0.01",
+          "expected": -0.01
+        },
+        {
+          "task_id": "road_hard_004",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "-0.01",
+          "expected": -0.01
+        },
+        {
+          "task_id": "road_hard_021",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'weather': 'foggy', 'count': 181463, 'avg_accident_risk': 0.3863}, {'weather': 'rainy', 'count': 156985, 'avg_accident_risk': 0.3615}, {'weather': 'clear', 'count': 179306, 'avg_accident_risk': 0.3101}]",
+          "expected": [
+            {
+              "weather": "foggy",
+              "count": 181463,
+              "avg_accident_risk": 0.3863
+            },
+            {
+              "weather": "rainy",
+              "count": 156985,
+              "avg_accident_risk": 0.3615
+            },
+            {
+              "weather": "clear",
+              "count": 179306,
+              "avg_accident_risk": 0.3101
+            }
+          ]
+        },
+        {
+          "task_id": "road_hard_021",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'weather': 'foggy', 'count': 181463, 'avg_accident_risk': 0.3863}, {'weather': 'rainy', 'count': 156985, 'avg_accident_risk': 0.3615}, {'weather': 'clear', 'count': 179306, 'avg_accident_risk': 0.3101}]",
+          "expected": [
+            {
+              "weather": "foggy",
+              "count": 181463,
+              "avg_accident_risk": 0.3863
+            },
+            {
+              "weather": "rainy",
+              "count": 156985,
+              "avg_accident_risk": 0.3615
+            },
+            {
+              "weather": "clear",
+              "count": 179306,
+              "avg_accident_risk": 0.3101
+            }
+          ]
+        },
+        {
+          "task_id": "road_hard_021",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'weather': 'foggy', 'count': 181463, 'avg_accident_risk': 0.3863}, {'weather': 'rainy', 'count': 156985, 'avg_accident_risk': 0.3615}, {'weather': 'clear', 'count': 179306, 'avg_accident_risk': 0.3101}]",
+          "expected": [
+            {
+              "weather": "foggy",
+              "count": 181463,
+              "avg_accident_risk": 0.3863
+            },
+            {
+              "weather": "rainy",
+              "count": 156985,
+              "avg_accident_risk": 0.3615
+            },
+            {
+              "weather": "clear",
+              "count": 179306,
+              "avg_accident_risk": 0.3101
+            }
+          ]
+        },
+        {
+          "task_id": "road_hard_014",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'lighting': 'dim', 'count': 183826, 'total_num_reported_accidents': 211283, 'avg_num_reported_accidents': 1.15}, {'lighting': 'daylight', 'count': 178015, 'total_num_reported_accidents': 207579, 'avg_num_reported_accidents': 1.17}, {'lighting': 'night', 'count': 155913, 'total_num_reported_accidents': 196214, 'avg_num_reported_accidents': 1.26}]",
+          "expected": [
+            {
+              "lighting": "dim",
+              "count": 183826,
+              "total_num_reported_accidents": 211283,
+              "avg_num_reported_accidents": 1.15
+            },
+            {
+              "lighting": "daylight",
+              "count": 178015,
+              "total_num_reported_accidents": 207579,
+              "avg_num_reported_accidents": 1.17
+            },
+            {
+              "lighting": "night",
+              "count": 155913,
+              "total_num_reported_accidents": 196214,
+              "avg_num_reported_accidents": 1.26
+            }
+          ]
+        },
+        {
+          "task_id": "road_hard_014",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'lighting': 'dim', 'count': 183826, 'total_num_reported_accidents': 211283, 'avg_num_reported_accidents': 1.15}, {'lighting': 'daylight', 'count': 178015, 'total_num_reported_accidents': 207579, 'avg_num_reported_accidents': 1.17}, {'lighting': 'night', 'count': 155913, 'total_num_reported_accidents': 196214, 'avg_num_reported_accidents': 1.26}]",
+          "expected": [
+            {
+              "lighting": "dim",
+              "count": 183826,
+              "total_num_reported_accidents": 211283,
+              "avg_num_reported_accidents": 1.15
+            },
+            {
+              "lighting": "daylight",
+              "count": 178015,
+              "total_num_reported_accidents": 207579,
+              "avg_num_reported_accidents": 1.17
+            },
+            {
+              "lighting": "night",
+              "count": 155913,
+              "total_num_reported_accidents": 196214,
+              "avg_num_reported_accidents": 1.26
+            }
+          ]
+        },
+        {
+          "task_id": "road_hard_014",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "[{'lighting': 'dim', 'count': 183826, 'total_num_reported_accidents': 211283, 'avg_num_reported_accidents': 1.15}, {'lighting': 'daylight', 'count': 178015, 'total_num_reported_accidents': 207579, 'avg_num_reported_accidents': 1.17}, {'lighting': 'night', 'count': 155913, 'total_num_reported_accidents': 196214, 'avg_num_reported_accidents': 1.26}]",
+          "expected": [
+            {
+              "lighting": "dim",
+              "count": 183826,
+              "total_num_reported_accidents": 211283,
+              "avg_num_reported_accidents": 1.15
+            },
+            {
+              "lighting": "daylight",
+              "count": 178015,
+              "total_num_reported_accidents": 207579,
+              "avg_num_reported_accidents": 1.17
+            },
+            {
+              "lighting": "night",
+              "count": 155913,
+              "total_num_reported_accidents": 196214,
+              "avg_num_reported_accidents": 1.26
+            }
+          ]
+        },
+        {
+          "task_id": "road_hard_007",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "-0.17",
+          "expected": -0.17
+        },
+        {
+          "task_id": "road_hard_007",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "-0.17",
+          "expected": -0.17
+        },
+        {
+          "task_id": "road_hard_007",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "-0.17",
+          "expected": -0.17
+        },
+        {
+          "task_id": "road_hard_015",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "0.29",
+          "expected": 0.29
+        },
+        {
+          "task_id": "road_hard_015",
+          "dataset": "road",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "0.29",
+          "expected": 0.29
+        },
+        {
+          "task_id": "road_hard_015",
+          "dataset": "road",
+          "score_correctness": 0.8,
+          "score_efficiency": 0.03,
+          "reward": 0.9138888889,
+          "answer": "0.29",
+          "expected": 0.29
+        }
+      ]
+    },
+    {
+      "model": "google--gemini-3-flash-preview",
+      "provider": "google",
+      "name": "gemini-3-flash-preview",
+      "displayName": "Gemini 3 Flash Preview",
+      "color": "#3B82F6",
+      "bank": {
+        "correct": 1,
+        "total": 57,
+        "partial": 1,
+        "pct": 1.8
+      },
+      "road": {
+        "correct": 3,
+        "total": 18,
+        "partial": 0,
+        "pct": 16.7
+      },
+      "combined": {
+        "correct": 4,
+        "total": 75,
+        "partial": 1,
+        "pct": 5.3
+      },
+      "avgReward": 0.0557,
+      "hasBank": true,
+      "hasRoad": true,
+      "complete": true,
+      "rollouts": [
+        {
+          "task_id": "bank_hard_020",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "['oct']",
+          "expected": [
+            "oct"
+          ]
+        },
+        {
+          "task_id": "bank_hard_020",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "['oct']",
+          "expected": [
+            "oct"
+          ]
+        },
+        {
+          "task_id": "bank_hard_020",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "['oct']",
+          "expected": [
+            "oct"
+          ]
+        },
+        {
+          "task_id": "bank_hard_039",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "11.55",
+          "expected": 11.55
+        },
+        {
+          "task_id": "bank_hard_039",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "11.55",
+          "expected": 11.55
+        },
+        {
+          "task_id": "bank_hard_039",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "11.55",
+          "expected": 11.55
+        },
+        {
+          "task_id": "bank_hard_019",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "7.04",
+          "expected": 7.04
+        },
+        {
+          "task_id": "bank_hard_019",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "7.04",
+          "expected": 7.04
+        },
+        {
+          "task_id": "bank_hard_019",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "7.04",
+          "expected": 7.04
+        },
+        {
+          "task_id": "bank_hard_021",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "24.62",
+          "expected": 24.62
+        },
+        {
+          "task_id": "bank_hard_021",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "24.62",
+          "expected": 24.62
+        },
+        {
+          "task_id": "bank_hard_021",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "24.62",
+          "expected": 24.62
+        },
+        {
+          "task_id": "bank_hard_001",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "2.44",
+          "expected": 2.44
+        },
+        {
+          "task_id": "bank_hard_001",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "2.44",
+          "expected": 2.44
+        },
+        {
+          "task_id": "bank_hard_001",
+          "dataset": "bank",
+          "score_correctness": 0.0,
+          "score_efficiency": 0.0,
+          "reward": 0.0,
+          "answer": "2.44",
+          "expected": 2.44
+        }
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "id": "bank_hard_001",
+      "dataset": "bank",
+      "level": "L6",
+      "template": "multi_condition_filter",
+      "goal": "What's the subscription rate for month='may' AND job='management' AND balance in Q1?",
+      "expected_type": "scalar",
+      "expected_value": 2.44,
+      "tolerance": 0.01,
+      "slots": {
+        "col_a": "month",
+        "val_a": "may",
+        "col_b": "job",
+        "val_b": "management",
+        "metric": "balance",
+        "quartile": "Q1",
+        "target_col": "y",
+        "target_pos": "1",
+        "target_desc": "subscription"
+      },
+      "ambiguities": [
+        "quartile",
+        "how",
+        "define",
+        "q1",
+        "q2",
+        "q3",
+        "q4",
+        "bins",
+        "bucket",
+        "positive",
+        "success",
+        "target",
+        "y=1",
+        "class",
+        "outcome",
+        "null",
+        "missing",
+        "nan",
+        "empty",
+        "na"
+      ]
+    },
+    {
+      "id": "bank_hard_005",
+      "dataset": "bank",
+      "level": "L6",
+      "template": "percentile_cohort",
+      "goal": "Among customers in top 95% of age AND bottom 10% of duration, what's subscription rate?",
+      "expected_type": "scalar",
+      "expected_value": 0.59,
+      "tolerance": 0.01,
+      "slots": {
+        "metric_a": "age",
+        "metric_b": "duration",
+        "pct_high": 95,
+        "pct_low": 10,
+        "target_col": "y",
+        "target_pos": "1",
+        "target_desc": "subscription"
+      },
+      "ambiguities": [
+        "percentile",
+        "inclusive",
+        "exclusive",
+        "boundary",
+        "include",
+        "positive",
+        "success",
+        "target",
+        "y=1",
+        "class",
+        "outcome"
+      ]
+    },
+    {
+      "id": "bank_hard_012",
+      "dataset": "bank",
+      "level": "L5",
+      "template": "chain_conversion",
+      "goal": "Find the job with lowest average balance. What is the subscription rate for that segment?",
+      "expected_type": "scalar",
+      "expected_value": 8.27,
+      "tolerance": 0.01,
+      "slots": {
+        "group_col": "job",
+        "metric": "balance",
+        "extrema": "lowest",
+        "target_col": "y",
+        "target_pos": "1",
+        "target_desc": "subscription"
+      },
+      "ambiguities": [
+        "positive",
+        "success",
+        "target",
+        "y=1",
+        "class",
+        "outcome",
+        "rate",
+        "percentage",
+        "decimal",
+        "format",
+        "0-100",
+        "0-1"
+      ]
+    },
+    {
+      "id": "bank_hard_019",
+      "dataset": "bank",
+      "level": "L6",
+      "template": "multi_condition_filter",
+      "goal": "What's the subscription rate for month='may' AND job='management' AND age in Q4?",
+      "expected_type": "scalar",
+      "expected_value": 7.04,
+      "tolerance": 0.01,
+      "slots": {
+        "col_a": "month",
+        "val_a": "may",
+        "col_b": "job",
+        "val_b": "management",
+        "metric": "age",
+        "quartile": "Q4",
+        "target_col": "y",
+        "target_pos": "1",
+        "target_desc": "subscription"
+      },
+      "ambiguities": [
+        "quartile",
+        "how",
+        "define",
+        "q1",
+        "q2",
+        "q3",
+        "q4",
+        "bins",
+        "bucket",
+        "positive",
+        "success",
+        "target",
+        "y=1",
+        "class",
+        "outcome",
+        "null",
+        "missing",
+        "nan",
+        "empty",
+        "na"
+      ]
+    },
+    {
+      "id": "bank_hard_020",
+      "dataset": "bank",
+      "level": "L5",
+      "template": "top_n_in_segment",
+      "goal": "For month with above-average day, which have subscription rate > 25%? Return sorted list.",
+      "expected_type": "list",
+      "expected_value": [
+        "oct"
+      ],
+      "tolerance": 0.0,
+      "slots": {
+        "group_col": "month",
+        "metric": "day",
+        "threshold": 25,
+        "target_col": "y",
+        "target_pos": "1",
+        "target_desc": "subscription"
+      },
+      "ambiguities": [
+        "tie",
+        "ties",
+        "equal",
+        "same",
+        "duplicate"
+      ]
+    },
+    {
+      "id": "bank_hard_021",
+      "dataset": "bank",
+      "level": "L5",
+      "template": "chain_conversion",
+      "goal": "Find the job with highest average balance. What is the subscription rate for that segment?",
+      "expected_type": "scalar",
+      "expected_value": 24.62,
+      "tolerance": 0.01,
+      "slots": {
+        "group_col": "job",
+        "metric": "balance",
+        "extrema": "highest",
+        "target_col": "y",
+        "target_pos": "1",
+        "target_desc": "subscription"
+      },
+      "ambiguities": [
+        "positive",
+        "success",
+        "target",
+        "y=1",
+        "class",
+        "outcome",
+        "rate",
+        "percentage",
+        "decimal",
+        "format",
+        "0-100",
+        "0-1"
+      ]
+    },
+    {
+      "id": "bank_hard_023",
+      "dataset": "bank",
+      "level": "L6",
+      "template": "percentile_cohort",
+      "goal": "Among customers in top 90% of balance AND bottom 10% of day, what's subscription rate?",
+      "expected_type": "scalar",
+      "expected_value": 33.53,
+      "tolerance": 0.01,
+      "slots": {
+        "metric_a": "balance",
+        "metric_b": "day",
+        "pct_high": 90,
+        "pct_low": 10,
+        "target_col": "y",
+        "target_pos": "1",
+        "target_desc": "subscription"
+      },
+      "ambiguities": [
+        "percentile",
+        "inclusive",
+        "exclusive",
+        "boundary",
+        "include",
+        "positive",
+        "success",
+        "target",
+        "y=1",
+        "class",
+        "outcome"
+      ]
+    },
+    {
+      "id": "bank_hard_026",
+      "dataset": "bank",
+      "level": "L6",
+      "template": "segment_volatility",
+      "goal": "For each job, compute volatility score: std(age) / mean(age). Return top 5 with [group, mean, std, volatility].",
+      "expected_type": "dataframe",
+      "expected_value": [
+        {
+          "job": "unemployed",
+          "mean": 40.97,
+          "std": 9.74,
+          "volatility": 0.2377
+        },
+        {
+          "job": "self-employed",
+          "mean": 40.42,
+          "std": 9.46,
+          "volatility": 0.234
+        },
+        {
+          "job": "admin.",
+          "mean": 39.68,
+          "std": 9.23,
+          "volatility": 0.2326
+        },
+        {
+          "job": "services",
+          "mean": 38.94,
+          "std": 8.86,
+          "volatility": 0.2275
+        },
+        {
+          "job": "management",
+          "mean": 40.2,
+          "std": 9.13,
+          "volatility": 0.2271
+        }
+      ],
+      "tolerance": 0.0,
+      "slots": {
+        "group_col": "job",
+        "metric": "age"
+      },
+      "ambiguities": [
+        "round",
+        "decimal",
+        "precision",
+        "digits",
+        "volatility",
+        "cv",
+        "coefficient",
+        "variation"
+      ]
+    },
+    {
+      "id": "bank_hard_028",
+      "dataset": "bank",
+      "level": "L6",
+      "template": "percentile_cohort",
+      "goal": "Among customers in top 95% of balance AND bottom 10% of duration, what's subscription rate?",
+      "expected_type": "scalar",
+      "expected_value": 0.84,
+      "tolerance": 0.01,
+      "slots": {
+        "metric_a": "balance",
+        "metric_b": "duration",
+        "pct_high": 95,
+        "pct_low": 10,
+        "target_col": "y",
+        "target_pos": "1",
+        "target_desc": "subscription"
+      },
+      "ambiguities": [
+        "percentile",
+        "inclusive",
+        "exclusive",
+        "boundary",
+        "include",
+        "positive",
+        "success",
+        "target",
+        "y=1",
+        "class",
+        "outcome"
+      ]
+    },
+    {
+      "id": "bank_hard_029",
+      "dataset": "bank",
+      "level": "L6",
+      "template": "percentile_cohort",
+      "goal": "Among customers in top 90% of balance AND bottom 25% of duration, what's subscription rate?",
+      "expected_type": "scalar",
+      "expected_value": 0.54,
+      "tolerance": 0.01,
+      "slots": {
+        "metric_a": "balance",
+        "metric_b": "duration",
+        "pct_high": 90,
+        "pct_low": 25,
+        "target_col": "y",
+        "target_pos": "1",
+        "target_desc": "subscription"
+      },
+      "ambiguities": [
+        "percentile",
+        "inclusive",
+        "exclusive",
+        "boundary",
+        "include",
+        "positive",
+        "success",
+        "target",
+        "y=1",
+        "class",
+        "outcome"
+      ]
+    },
+    {
+      "id": "bank_hard_030",
+      "dataset": "bank",
+      "level": "L6",
+      "template": "ranked_anomaly",
+      "goal": "Rank job by subscription rate. Which bottom-3 have above-median age?",
+      "expected_type": "list",
+      "expected_value": [
+        "blue-collar",
+        "entrepreneur"
+      ],
+      "tolerance": 0.0,
+      "slots": {
+        "group_col": "job",
+        "metric": "age",
+        "target_col": "y",
+        "target_pos": "1",
+        "target_desc": "subscription"
+      },
+      "ambiguities": [
+        "positive",
+        "success",
+        "target",
+        "y=1",
+        "class",
+        "outcome",
+        "rank",
+        "order",
+        "sort",
+        "ascending",
+        "descending"
+      ]
+    },
+    {
+      "id": "bank_hard_031",
+      "dataset": "bank",
+      "level": "L6",
+      "template": "segment_volatility",
+      "goal": "For each month, compute volatility score: std(day) / mean(day). Return top 5 with [group, mean, std, volatility].",
+      "expected_type": "dataframe",
+      "expected_value": [
+        {
+          "month": "feb",
+          "mean": 6.05,
+          "std": 5.46,
+          "volatility": 0.9025
+        },
+        {
+          "month": "sep",
+          "mean": 11.67,
+          "std": 8.04,
+          "volatility": 0.6889
+        },
+        {
+          "month": "mar",
+          "mean": 13.45,
+          "std": 9.18,
+          "volatility": 0.6825
+        },
+        {
+          "month": "jun",
+          "mean": 11.32,
+          "std": 7.33,
+          "volatility": 0.6475
+        },
+        {
+          "month": "dec",
+          "mean": 14.19,
+          "std": 8.83,
+          "volatility": 0.6223
+        }
+      ],
+      "tolerance": 0.0,
+      "slots": {
+        "group_col": "month",
+        "metric": "day"
+      },
+      "ambiguities": [
+        "round",
+        "decimal",
+        "precision",
+        "digits",
+        "volatility",
+        "cv",
+        "coefficient",
+        "variation"
+      ]
+    },
+    {
+      "id": "bank_hard_033",
+      "dataset": "bank",
+      "level": "L4",
+      "template": "metric_breakdown",
+      "goal": "Show the average balance breakdown by job. Include count and mean balance for each category, sorted by mean descending.",
+      "expected_type": "dataframe",
+      "expected_value": [
+        {
+          "job": "retired",
+          "count": 35185,
+          "mean_balance": 1812.07
+        },
+        {
+          "job": "unknown",
+          "count": 2917,
+          "mean_balance": 1678.96
+        },
+        {
+          "job": "self-employed",
+          "count": 19020,
+          "mean_balance": 1598.27
+        },
+        {
+          "job": "student",
+          "count": 11767,
+          "mean_balance": 1577.32
+        },
+        {
+          "job": "management",
+          "count": 175541,
+          "mean_balance": 1510.39
+        },
+        {
+          "job": "unemployed",
+          "count": 17634,
+          "mean_balance": 1440.57
+        },
+        {
+          "job": "entrepreneur",
+          "count": 17718,
+          "mean_balance": 1306.75
+        },
+        {
+          "job": "housemaid",
+          "count": 15912,
+          "mean_balance": 1281.22
+        },
+        {
+          "job": "technician",
+          "count": 138107,
+          "mean_balance": 1071.57
+        },
+        {
+          "job": "admin.",
+          "count": 81492,
+          "mean_balance": 1019.92
+        },
+        {
+          "job": "blue-collar",
+          "count": 170498,
+          "mean_balance": 977.49
+        },
+        {
+          "job": "services",
+          "count": 64209,
+          "mean_balance": 834.63
+        }
+      ],
+      "tolerance": 0.0,
+      "slots": {
+        "group_col": "job",
+        "metric": "balance"
+      },
+      "ambiguities": [
+        "round",
+        "decimal",
+        "precision",
+        "digits"
+      ]
+    },
+    {
+      "id": "bank_hard_035",
+      "dataset": "bank",
+      "level": "L5",
+      "template": "chain_conversion",
+      "goal": "Find the job with lowest average age. What is the subscription rate for that segment?",
+      "expected_type": "scalar",
+      "expected_value": 34.08,
+      "tolerance": 0.01,
+      "slots": {
+        "group_col": "job",
+        "metric": "age",
+        "extrema": "lowest",
+        "target_col": "y",
+        "target_pos": "1",
+        "target_desc": "subscription"
+      },
+      "ambiguities": [
+        "positive",
+        "success",
+        "target",
+        "y=1",
+        "class",
+        "outcome",
+        "rate",
+        "percentage",
+        "decimal",
+        "format",
+        "0-100",
+        "0-1"
+      ]
+    },
+    {
+      "id": "bank_hard_038",
+      "dataset": "bank",
+      "level": "L5",
+      "template": "nested_extrema",
+      "goal": "Find the month with the lowest subscription rate. Within that group, what is the average day?",
+      "expected_type": "scalar",
+      "expected_value": 16.09,
+      "tolerance": 0.01,
+      "slots": {
+        "group_col": "month",
+        "metric": "day",
+        "extrema_outer": "lowest",
+        "extrema_inner": "highest",
+        "target_col": "y",
+        "target_pos": "1",
+        "target_desc": "subscription"
+      },
+      "ambiguities": [
+        "tie",
+        "ties",
+        "equal",
+        "same",
+        "duplicate",
+        "positive",
+        "success",
+        "target",
+        "y=1",
+        "class",
+        "outcome"
+      ]
+    },
+    {
+      "id": "bank_hard_039",
+      "dataset": "bank",
+      "level": "L4",
+      "template": "quartile_conversion",
+      "goal": "Divide customers into 4 day quartiles. What is the subscription percentage (0-100) in the highest (top 25%) (Q4) quartile?",
+      "expected_type": "scalar",
+      "expected_value": 11.55,
+      "tolerance": 0.01,
+      "slots": {
+        "bin_col": "day",
+        "quartile": "Q4",
+        "quartile_desc": "highest (top 25%)",
+        "target_col": "y",
+        "target_pos": "1",
+        "target_desc": "subscription"
+      },
+      "ambiguities": [
+        "quartile",
+        "how",
+        "define",
+        "q1",
+        "q2",
+        "q3",
+        "q4",
+        "bins",
+        "bucket",
+        "positive",
+        "success",
+        "target",
+        "y=1",
+        "class",
+        "outcome",
+        "rate",
+        "percentage",
+        "decimal",
+        "format",
+        "0-100",
+        "0-1"
+      ]
+    },
+    {
+      "id": "bank_hard_040",
+      "dataset": "bank",
+      "level": "L6",
+      "template": "percentile_cohort",
+      "goal": "Among customers in top 95% of balance AND bottom 25% of duration, what's subscription rate?",
+      "expected_type": "scalar",
+      "expected_value": 0.65,
+      "tolerance": 0.01,
+      "slots": {
+        "metric_a": "balance",
+        "metric_b": "duration",
+        "pct_high": 95,
+        "pct_low": 25,
+        "target_col": "y",
+        "target_pos": "1",
+        "target_desc": "subscription"
+      },
+      "ambiguities": [
+        "percentile",
+        "inclusive",
+        "exclusive",
+        "boundary",
+        "include",
+        "positive",
+        "success",
+        "target",
+        "y=1",
+        "class",
+        "outcome"
+      ]
+    },
+    {
+      "id": "bank_hard_041",
+      "dataset": "bank",
+      "level": "L5",
+      "template": "segment_improvement_potential",
+      "goal": "Which job categories would have the biggest impact if brought to average subscription rate? Return top 3 by potential gain (count * rate gap), sorted by impact.",
+      "expected_type": "list",
+      "expected_value": [
+        "blue-collar",
+        "services",
+        "entrepreneur"
+      ],
+      "tolerance": 0.0,
+      "slots": {
+        "group_col": "job",
+        "target_col": "y",
+        "target_pos": "1",
+        "target_desc": "subscription"
+      },
+      "ambiguities": [
+        "positive",
+        "success",
+        "target",
+        "y=1",
+        "class",
+        "outcome",
+        "rate",
+        "percentage",
+        "decimal",
+        "format",
+        "0-100",
+        "0-1"
+      ]
+    },
+    {
+      "id": "bank_hard_044",
+      "dataset": "bank",
+      "level": "L5",
+      "template": "nested_extrema",
+      "goal": "Find the month with the lowest subscription rate. Within that group, what is the average age?",
+      "expected_type": "scalar",
+      "expected_value": 38.98,
+      "tolerance": 0.01,
+      "slots": {
+        "group_col": "month",
+        "metric": "age",
+        "extrema_outer": "lowest",
+        "extrema_inner": "lowest",
+        "target_col": "y",
+        "target_pos": "1",
+        "target_desc": "subscription"
+      },
+      "ambiguities": [
+        "tie",
+        "ties",
+        "equal",
+        "same",
+        "duplicate",
+        "positive",
+        "success",
+        "target",
+        "y=1",
+        "class",
+        "outcome"
+      ]
+    },
+    {
+      "id": "road_hard_014",
+      "dataset": "road",
+      "level": "L4",
+      "template": "count_segment_total",
+      "goal": "Which lighting categories have the highest total reported accidents? Show breakdown with [lighting, count, total_num_reported_accidents, avg_num_reported_accidents] sorted by total descending.",
+      "expected_type": "dataframe",
+      "expected_value": [
+        {
+          "lighting": "dim",
+          "count": 183826,
+          "total_num_reported_accidents": 211283,
+          "avg_num_reported_accidents": 1.15
+        },
+        {
+          "lighting": "daylight",
+          "count": 178015,
+          "total_num_reported_accidents": 207579,
+          "avg_num_reported_accidents": 1.17
+        },
+        {
+          "lighting": "night",
+          "count": 155913,
+          "total_num_reported_accidents": 196214,
+          "avg_num_reported_accidents": 1.26
+        }
+      ],
+      "tolerance": 0.0,
+      "slots": {
+        "group_col": "lighting",
+        "target_col": "num_reported_accidents",
+        "target_desc": "reported accidents"
+      },
+      "ambiguities": []
+    },
+    {
+      "id": "road_hard_021",
+      "dataset": "road",
+      "level": "L4",
+      "template": "continuous_segment_breakdown",
+      "goal": "Which weather categories have the highest average accident risk? Show breakdown with [weather, count, avg_accident_risk] sorted by average descending.",
+      "expected_type": "dataframe",
+      "expected_value": [
+        {
+          "weather": "foggy",
+          "count": 181463,
+          "avg_accident_risk": 0.3863
+        },
+        {
+          "weather": "rainy",
+          "count": 156985,
+          "avg_accident_risk": 0.3615
+        },
+        {
+          "weather": "clear",
+          "count": 179306,
+          "avg_accident_risk": 0.3101
+        }
+      ],
+      "tolerance": 0.0,
+      "slots": {
+        "group_col": "weather",
+        "target_col": "accident_risk",
+        "target_desc": "accident risk"
+      },
+      "ambiguities": []
+    },
+    {
+      "id": "road_hard_015",
+      "dataset": "road",
+      "level": "L4",
+      "template": "continuous_quartile_analysis",
+      "goal": "Divide records into 4 speed_limit quartiles. What is the average accident risk in the lower-middle (25-50%) (Q2) quartile?",
+      "expected_type": "scalar",
+      "expected_value": 0.29,
+      "tolerance": 0.01,
+      "slots": {
+        "bin_col": "speed_limit",
+        "quartile": "Q2",
+        "quartile_desc": "lower-middle (25-50%)",
+        "target_col": "accident_risk",
+        "target_desc": "accident risk"
+      },
+      "ambiguities": []
+    },
+    {
+      "id": "road_hard_002",
+      "dataset": "road",
+      "level": "L4",
+      "template": "continuous_quartile_analysis",
+      "goal": "Divide records into 4 curvature quartiles. What is the average accident risk in the upper-middle (50-75%) (Q3) quartile?",
+      "expected_type": "scalar",
+      "expected_value": 0.41,
+      "tolerance": 0.01,
+      "slots": {
+        "bin_col": "curvature",
+        "quartile": "Q3",
+        "quartile_desc": "upper-middle (50-75%)",
+        "target_col": "accident_risk",
+        "target_desc": "accident risk"
+      },
+      "ambiguities": []
+    },
+    {
+      "id": "road_hard_007",
+      "dataset": "road",
+      "level": "L5",
+      "template": "continuous_comparison",
+      "goal": "How much higher is the average accident risk for lighting='daylight' compared to 'night'? Return difference.",
+      "expected_type": "scalar",
+      "expected_value": -0.17,
+      "tolerance": 0.01,
+      "slots": {
+        "group_col": "lighting",
+        "val_a": "daylight",
+        "val_b": "night",
+        "target_col": "accident_risk",
+        "target_desc": "accident risk"
+      },
+      "ambiguities": []
+    },
+    {
+      "id": "road_hard_004",
+      "dataset": "road",
+      "level": "L5",
+      "template": "continuous_comparison",
+      "goal": "How much higher is the average accident risk for road_type='rural' compared to 'urban'? Return difference.",
+      "expected_type": "scalar",
+      "expected_value": -0.01,
+      "tolerance": 0.01,
+      "slots": {
+        "group_col": "road_type",
+        "val_a": "rural",
+        "val_b": "urban",
+        "target_col": "accident_risk",
+        "target_desc": "accident risk"
+      },
+      "ambiguities": []
+    }
+  ],
+  "templateStats": [
+    {
+      "template": "nested_extrema",
+      "tasks": 2,
+      "correct": 9,
+      "total": 15,
+      "pct": 60.0
+    },
+    {
+      "template": "percentile_cohort",
+      "tasks": 5,
+      "correct": 19,
+      "total": 33,
+      "pct": 57.6
+    },
+    {
+      "template": "quartile_conversion",
+      "tasks": 1,
+      "correct": 2,
+      "total": 6,
+      "pct": 33.3
+    },
+    {
+      "template": "segment_improvement_potential",
+      "tasks": 1,
+      "correct": 1,
+      "total": 3,
+      "pct": 33.3
+    },
+    {
+      "template": "chain_conversion",
+      "tasks": 3,
+      "correct": 7,
+      "total": 27,
+      "pct": 25.9
+    },
+    {
+      "template": "multi_condition_filter",
+      "tasks": 2,
+      "correct": 4,
+      "total": 18,
+      "pct": 22.2
+    },
+    {
+      "template": "top_n_in_segment",
+      "tasks": 1,
+      "correct": 0,
+      "total": 9,
+      "pct": 0.0
+    },
+    {
+      "template": "segment_volatility",
+      "tasks": 2,
+      "correct": 0,
+      "total": 12,
+      "pct": 0.0
+    },
+    {
+      "template": "ranked_anomaly",
+      "tasks": 1,
+      "correct": 0,
+      "total": 9,
+      "pct": 0.0
+    },
+    {
+      "template": "metric_breakdown",
+      "tasks": 1,
+      "correct": 0,
+      "total": 3,
+      "pct": 0.0
+    },
+    {
+      "template": "count_segment_total",
+      "tasks": 1,
+      "correct": 0,
+      "total": 0,
+      "pct": 0
+    },
+    {
+      "template": "continuous_segment_breakdown",
+      "tasks": 1,
+      "correct": 0,
+      "total": 0,
+      "pct": 0
+    },
+    {
+      "template": "continuous_quartile_analysis",
+      "tasks": 2,
+      "correct": 0,
+      "total": 0,
+      "pct": 0
+    },
+    {
+      "template": "continuous_comparison",
+      "tasks": 2,
+      "correct": 0,
+      "total": 0,
+      "pct": 0
+    }
+  ],
+  "anomalies": [
+    {
+      "model": "qwen--qwen3-max",
+      "type": "partial_credits",
+      "description": "qwen3-max: 8 partial credits (100x scale errors)",
+      "details": {
+        "partial_count": 8
+      }
+    },
+    {
+      "model": "meta-llama--llama-4-maverick",
+      "type": "partial_credits",
+      "description": "llama-4-maverick: 6 partial credits (100x scale errors)",
+      "details": {
+        "partial_count": 6
+      }
+    },
+    {
+      "model": "google--gemini-3-pro-preview",
+      "type": "domain_gap",
+      "description": "gemini-3-pro-preview: road > bank gap of 43.6%",
+      "details": {
+        "bank_pct": 17.5,
+        "road_pct": 61.1,
+        "gap": 43.6
+      }
+    },
+    {
+      "model": "google--gemini-3-pro-preview",
+      "type": "partial_credits",
+      "description": "gemini-3-pro-preview: 14 partial credits (100x scale errors)",
+      "details": {
+        "partial_count": 14
+      }
+    }
+  ]
+}

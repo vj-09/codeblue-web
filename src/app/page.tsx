@@ -35,6 +35,7 @@ export default function Home() {
               <Link href="/demo" className="text-sm text-gray-400 hover:text-white transition-colors">
                 Demo
               </Link>
+
               <a href="https://github.com/vj-09/codeblue-env" className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm hover:bg-emerald-500/20 transition-colors">
                 <Github className="w-4 h-4" />
                 <span className="hidden sm:inline">GitHub</span>
@@ -96,7 +97,7 @@ export default function Home() {
           From benchmarking to deployment, CodeBlue covers the full lifecycle of analytics agents.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Product 1: Benchmark */}
           <Link href="/benchmark" className="group p-6 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-transparent border border-emerald-500/20 hover:border-emerald-500/40 transition-all">
             <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center mb-4">
@@ -141,6 +142,8 @@ export default function Home() {
               Try Demo <ArrowRight className="w-4 h-4" />
             </div>
           </Link>
+
+
         </div>
       </section>
 

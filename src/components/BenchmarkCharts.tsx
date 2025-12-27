@@ -1,180 +1,326 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
 import {
-  ScatterChart, Scatter, XAxis, YAxis, ZAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend,
-  BarChart, Bar, Cell, LineChart, Line,
-  ReferenceLine, ReferenceArea, Label
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  ScatterChart, Scatter, ZAxis, RadarChart, PolarGrid, PolarAngleAxis,
+  PolarRadiusAxis, Radar, Legend, Cell, LineChart, Line, ReferenceLine
 } from 'recharts';
-import { ChevronDown, Database, ExternalLink, Github, TrendingUp, Grid3X3, BarChart3, Target, Layers } from 'lucide-react';
+import { Trophy, TrendingUp, Zap, BarChart3, Target, Database, ArrowLeft, Play, ChevronDown, ChevronUp, Grid3X3, Layers, DollarSign, ArrowRight, Swords, ChevronLeft, ChevronRight, Filter, X, Share2, Sparkles } from 'lucide-react';
+import benchmarkDataRaw from '@/data/benchmark-data.json';
+import ScenarioBuilder from './ScenarioBuilder';
+import FailureInsights from './FailureInsights';
+import ModelRace from './ModelRace';
+import ABTestSimulator from './ABTestSimulator';
 
-// Enhanced benchmark data with cost and more metrics
-const benchmarkData = [
-  { id: 1, model: "GPT-4o", org: "OpenAI", size: "UNK", cost: 2.50, stateless: 78.4, stateful: 72.1, singleCsv: 82.3, multiCsv: 68.5, oneshot: 71.2, agentic: 79.8, aggregation: 81.2, joins: 74.5, timeseries: 76.8, nulls: 69.3, ambiguous: 72.1, adversarial: 58.4, overall: 75.4, color: "#10B981" },
-  { id: 2, model: "Claude 3.5 Sonnet", org: "Anthropic", size: "UNK", cost: 3.00, stateless: 76.8, stateful: 74.3, singleCsv: 80.1, multiCsv: 71.0, oneshot: 73.5, agentic: 77.6, aggregation: 79.8, joins: 76.2, timeseries: 74.5, nulls: 72.8, ambiguous: 75.3, adversarial: 61.2, overall: 75.6, color: "#8B5CF6" },
-  { id: 3, model: "Gemini 2.0 Pro", org: "Google", size: "UNK", cost: 1.25, stateless: 74.2, stateful: 70.8, singleCsv: 78.9, multiCsv: 66.1, oneshot: 69.8, agentic: 75.2, aggregation: 77.4, joins: 71.8, timeseries: 73.2, nulls: 67.5, ambiguous: 69.8, adversarial: 55.3, overall: 72.5, color: "#3B82F6" },
-  { id: 4, model: "DeepSeek-R1", org: "DeepSeek", size: "671B", cost: 0.55, stateless: 72.1, stateful: 75.6, singleCsv: 74.3, multiCsv: 73.4, oneshot: 68.9, agentic: 78.8, aggregation: 75.6, joins: 77.3, timeseries: 71.4, nulls: 74.2, ambiguous: 73.8, adversarial: 62.5, overall: 73.9, color: "#F59E0B" },
-  { id: 5, model: "Qwen2.5-72B", org: "Alibaba", size: "72B", cost: 0.40, stateless: 69.5, stateful: 67.2, singleCsv: 72.8, multiCsv: 63.9, oneshot: 66.4, agentic: 70.3, aggregation: 71.8, joins: 68.4, timeseries: 67.9, nulls: 64.2, ambiguous: 66.5, adversarial: 52.8, overall: 68.4, color: "#EC4899" },
-  { id: 6, model: "Llama-3.3-70B", org: "Meta", size: "70B", cost: 0.35, stateless: 65.8, stateful: 62.4, singleCsv: 69.2, multiCsv: 59.0, oneshot: 61.7, agentic: 66.5, aggregation: 68.3, joins: 63.7, timeseries: 64.1, nulls: 60.8, ambiguous: 62.4, adversarial: 48.9, overall: 64.1, color: "#06B6D4" },
-  { id: 7, model: "Mistral Large 2", org: "Mistral", size: "123B", cost: 0.80, stateless: 67.3, stateful: 64.9, singleCsv: 70.5, multiCsv: 61.7, oneshot: 63.8, agentic: 68.4, aggregation: 69.7, joins: 65.8, timeseries: 66.2, nulls: 62.9, ambiguous: 64.7, adversarial: 51.3, overall: 66.1, color: "#EF4444" },
-  { id: 8, model: "Arctic-SQL-32B", org: "Snowflake", size: "32B", cost: 0.25, stateless: 71.8, stateful: 68.2, singleCsv: 75.4, multiCsv: 64.6, oneshot: 67.3, agentic: 72.7, aggregation: 74.2, joins: 70.5, timeseries: 69.8, nulls: 66.4, ambiguous: 68.9, adversarial: 54.7, overall: 70.0, color: "#14B8A6" },
-  { id: 9, model: "CodeS-15B", org: "RUC", size: "15B", cost: 0.08, stateless: 58.5, stateful: 54.2, singleCsv: 62.1, multiCsv: 50.6, oneshot: 55.8, agentic: 56.9, aggregation: 60.4, joins: 55.2, timeseries: 56.8, nulls: 52.1, ambiguous: 54.3, adversarial: 42.6, overall: 56.4, color: "#A855F7" },
-  { id: 10, model: "XiYan-SQL-32B", org: "Alibaba Cloud", size: "32B", cost: 0.30, stateless: 69.0, stateful: 67.0, singleCsv: 72.3, multiCsv: 63.7, oneshot: 65.2, agentic: 70.8, aggregation: 71.5, joins: 68.8, timeseries: 67.4, nulls: 65.3, ambiguous: 66.9, adversarial: 53.1, overall: 68.0, color: "#F97316" },
-];
-
-const humanBaseline = { model: "Human Expert", stateless: 94.2, stateful: 91.8, singleCsv: 96.1, multiCsv: 89.7, oneshot: 92.5, agentic: 93.5, aggregation: 95.8, joins: 93.2, timeseries: 91.5, nulls: 88.4, ambiguous: 86.7, adversarial: 82.3, overall: 92.9 };
-
-const taskCategories = [
-  { id: 'aggregation', name: 'Aggregation', description: 'SUM, AVG, COUNT, GROUP BY', count: 245 },
-  { id: 'joins', name: 'Multi-table JOINs', description: 'Complex JOIN operations', count: 189 },
-  { id: 'timeseries', name: 'Time Series', description: 'Date parsing, trends', count: 156 },
-  { id: 'nulls', name: 'Null Handling', description: 'Missing values, edge cases', count: 134 },
-  { id: 'ambiguous', name: 'Ambiguous Queries', description: 'Underspecified NL', count: 112 },
-  { id: 'adversarial', name: 'Adversarial', description: 'Injection, destructive ops', count: 78 },
-];
-
-interface TooltipProps {
-  active?: boolean;
-  payload?: Array<{ payload: typeof benchmarkData[0] }>;
+// Types
+interface ModelData {
+  model: string;
+  provider: string;
+  name: string;
+  totalRuns: number;
+  avgReward: number;
+  bestReward: number;
+  modes: Record<string, {
+    reward: number;
+    metrics: Record<string, number>;
+    runs: number;
+  }>;
+  metrics: Record<string, number>;
+  examples: Array<{
+    example_id: number;
+    task: string;
+    reward: number;
+    answer: string;
+    info: { expected: number; level: string; task_id: string; tolerance?: number };
+    prompt: Array<{ content: string; role: string }>;
+    completion: Array<{ content: string; role: string }>;
+    score_correctness: number;
+    score_efficiency: number;
+    generation_ms?: number;
+  }>;
+  rank?: number;
+  color?: string;
 }
 
-// Custom tooltip for scatter chart
-const CustomScatterTooltip = ({ active, payload }: TooltipProps) => {
-  if (active && payload && payload.length) {
-    const data = payload[0].payload;
-    return (
-      <div className="bg-gray-900/95 border border-emerald-500/30 rounded-lg p-3 shadow-xl backdrop-blur-sm">
-        <p className="font-semibold text-white mb-1">{data.model}</p>
-        <p className="text-sm text-gray-400">{data.org}</p>
-        <div className="mt-2 space-y-1 text-sm">
-          <p className="text-emerald-400">Score: <span className="font-mono">{data.overall.toFixed(1)}%</span></p>
-          <p className="text-yellow-400">Cost: <span className="font-mono">${data.cost.toFixed(2)}/task</span></p>
-          <p className="text-gray-400">Efficiency: <span className="font-mono text-white">{(data.overall / data.cost).toFixed(1)}</span></p>
-        </div>
-      </div>
-    );
-  }
-  return null;
+interface BenchmarkData {
+  generated: string;
+  totalRuns: number;
+  models: ModelData[];
+}
+
+const benchmarkData = benchmarkDataRaw as BenchmarkData;
+
+// Provider colors
+const providerColors: Record<string, string> = {
+  'qwen': '#10B981',
+  'anthropic': '#8B5CF6',
+  'google': '#3B82F6',
+  'openai': '#F59E0B',
+  'deepseek': '#EC4899',
+  'mistralai': '#F97316',
+  'meta-llama': '#06B6D4',
+  'x-ai': '#EF4444',
+  'prime-intellect': '#A855F7',
+  'ensemble': '#14B8A6',
 };
 
-// Custom tooltip for quadrant chart
-const QuadrantTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ payload: { model: string; x?: number; y?: number } }> }) => {
-  if (active && payload && payload.length) {
-    const data = payload[0].payload;
-    return (
-      <div className="bg-gray-900/95 border border-emerald-500/30 rounded-lg p-3 shadow-xl backdrop-blur-sm">
-        <p className="font-semibold text-white mb-1">{data.model}</p>
-        <div className="mt-2 space-y-1 text-sm">
-          <p className="text-cyan-400">X-Axis: <span className="font-mono">{data.x?.toFixed(1)}%</span></p>
-          <p className="text-pink-400">Y-Axis: <span className="font-mono">{data.y?.toFixed(1)}%</span></p>
-        </div>
-      </div>
-    );
-  }
-  return null;
+// Tab definitions - consolidated from 8 to 4
+const tabs = [
+  { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
+  { id: 'arena', label: 'Arena', icon: Swords },
+  { id: 'race', label: 'Race', icon: Zap },
+  { id: 'examples', label: 'Trajectories', icon: Play },
+];
+
+// Mode options - now bank vs road
+const modeOptions = [
+  { value: 'bank', label: 'Bank (19 tasks)' },
+  { value: 'road', label: 'Road (6 tasks)' },
+];
+
+// Axis options for quadrant
+const axisOptions = [
+  { value: 'score_correctness', label: 'Correctness' },
+  { value: 'score_efficiency', label: 'Efficiency' },
+  { value: 'score_notes_usage', label: 'Notes Usage' },
+  { value: 'score_code_quality', label: 'Code Quality' },
+  { value: 'avgReward', label: 'Avg Reward' },
+  { value: 'bestReward', label: 'Best Reward' },
+  { value: 'totalRuns', label: 'Total Runs' },
+];
+
+// Simulated cost data (would come from actual pricing)
+const modelCosts: Record<string, number> = {
+  'anthropic/claude-opus-4.5': 15.0,
+  'google/gemini-3-pro-preview': 3.5,
+  'google/gemini-3-flash-preview': 0.35,
+  'openai/gpt-5.2': 10.0,
+  'openai/gpt-5.1-codex-mini': 2.0,
+  'qwen/qwen3-235b-a22b-thinking-2507': 1.5,
+  'qwen/qwen3-max': 1.0,
+  'deepseek/deepseek-v3.2-speciale': 0.5,
+  'ensemble': 2.0,
 };
 
-export default function AnalyticsBenchmarkCharts() {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [quadrantX, setQuadrantX] = useState('stateless');
-  const [quadrantY, setQuadrantY] = useState('agentic');
-  const [selectedModels, setSelectedModels] = useState(['GPT-4o', 'Claude 3.5 Sonnet', 'DeepSeek-R1']);
-  const [showHuman, setShowHuman] = useState(true);
+export default function BenchmarkCharts() {
+  const [activeTab, setActiveTab] = useState('leaderboard');
+  const [selectedMode, setSelectedMode] = useState('stateless_singleCsv');
+  const [selectedModels, setSelectedModels] = useState<string[]>(
+    benchmarkData.models.slice(0, 5).map(m => m.model)
+  );
+  const [selectedExample, setSelectedExample] = useState<ModelData['examples'][0] | null>(null);
+  const [expandedModel, setExpandedModel] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<'bestReward' | 'avgReward' | 'totalRuns'>('bestReward');
+  const [quadrantX, setQuadrantX] = useState('score_efficiency');
+  const [quadrantY, setQuadrantY] = useState('score_correctness');
 
-  // Prepare scatter data (Cost vs Performance)
-  const scatterData = benchmarkData.map(d => ({
-    ...d,
-    x: d.cost,
-    y: d.overall,
-    z: 400
-  }));
+  // Arena state
+  const [arenaModels, setArenaModels] = useState<string[]>([]);
+  const [arenaTaskIndex, setArenaTaskIndex] = useState(0);
 
-  // Prepare quadrant data
+  // Filter state
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [selectedProviders, setSelectedProviders] = useState<string[]>([]);
+  const [minCorrectness, setMinCorrectness] = useState(0);
+  const [minRuns, setMinRuns] = useState(0);
+  const [showScenarioBuilder, setShowScenarioBuilder] = useState(false);
+  const [arenaMode, setArenaMode] = useState<'compare' | 'abtest'>('compare');
+
+  // Get unique providers
+  const providers = useMemo(() => {
+    return [...new Set(benchmarkData.models.map(m => m.provider))];
+  }, []);
+
+  // Initialize from URL params
+  useEffect(() => {
+    const providerParam = searchParams.get('providers');
+    const correctnessParam = searchParams.get('correctness');
+    const runsParam = searchParams.get('minRuns');
+    const tabParam = searchParams.get('tab');
+
+    if (providerParam) setSelectedProviders(providerParam.split(','));
+    if (correctnessParam) setMinCorrectness(parseInt(correctnessParam, 10));
+    if (runsParam) setMinRuns(parseInt(runsParam, 10));
+    if (tabParam && tabs.some(t => t.id === tabParam)) setActiveTab(tabParam);
+  }, [searchParams]);
+
+  // Update URL when filters change
+  const updateURL = (newProviders: string[], newCorrectness: number, newRuns: number) => {
+    const params = new URLSearchParams();
+    if (newProviders.length > 0) params.set('providers', newProviders.join(','));
+    if (newCorrectness > 0) params.set('correctness', newCorrectness.toString());
+    if (newRuns > 0) params.set('minRuns', newRuns.toString());
+    if (activeTab !== 'leaderboard') params.set('tab', activeTab);
+
+    const queryString = params.toString();
+    router.push(queryString ? `?${queryString}` : '/benchmark', { scroll: false });
+  };
+
+  const toggleProvider = (provider: string) => {
+    const newProviders = selectedProviders.includes(provider)
+      ? selectedProviders.filter(p => p !== provider)
+      : [...selectedProviders, provider];
+    setSelectedProviders(newProviders);
+    updateURL(newProviders, minCorrectness, minRuns);
+  };
+
+  const clearFilters = () => {
+    setSelectedProviders([]);
+    setMinCorrectness(0);
+    setMinRuns(0);
+    router.push('/benchmark', { scroll: false });
+  };
+
+  const copyShareLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+  };
+
+  // Filter models based on selections
+  const filteredModels = useMemo(() => {
+    return benchmarkData.models.filter(m => {
+      if (selectedProviders.length > 0 && !selectedProviders.includes(m.provider)) return false;
+      if (minCorrectness > 0 && (m.metrics.score_correctness || 0) * 100 < minCorrectness) return false;
+      if (minRuns > 0 && m.totalRuns < minRuns) return false;
+      return true;
+    });
+  }, [selectedProviders, minCorrectness, minRuns]);
+
+  const hasActiveFilters = selectedProviders.length > 0 || minCorrectness > 0 || minRuns > 0;
+
+  // Sorted models (using filtered)
+  const sortedModels = useMemo(() => {
+    return [...filteredModels].sort((a, b) => b[sortBy] - a[sortBy]);
+  }, [sortBy, filteredModels]);
+
+  // Quadrant data
   const quadrantData = useMemo(() => {
-    return benchmarkData.map(d => ({
-      ...d,
-      x: d[quadrantX as keyof typeof d] as number,
-      y: d[quadrantY as keyof typeof d] as number,
-    }));
+    return benchmarkData.models.map(m => {
+      const getVal = (key: string) => {
+        if (key === 'avgReward') return m.avgReward;
+        if (key === 'bestReward') return m.bestReward;
+        if (key === 'totalRuns') return m.totalRuns;
+        return m.metrics[key] || 0;
+      };
+      return {
+        ...m,
+        x: getVal(quadrantX),
+        y: getVal(quadrantY),
+        z: 300,
+      };
+    });
   }, [quadrantX, quadrantY]);
 
-  // Calculate quadrant medians
-  const medianX = useMemo(() => {
-    const values = benchmarkData.map(d => d[quadrantX as keyof typeof d] as number).sort((a, b) => a - b);
-    return values[Math.floor(values.length / 2)];
-  }, [quadrantX]);
+  // Cost efficiency data
+  const costData = useMemo(() => {
+    return benchmarkData.models.map(m => ({
+      ...m,
+      cost: modelCosts[m.model] || 1.0,
+      performance: m.bestReward,
+      efficiency: m.bestReward / (modelCosts[m.model] || 1.0),
+    })).sort((a, b) => b.efficiency - a.efficiency);
+  }, []);
 
-  const medianY = useMemo(() => {
-    const values = benchmarkData.map(d => d[quadrantY as keyof typeof d] as number).sort((a, b) => a - b);
-    return values[Math.floor(values.length / 2)];
-  }, [quadrantY]);
+  // Mode comparison data
+  const modeComparisonData = useMemo(() => {
+    return benchmarkData.models
+      .filter(m => m.modes[selectedMode])
+      .map(m => ({
+        name: m.name.split('-').slice(0, 2).join('-'),
+        fullName: m.model,
+        reward: m.modes[selectedMode]?.reward || 0,
+        correctness: (m.modes[selectedMode]?.metrics.score_correctness || 0) * 100,
+        efficiency: (m.modes[selectedMode]?.metrics.score_efficiency || 0) * 100,
+        runs: m.modes[selectedMode]?.runs || 0,
+        color: providerColors[m.provider] || '#6B7280',
+      }))
+      .sort((a, b) => b.reward - a.reward);
+  }, [selectedMode]);
 
-  // Prepare radar data
-  const radarData = taskCategories.map(cat => {
-    const point: Record<string, string | number> = { category: cat.name };
-    selectedModels.forEach(modelName => {
-      const model = benchmarkData.find(d => d.model === modelName);
-      if (model) {
-        point[modelName] = model[cat.id as keyof typeof model] as number;
-      }
-    });
-    if (showHuman) {
-      point['Human Expert'] = humanBaseline[cat.id as keyof typeof humanBaseline] as number;
-    }
-    return point;
-  });
-
-  // Prepare category bar data
-  const categoryBarData = taskCategories.map(cat => {
-    const avgScore = benchmarkData.reduce((sum, d) => sum + (d[cat.id as keyof typeof d] as number), 0) / benchmarkData.length;
-    return {
-      name: cat.name,
-      avg: avgScore,
-      max: Math.max(...benchmarkData.map(d => d[cat.id as keyof typeof d] as number)),
-      min: Math.min(...benchmarkData.map(d => d[cat.id as keyof typeof d] as number)),
-      human: humanBaseline[cat.id as keyof typeof humanBaseline] as number,
-      gap: (humanBaseline[cat.id as keyof typeof humanBaseline] as number) - avgScore
+  // Radar data
+  const radarData = useMemo(() => {
+    const metrics = ['score_correctness', 'score_efficiency', 'score_notes_usage', 'score_code_quality'];
+    const metricLabels: Record<string, string> = {
+      score_correctness: 'Correctness',
+      score_efficiency: 'Efficiency',
+      score_notes_usage: 'Notes Usage',
+      score_code_quality: 'Code Quality',
     };
-  });
 
-  // Prepare bump chart data (rankings across categories)
-  const bumpData = taskCategories.map(cat => {
-    const sorted = [...benchmarkData].sort((a, b) => (b[cat.id as keyof typeof b] as number) - (a[cat.id as keyof typeof a] as number));
-    const point: Record<string, string | number> = { category: cat.name };
-    sorted.forEach((model, idx) => {
-      point[model.model] = idx + 1;
+    return metrics.map(metric => {
+      const point: Record<string, string | number> = { metric: metricLabels[metric] || metric };
+      selectedModels.forEach(modelId => {
+        const model = benchmarkData.models.find(m => m.model === modelId);
+        if (model) {
+          point[model.name] = (model.metrics[metric] || 0) * 100;
+        }
+      });
+      return point;
     });
-    return point;
-  });
+  }, [selectedModels]);
 
-  const axisOptions = [
-    { value: 'stateless', label: 'Stateless' },
-    { value: 'stateful', label: 'Stateful' },
-    { value: 'singleCsv', label: 'Single CSV' },
-    { value: 'multiCsv', label: 'Multi-CSV' },
-    { value: 'oneshot', label: 'Oneshot' },
-    { value: 'agentic', label: 'Agentic' },
-    { value: 'aggregation', label: 'Aggregation' },
-    { value: 'joins', label: 'JOINs' },
-    { value: 'adversarial', label: 'Adversarial' },
-  ];
+  // Ranking flow data
+  const rankingData = useMemo(() => {
+    const modes = Object.keys(modeOptions.reduce((acc, m) => ({ ...acc, [m.value]: true }), {}));
+    return modeOptions.map(mode => {
+      const modeModels = benchmarkData.models
+        .filter(m => m.modes[mode.value])
+        .sort((a, b) => (b.modes[mode.value]?.reward || 0) - (a.modes[mode.value]?.reward || 0));
 
-  const FilterDropdown = ({ value, onChange, options, label }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[]; label: string }) => (
-    <div className="relative">
-      <label className="block text-xs font-mono uppercase tracking-wider text-emerald-400/70 mb-1.5">{label}</label>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full appearance-none bg-black/40 border border-emerald-500/30 rounded-lg py-2 px-3 pr-8 text-emerald-100 font-mono text-sm focus:outline-none focus:border-emerald-400 transition-all cursor-pointer"
-      >
-        {options.map(opt => (
-          <option key={opt.value} value={opt.value} className="bg-gray-900">{opt.label}</option>
-        ))}
-      </select>
-      <ChevronDown className="absolute right-2 bottom-2.5 w-4 h-4 text-emerald-500/50 pointer-events-none" />
-    </div>
-  );
+      const point: Record<string, string | number> = { mode: mode.label.split(' ')[0] };
+      modeModels.forEach((m, idx) => {
+        point[m.name] = idx + 1;
+      });
+      return point;
+    });
+  }, []);
+
+  const toggleModelSelection = (modelId: string) => {
+    setSelectedModels(prev => {
+      if (prev.includes(modelId)) {
+        return prev.filter(m => m !== modelId);
+      }
+      if (prev.length >= 5) return prev;
+      return [...prev, modelId];
+    });
+  };
+
+  // Arena data - find common tasks between selected models
+  const arenaData = useMemo(() => {
+    if (arenaModels.length < 2) return { tasks: [], modelData: [] };
+
+    const models = arenaModels.map(id => benchmarkData.models.find(m => m.model === id)).filter(Boolean) as ModelData[];
+
+    // Find tasks that exist in all selected models
+    const taskSets = models.map(m => new Set(m.examples.filter(e => e.info).map(e => e.info.task_id)));
+    const commonTasks = [...taskSets[0]].filter(task =>
+      taskSets.every(set => set.has(task))
+    );
+
+    return {
+      tasks: commonTasks,
+      modelData: models,
+    };
+  }, [arenaModels]);
+
+  const toggleArenaModel = (modelId: string) => {
+    setArenaModels(prev => {
+      if (prev.includes(modelId)) {
+        return prev.filter(m => m !== modelId);
+      }
+      if (prev.length >= 4) return prev;
+      return [...prev, modelId];
+    });
+    setArenaTaskIndex(0);
+  };
+
+  // Calculate quadrant averages
+  const xAvg = useMemo(() => quadrantData.reduce((sum, d) => sum + d.x, 0) / quadrantData.length, [quadrantData]);
+  const yAvg = useMemo(() => quadrantData.reduce((sum, d) => sum + d.y, 0) / quadrantData.length, [quadrantData]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-gray-100">
@@ -186,508 +332,652 @@ export default function AnalyticsBenchmarkCharts() {
 
       {/* Header */}
       <header className="relative border-b border-emerald-500/20 bg-black/40 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 py-5">
+        <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
-                <Database className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold tracking-tight">
-                  <span className="text-emerald-400">Analytics</span>
-                  <span className="text-white">Bench</span>
+              <Link href="/" className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
+                  <Database className="w-5 h-5 text-white" />
+                </div>
+                <h1 className="text-lg font-bold tracking-tight">
+                  <span className="text-emerald-400">Code</span>
+                  <span className="text-white">Blue</span>
                 </h1>
-                <p className="text-xs text-gray-500 font-mono">v1.0 • 2,847 tasks • 95 databases</p>
-              </div>
+              </Link>
+              <span className="text-gray-600">|</span>
+              <span className="text-emerald-400 font-medium">Benchmark</span>
             </div>
-            <div className="flex items-center gap-2">
-              <a href="#" className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm hover:bg-emerald-500/20 transition-colors">
-                <Github className="w-4 h-4" />
-                <span className="hidden sm:inline">GitHub</span>
-              </a>
-              <a href="#" className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-gray-300 text-sm hover:bg-white/10 transition-colors">
-                <ExternalLink className="w-4 h-4" />
-                <span className="hidden sm:inline">Paper</span>
-              </a>
+            <div className="flex items-center gap-4">
+              <span className="text-xs text-gray-500">
+                {benchmarkData.totalRuns} runs | {benchmarkData.models.length} models
+              </span>
+              <Link href="/final25" className="flex items-center gap-2 text-sm text-emerald-400 hover:text-emerald-300 transition-colors">
+                Final 25
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link href="/" className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
+                <ArrowLeft className="w-4 h-4" />
+                Home
+              </Link>
             </div>
           </div>
-
-          {/* Chart Navigation */}
-          <nav className="flex gap-1 mt-5 overflow-x-auto pb-1">
-            {[
-              { id: 'overview', label: 'Cost vs Performance', icon: TrendingUp },
-              { id: 'quadrant', label: 'Four Quadrants', icon: Grid3X3 },
-              { id: 'radar', label: 'Radar Compare', icon: Target },
-              { id: 'categories', label: 'Category Gap', icon: BarChart3 },
-              { id: 'rankings', label: 'Rank Flow', icon: Layers },
-            ].map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-                  activeTab === tab.id
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                    : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
-                }`}
-              >
-                <tab.icon className="w-4 h-4" />
-                {tab.label}
-              </button>
-            ))}
-          </nav>
         </div>
       </header>
 
-      <main className="relative max-w-7xl mx-auto px-6 py-6">
+      <main className="relative max-w-7xl mx-auto px-6 py-8">
+        {/* Tabs */}
+        <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
+          {tabs.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
+                activeTab === tab.id
+                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <tab.icon className="w-4 h-4" />
+              {tab.label}
+            </button>
+          ))}
+        </div>
 
-        {/* Cost vs Performance Scatter (ARC-AGI Style) */}
-        {activeTab === 'overview' && (
-          <div className="space-y-6">
-            <div className="flex items-start justify-between">
-              <div>
-                <h2 className="text-xl font-bold text-white">Cost vs Performance</h2>
-                <p className="text-gray-400 text-sm mt-1">True intelligence isn&apos;t just solving problems—it&apos;s solving them efficiently</p>
-              </div>
-              <div className="text-right text-xs text-gray-500">
-                <p>Bubble size = model size</p>
-                <p>Higher &amp; left = better efficiency</p>
-              </div>
-            </div>
+        {/* Filter Panel */}
+        <div className="mb-6">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setFiltersOpen(!filtersOpen)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                hasActiveFilters
+                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                  : 'bg-black/30 text-gray-400 border border-white/10 hover:border-white/20'
+              }`}
+            >
+              <Filter className="w-4 h-4" />
+              Filters
+              {hasActiveFilters && (
+                <span className="bg-emerald-500 text-black text-xs px-1.5 py-0.5 rounded-full">
+                  {selectedProviders.length + (minCorrectness > 0 ? 1 : 0) + (minRuns > 0 ? 1 : 0)}
+                </span>
+              )}
+            </button>
 
-            <div className="rounded-2xl bg-black/30 border border-emerald-500/20 p-6">
-              <ResponsiveContainer width="100%" height={500}>
-                <ScatterChart margin={{ top: 20, right: 30, bottom: 60, left: 60 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
-                  <XAxis
-                    type="number"
-                    dataKey="x"
-                    name="Cost"
-                    domain={[0, 'auto']}
-                    tick={{ fill: '#9ca3af', fontSize: 12 }}
-                    tickFormatter={(v) => `${v}`}
-                  >
-                    <Label value="Cost per Task ($)" position="bottom" offset={40} fill="#6b7280" />
-                  </XAxis>
-                  <YAxis
-                    type="number"
-                    dataKey="y"
-                    name="Score"
-                    domain={[50, 100]}
-                    tick={{ fill: '#9ca3af', fontSize: 12 }}
-                    tickFormatter={(v) => `${v}%`}
-                  >
-                    <Label value="Accuracy (%)" angle={-90} position="left" offset={40} fill="#6b7280" />
-                  </YAxis>
-                  <ZAxis type="number" dataKey="z" range={[200, 600]} />
-                  <Tooltip content={<CustomScatterTooltip />} />
+            <button
+              onClick={() => setShowScenarioBuilder(true)}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-500 hover:to-teal-500 transition-all"
+            >
+              <Sparkles className="w-4 h-4" />
+              Help Me Choose
+            </button>
 
-                  {/* Efficiency zones */}
-                  <ReferenceArea x1={0} x2={1} y1={70} y2={100} fill="#10b981" fillOpacity={0.05} />
-                  <ReferenceLine y={humanBaseline.overall} stroke="#fbbf24" strokeDasharray="5 5" label={{ value: 'Human', fill: '#fbbf24', fontSize: 11 }} />
-
-                  <Scatter data={scatterData} fill="#10b981">
-                    {scatterData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} fillOpacity={0.8} stroke={entry.color} strokeWidth={2} />
-                    ))}
-                  </Scatter>
-                </ScatterChart>
-              </ResponsiveContainer>
-
-              {/* Legend */}
-              <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-white/10">
-                {benchmarkData.map(d => (
-                  <div key={d.id} className="flex items-center gap-2 text-xs">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: d.color }} />
-                    <span className="text-gray-400">{d.model}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Efficiency Leaders */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {[
-                { label: 'Best Overall', model: benchmarkData.reduce((a, b) => a.overall > b.overall ? a : b) },
-                { label: 'Best Efficiency', model: benchmarkData.reduce((a, b) => (a.overall/a.cost) > (b.overall/b.cost) ? a : b) },
-                { label: 'Best Budget', model: benchmarkData.filter(d => d.cost < 0.5).reduce((a, b) => a.overall > b.overall ? a : b) },
-              ].map((item, i) => (
-                <div key={i} className="p-4 rounded-xl bg-gradient-to-br from-emerald-500/10 to-transparent border border-emerald-500/20">
-                  <p className="text-xs text-emerald-400/70 uppercase tracking-wider">{item.label}</p>
-                  <p className="text-lg font-bold text-white mt-1">{item.model.model}</p>
-                  <p className="text-sm text-gray-400">{item.model.overall.toFixed(1)}% @ ${item.model.cost.toFixed(2)}/task</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Four Quadrant Analysis */}
-        {activeTab === 'quadrant' && (
-          <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-              <div>
-                <h2 className="text-xl font-bold text-white">Four Quadrant Analysis</h2>
-                <p className="text-gray-400 text-sm mt-1">Compare any two dimensions to find model strengths</p>
-              </div>
-              <div className="flex gap-3">
-                <FilterDropdown value={quadrantX} onChange={setQuadrantX} options={axisOptions} label="X-Axis" />
-                <FilterDropdown value={quadrantY} onChange={setQuadrantY} options={axisOptions} label="Y-Axis" />
-              </div>
-            </div>
-
-            <div className="rounded-2xl bg-black/30 border border-emerald-500/20 p-6">
-              <ResponsiveContainer width="100%" height={550}>
-                <ScatterChart margin={{ top: 20, right: 30, bottom: 60, left: 60 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
-
-                  {/* Quadrant backgrounds */}
-                  <ReferenceArea x1={medianX} x2={100} y1={medianY} y2={100} fill="#10b981" fillOpacity={0.08} label={{ value: '★ LEADERS', fill: '#10b981', fontSize: 11 }} />
-                  <ReferenceArea x1={0} x2={medianX} y1={medianY} y2={100} fill="#3b82f6" fillOpacity={0.08} label={{ value: 'Y Specialists', fill: '#3b82f6', fontSize: 11 }} />
-                  <ReferenceArea x1={medianX} x2={100} y1={0} y2={medianY} fill="#f59e0b" fillOpacity={0.08} label={{ value: 'X Specialists', fill: '#f59e0b', fontSize: 11 }} />
-                  <ReferenceArea x1={0} x2={medianX} y1={0} y2={medianY} fill="#ef4444" fillOpacity={0.05} label={{ value: 'Laggards', fill: '#ef4444', fontSize: 11 }} />
-
-                  {/* Median lines */}
-                  <ReferenceLine x={medianX} stroke="#4b5563" strokeDasharray="4 4" />
-                  <ReferenceLine y={medianY} stroke="#4b5563" strokeDasharray="4 4" />
-
-                  <XAxis
-                    type="number"
-                    dataKey="x"
-                    domain={[50, 100]}
-                    tick={{ fill: '#9ca3af', fontSize: 12 }}
-                    tickFormatter={(v) => `${v}%`}
-                  >
-                    <Label value={axisOptions.find(o => o.value === quadrantX)?.label} position="bottom" offset={40} fill="#6b7280" />
-                  </XAxis>
-                  <YAxis
-                    type="number"
-                    dataKey="y"
-                    domain={[50, 100]}
-                    tick={{ fill: '#9ca3af', fontSize: 12 }}
-                    tickFormatter={(v) => `${v}%`}
-                  >
-                    <Label value={axisOptions.find(o => o.value === quadrantY)?.label} angle={-90} position="left" offset={40} fill="#6b7280" />
-                  </YAxis>
-                  <ZAxis range={[300, 300]} />
-                  <Tooltip content={<QuadrantTooltip />} />
-
-                  <Scatter data={quadrantData}>
-                    {quadrantData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} stroke="#fff" strokeWidth={2} />
-                    ))}
-                  </Scatter>
-                </ScatterChart>
-              </ResponsiveContainer>
-
-              {/* Model Labels */}
-              <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-white/10">
-                {benchmarkData.map(d => (
-                  <div key={d.id} className="flex items-center gap-2 text-xs">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: d.color }} />
-                    <span className="text-gray-400">{d.model}</span>
-                    <span className="text-gray-600">({(d[quadrantX as keyof typeof d] as number).toFixed(0)}, {(d[quadrantY as keyof typeof d] as number).toFixed(0)})</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Quadrant Insights */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {[
-                { label: 'Leaders', desc: 'High on both axes', color: 'emerald', count: quadrantData.filter(d => d.x >= medianX && d.y >= medianY).length },
-                { label: `${axisOptions.find(o => o.value === quadrantY)?.label} Focus`, desc: 'Strong Y, weak X', color: 'blue', count: quadrantData.filter(d => d.x < medianX && d.y >= medianY).length },
-                { label: `${axisOptions.find(o => o.value === quadrantX)?.label} Focus`, desc: 'Strong X, weak Y', color: 'yellow', count: quadrantData.filter(d => d.x >= medianX && d.y < medianY).length },
-                { label: 'Laggards', desc: 'Low on both axes', color: 'red', count: quadrantData.filter(d => d.x < medianX && d.y < medianY).length },
-              ].map((q, i) => (
-                <div key={i} className={`p-3 rounded-lg border`} style={{ backgroundColor: `rgba(${q.color === 'emerald' ? '16,185,129' : q.color === 'blue' ? '59,130,246' : q.color === 'yellow' ? '245,158,11' : '239,68,68'}, 0.1)`, borderColor: `rgba(${q.color === 'emerald' ? '16,185,129' : q.color === 'blue' ? '59,130,246' : q.color === 'yellow' ? '245,158,11' : '239,68,68'}, 0.3)` }}>
-                  <p className="text-xs text-gray-400">{q.label}</p>
-                  <p className="text-2xl font-bold text-white font-mono">{q.count}</p>
-                  <p className="text-xs text-gray-500">{q.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Radar Chart Comparison */}
-        {activeTab === 'radar' && (
-          <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-              <div>
-                <h2 className="text-xl font-bold text-white">Multi-Dimensional Comparison</h2>
-                <p className="text-gray-400 text-sm mt-1">Compare models across all task categories</p>
-              </div>
-              <div className="flex items-center gap-4">
-                <label className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={showHuman}
-                    onChange={(e) => setShowHuman(e.target.checked)}
-                    className="rounded border-gray-600 bg-gray-800 text-emerald-500 focus:ring-emerald-500"
-                  />
-                  Show Human Baseline
-                </label>
-              </div>
-            </div>
-
-            {/* Model selector */}
-            <div className="flex flex-wrap gap-2">
-              {benchmarkData.map(d => (
+            {hasActiveFilters && (
+              <>
                 <button
-                  key={d.id}
-                  onClick={() => {
-                    if (selectedModels.includes(d.model)) {
-                      setSelectedModels(selectedModels.filter(m => m !== d.model));
-                    } else if (selectedModels.length < 5) {
-                      setSelectedModels([...selectedModels, d.model]);
-                    }
-                  }}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
-                    selectedModels.includes(d.model)
-                      ? 'bg-white/10 border-2 text-white'
-                      : 'bg-black/20 border border-white/10 text-gray-400 hover:text-white'
-                  }`}
-                  style={{ borderColor: selectedModels.includes(d.model) ? d.color : undefined }}
+                  onClick={clearFilters}
+                  className="flex items-center gap-1 px-3 py-2 text-sm text-gray-400 hover:text-white"
                 >
-                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: d.color }} />
-                  {d.model}
+                  <X className="w-4 h-4" />
+                  Clear
+                </button>
+                <button
+                  onClick={copyShareLink}
+                  className="flex items-center gap-1 px-3 py-2 text-sm text-gray-400 hover:text-emerald-400"
+                >
+                  <Share2 className="w-4 h-4" />
+                  Share
+                </button>
+              </>
+            )}
+
+            <span className="text-sm text-gray-500 ml-auto">
+              {filteredModels.length} of {benchmarkData.models.length} models
+            </span>
+          </div>
+
+          {filtersOpen && (
+            <div className="mt-4 p-4 bg-black/30 rounded-xl border border-white/10 space-y-4">
+              {/* Provider Filter */}
+              <div>
+                <div className="text-sm text-gray-400 mb-2">Provider</div>
+                <div className="flex flex-wrap gap-2">
+                  {providers.map(provider => (
+                    <button
+                      key={provider}
+                      onClick={() => toggleProvider(provider)}
+                      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                        selectedProviders.includes(provider)
+                          ? 'border-2'
+                          : 'bg-gray-800/50 text-gray-400 border border-gray-700 hover:border-gray-500'
+                      }`}
+                      style={selectedProviders.includes(provider) ? {
+                        backgroundColor: `${providerColors[provider]}20`,
+                        borderColor: providerColors[provider],
+                        color: providerColors[provider]
+                      } : {}}
+                    >
+                      {provider}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Correctness Filter */}
+              <div>
+                <div className="text-sm text-gray-400 mb-2">
+                  Min Correctness: {minCorrectness}%
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={minCorrectness}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value, 10);
+                    setMinCorrectness(val);
+                    updateURL(selectedProviders, val, minRuns);
+                  }}
+                  className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                />
+              </div>
+
+              {/* Min Runs Filter */}
+              <div>
+                <div className="text-sm text-gray-400 mb-2">Min Runs</div>
+                <div className="flex gap-2">
+                  {[0, 5, 10, 20].map(val => (
+                    <button
+                      key={val}
+                      onClick={() => {
+                        setMinRuns(val);
+                        updateURL(selectedProviders, minCorrectness, val);
+                      }}
+                      className={`px-3 py-1.5 rounded text-sm ${
+                        minRuns === val
+                          ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                          : 'bg-gray-800 text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      {val === 0 ? 'Any' : `${val}+`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Quick Presets */}
+              <div className="pt-2 border-t border-white/10">
+                <div className="text-sm text-gray-400 mb-2">Quick Presets</div>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => {
+                      setSelectedProviders(['qwen', 'deepseek']);
+                      setMinCorrectness(0);
+                      setMinRuns(0);
+                      updateURL(['qwen', 'deepseek'], 0, 0);
+                    }}
+                    className="px-3 py-1.5 rounded text-sm bg-gray-800 text-gray-400 hover:text-white"
+                  >
+                    Budget Models
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSelectedProviders(['anthropic', 'openai']);
+                      setMinCorrectness(0);
+                      setMinRuns(0);
+                      updateURL(['anthropic', 'openai'], 0, 0);
+                    }}
+                    className="px-3 py-1.5 rounded text-sm bg-gray-800 text-gray-400 hover:text-white"
+                  >
+                    Premium Models
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSelectedProviders([]);
+                      setMinCorrectness(50);
+                      setMinRuns(0);
+                      updateURL([], 50, 0);
+                    }}
+                    className="px-3 py-1.5 rounded text-sm bg-gray-800 text-gray-400 hover:text-white"
+                  >
+                    High Accuracy
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSelectedProviders([]);
+                      setMinCorrectness(0);
+                      setMinRuns(10);
+                      updateURL([], 0, 10);
+                    }}
+                    className="px-3 py-1.5 rounded text-sm bg-gray-800 text-gray-400 hover:text-white"
+                  >
+                    Well Tested
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Leaderboard Tab */}
+        {activeTab === 'leaderboard' && (
+          <div className="space-y-6">
+            {/* Failure Insights Section */}
+            <div className="mb-8">
+              <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <Target className="w-5 h-5 text-emerald-400" />
+                Insights
+              </h2>
+              <FailureInsights />
+            </div>
+
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-400">Sort by:</span>
+              {(['bestReward', 'avgReward', 'totalRuns'] as const).map(key => (
+                <button
+                  key={key}
+                  onClick={() => setSortBy(key)}
+                  className={`px-3 py-1 rounded text-sm ${
+                    sortBy === key ? 'bg-emerald-500/20 text-emerald-400' : 'text-gray-500 hover:text-white'
+                  }`}
+                >
+                  {key === 'bestReward' ? 'Best Score' : key === 'avgReward' ? 'Avg Score' : 'Total Runs'}
                 </button>
               ))}
             </div>
 
-            <div className="rounded-2xl bg-black/30 border border-emerald-500/20 p-6">
-              <ResponsiveContainer width="100%" height={500}>
-                <RadarChart data={radarData} margin={{ top: 20, right: 30, bottom: 20, left: 30 }}>
-                  <PolarGrid stroke="#374151" />
-                  <PolarAngleAxis dataKey="category" tick={{ fill: '#9ca3af', fontSize: 12 }} />
-                  <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: '#6b7280', fontSize: 10 }} />
-
-                  {showHuman && (
-                    <Radar
-                      name="Human Expert"
-                      dataKey="Human Expert"
-                      stroke="#fbbf24"
-                      fill="#fbbf24"
-                      fillOpacity={0.1}
-                      strokeWidth={2}
-                      strokeDasharray="5 5"
-                    />
-                  )}
-
-                  {selectedModels.map(modelName => {
-                    const model = benchmarkData.find(d => d.model === modelName);
-                    return (
-                      <Radar
-                        key={modelName}
-                        name={modelName}
-                        dataKey={modelName}
-                        stroke={model?.color}
-                        fill={model?.color}
-                        fillOpacity={0.15}
-                        strokeWidth={2}
-                      />
-                    );
-                  })}
-
-                  <Legend wrapperStyle={{ paddingTop: 20 }} />
-                </RadarChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* Selected model stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {selectedModels.map(modelName => {
-                const model = benchmarkData.find(d => d.model === modelName);
-                if (!model) return null;
-                const strongestCat = taskCategories.reduce((a, b) => (model[a.id as keyof typeof model] as number) > (model[b.id as keyof typeof model] as number) ? a : b);
-                const weakestCat = taskCategories.reduce((a, b) => (model[a.id as keyof typeof model] as number) < (model[b.id as keyof typeof model] as number) ? a : b);
-                return (
-                  <div key={modelName} className="p-4 rounded-xl bg-black/20 border border-white/10" style={{ borderLeftColor: model.color, borderLeftWidth: 3 }}>
-                    <p className="font-semibold text-white">{model.model}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{model.org}</p>
-                    <div className="mt-3 space-y-1 text-xs">
-                      <p className="text-emerald-400">Strongest: {strongestCat.name} ({(model[strongestCat.id as keyof typeof model] as number).toFixed(1)}%)</p>
-                      <p className="text-red-400">Weakest: {weakestCat.name} ({(model[weakestCat.id as keyof typeof model] as number).toFixed(1)}%)</p>
+            <div className="space-y-3">
+              {sortedModels.map((model, idx) => (
+                <div
+                  key={model.model}
+                  className="p-4 rounded-xl bg-black/30 border border-white/10 hover:border-emerald-500/30 transition-all"
+                >
+                  <div
+                    className="flex items-center justify-between cursor-pointer"
+                    onClick={() => setExpandedModel(expandedModel === model.model ? null : model.model)}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold ${
+                        idx === 0 ? 'bg-yellow-500/20 text-yellow-400' :
+                        idx === 1 ? 'bg-gray-400/20 text-gray-300' :
+                        idx === 2 ? 'bg-orange-500/20 text-orange-400' :
+                        'bg-gray-700/50 text-gray-500'
+                      }`}>
+                        {idx + 1}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-white">{model.name}</span>
+                          <span
+                            className="px-2 py-0.5 rounded text-xs"
+                            style={{ backgroundColor: `${providerColors[model.provider]}20`, color: providerColors[model.provider] }}
+                          >
+                            {model.provider}
+                          </span>
+                        </div>
+                        <div className="text-xs text-gray-500">{model.totalRuns} runs</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-6">
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-emerald-400">{model.bestReward.toFixed(2)}</div>
+                        <div className="text-xs text-gray-500">best</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-mono text-gray-300">{model.avgReward.toFixed(2)}</div>
+                        <div className="text-xs text-gray-500">avg</div>
+                      </div>
+                      {expandedModel === model.model ? <ChevronUp className="w-5 h-5 text-gray-500" /> : <ChevronDown className="w-5 h-5 text-gray-500" />}
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
 
-        {/* Category Gap Analysis */}
-        {activeTab === 'categories' && (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-xl font-bold text-white">Human-AI Gap by Category</h2>
-              <p className="text-gray-400 text-sm mt-1">Where do models struggle most compared to humans?</p>
-            </div>
+                  {expandedModel === model.model && (
+                    <div className="mt-4 pt-4 border-t border-white/10">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                        {['score_correctness', 'score_efficiency', 'score_notes_usage', 'score_code_quality'].map(metric => (
+                          <div key={metric} className="p-3 rounded-lg bg-black/30">
+                            <div className="text-xs text-gray-500 mb-1">{metric.replace('score_', '').replace(/_/g, ' ')}</div>
+                            <div className="text-lg font-mono text-white">
+                              {((model.metrics[metric] || 0) * 100).toFixed(1)}%
+                            </div>
+                          </div>
+                        ))}
+                      </div>
 
-            <div className="rounded-2xl bg-black/30 border border-emerald-500/20 p-6">
-              <ResponsiveContainer width="100%" height={400}>
-                <BarChart data={categoryBarData} layout="vertical" margin={{ top: 20, right: 30, bottom: 20, left: 100 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" horizontal={true} vertical={false} />
-                  <XAxis type="number" domain={[0, 100]} tick={{ fill: '#9ca3af', fontSize: 12 }} tickFormatter={(v) => `${v}%`} />
-                  <YAxis type="category" dataKey="name" tick={{ fill: '#9ca3af', fontSize: 12 }} width={90} />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: '#111827', border: '1px solid #374151', borderRadius: 8 }}
-                    labelStyle={{ color: '#fff' }}
-                  />
-                  <Bar dataKey="avg" name="Model Average" fill="#10b981" radius={[0, 4, 4, 0]} />
-                  <Bar dataKey="human" name="Human Expert" fill="#fbbf24" radius={[0, 4, 4, 0]} fillOpacity={0.5} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+                      <div className="text-sm text-gray-400 mb-2">Performance by Mode:</div>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        {Object.entries(model.modes).map(([mode, data]) => (
+                          <div key={mode} className="p-2 rounded bg-black/20 text-xs">
+                            <div className="text-gray-500">{mode.replace(/_/g, ' ')}</div>
+                            <div className="text-emerald-400 font-mono">{data.reward.toFixed(2)}</div>
+                            <div className="text-gray-600">{data.runs} runs</div>
+                          </div>
+                        ))}
+                      </div>
 
-            {/* Gap Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-              {categoryBarData.sort((a, b) => b.gap - a.gap).map((cat, i) => (
-                <div key={cat.name} className={`p-3 rounded-xl border ${i === 0 ? 'bg-red-500/10 border-red-500/30' : 'bg-black/20 border-white/10'}`}>
-                  <p className="text-xs text-gray-400 truncate">{cat.name}</p>
-                  <p className={`text-xl font-bold font-mono mt-1 ${i === 0 ? 'text-red-400' : 'text-white'}`}>
-                    -{cat.gap.toFixed(1)}%
-                  </p>
-                  <p className="text-xs text-gray-500">gap to human</p>
+                      {model.examples.length > 0 && (
+                        <div className="mt-4">
+                          <div className="text-sm text-gray-400 mb-2">Sample Trajectories:</div>
+                          <div className="flex gap-2 overflow-x-auto pb-2">
+                            {model.examples.slice(0, 5).map((ex, i) => (
+                              <button
+                                key={i}
+                                onClick={(e) => { e.stopPropagation(); setSelectedExample(ex); setActiveTab('examples'); }}
+                                className={`flex-shrink-0 p-2 rounded-lg border text-xs text-left ${
+                                  ex.score_correctness > 0.5 ? 'border-emerald-500/30 bg-emerald-500/10' : 'border-red-500/30 bg-red-500/10'
+                                }`}
+                              >
+                                <div className="text-white font-mono">{ex.info.task_id}</div>
+                                <div className="text-gray-500">{ex.info.level}</div>
+                                <div className={ex.score_correctness > 0.5 ? 'text-emerald-400' : 'text-red-400'}>
+                                  {ex.reward.toFixed(1)} reward
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <Link
+                        href={`/benchmark/${encodeURIComponent(model.model)}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 rounded-lg text-sm transition-colors"
+                      >
+                        View Full Details
+                        <ArrowRight className="w-4 h-4" />
+                      </Link>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
-
-            {/* Insights */}
-            <div className="p-5 rounded-xl bg-gradient-to-r from-red-500/10 to-transparent border border-red-500/20">
-              <h3 className="font-semibold text-white flex items-center gap-2">
-                <Target className="w-4 h-4 text-red-400" />
-                Key Insight: Adversarial Tasks
-              </h3>
-              <p className="text-gray-400 text-sm mt-2 leading-relaxed">
-                The largest human-AI gap ({categoryBarData.find(c => c.name === 'Adversarial')?.gap.toFixed(1)}%) is in <strong className="text-white">Adversarial tasks</strong>—prompt injections,
-                destructive operations, and edge cases. This is your benchmark&apos;s <strong className="text-emerald-400">unique value proposition</strong>: catching failures others miss.
-              </p>
-            </div>
           </div>
         )}
 
-        {/* Rank Flow / Bump Chart */}
-        {activeTab === 'rankings' && (
+        {/* Arena Tab - Head-to-Head Comparison */}
+        {activeTab === 'arena' && (
           <div className="space-y-6">
-            <div>
-              <h2 className="text-xl font-bold text-white">Ranking Flow Across Categories</h2>
-              <p className="text-gray-400 text-sm mt-1">How model rankings shift across different task types</p>
+            {/* Arena Mode Toggle */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setArenaMode('compare')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  arenaMode === 'compare'
+                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <Swords className="w-4 h-4" />
+                Task Comparison
+              </button>
+              <button
+                onClick={() => setArenaMode('abtest')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  arenaMode === 'abtest'
+                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <BarChart3 className="w-4 h-4" />
+                A/B Test Simulator
+              </button>
             </div>
 
-            <div className="rounded-2xl bg-black/30 border border-emerald-500/20 p-6">
-              <ResponsiveContainer width="100%" height={450}>
-                <LineChart data={bumpData} margin={{ top: 20, right: 30, bottom: 60, left: 40 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
-                  <XAxis
-                    dataKey="category"
-                    tick={{ fill: '#9ca3af', fontSize: 11 }}
-                    angle={-30}
-                    textAnchor="end"
-                    height={60}
-                  />
-                  <YAxis
-                    reversed
-                    domain={[1, 10]}
-                    tick={{ fill: '#9ca3af', fontSize: 12 }}
-                    tickFormatter={(v) => `#${v}`}
-                  />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: '#111827', border: '1px solid #374151', borderRadius: 8 }}
-                    labelStyle={{ color: '#fff' }}
-                    formatter={(value, name) => [`Rank #${value}`, name]}
-                  />
+            {/* A/B Test Simulator */}
+            {arenaMode === 'abtest' && <ABTestSimulator />}
 
-                  {benchmarkData.slice(0, 6).map(model => (
-                    <Line
-                      key={model.model}
-                      type="monotone"
-                      dataKey={model.model}
-                      stroke={model.color}
-                      strokeWidth={2}
-                      dot={{ fill: model.color, strokeWidth: 0, r: 4 }}
-                      activeDot={{ r: 6, stroke: '#fff', strokeWidth: 2 }}
-                    />
-                  ))}
-                </LineChart>
-              </ResponsiveContainer>
-
-              {/* Legend */}
-              <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-white/10">
-                {benchmarkData.slice(0, 6).map(d => (
-                  <div key={d.id} className="flex items-center gap-2 text-xs">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: d.color }} />
-                    <span className="text-gray-300">{d.model}</span>
-                  </div>
+            {/* Task Comparison Mode */}
+            {arenaMode === 'compare' && (
+              <>
+            {/* Model Selection */}
+            <div className="bg-black/20 rounded-xl p-4 border border-white/10">
+              <h3 className="text-sm font-medium text-gray-400 mb-3">Select 2-4 models to compare:</h3>
+              <div className="flex flex-wrap gap-2">
+                {benchmarkData.models.map((model) => (
+                  <button
+                    key={model.model}
+                    onClick={() => toggleArenaModel(model.model)}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                      arenaModels.includes(model.model)
+                        ? 'text-white border-2'
+                        : 'bg-gray-800/50 text-gray-400 border border-gray-700 hover:border-gray-500'
+                    }`}
+                    style={arenaModels.includes(model.model) ? {
+                      backgroundColor: `${providerColors[model.provider]}20`,
+                      borderColor: providerColors[model.provider],
+                      color: providerColors[model.provider]
+                    } : {}}
+                  >
+                    {model.name.split('-').slice(0, 2).join('-')}
+                  </button>
                 ))}
               </div>
             </div>
 
-            {/* Consistency Analysis */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 rounded-xl bg-black/20 border border-white/10">
-                <h3 className="font-semibold text-white mb-3">Most Consistent</h3>
-                <div className="space-y-2">
-                  {benchmarkData
-                    .map(d => ({
-                      ...d,
-                      variance: Math.sqrt(taskCategories.reduce((sum, cat) => sum + Math.pow((d[cat.id as keyof typeof d] as number) - d.overall, 2), 0) / taskCategories.length)
-                    }))
-                    .sort((a, b) => a.variance - b.variance)
-                    .slice(0, 3)
-                    .map((d) => (
-                      <div key={d.id} className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: d.color }} />
-                          <span className="text-sm text-gray-300">{d.model}</span>
-                        </div>
-                        <span className="text-xs text-emerald-400 font-mono">σ = {d.variance.toFixed(2)}</span>
-                      </div>
-                    ))
-                  }
-                </div>
+            {arenaModels.length < 2 ? (
+              <div className="text-center py-20 text-gray-500">
+                <Swords className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>Select at least 2 models to start the arena comparison</p>
               </div>
-              <div className="p-4 rounded-xl bg-black/20 border border-white/10">
-                <h3 className="font-semibold text-white mb-3">Most Variable</h3>
-                <div className="space-y-2">
-                  {benchmarkData
-                    .map(d => ({
-                      ...d,
-                      variance: Math.sqrt(taskCategories.reduce((sum, cat) => sum + Math.pow((d[cat.id as keyof typeof d] as number) - d.overall, 2), 0) / taskCategories.length)
-                    }))
-                    .sort((a, b) => b.variance - a.variance)
-                    .slice(0, 3)
-                    .map((d) => (
-                      <div key={d.id} className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: d.color }} />
-                          <span className="text-sm text-gray-300">{d.model}</span>
-                        </div>
-                        <span className="text-xs text-orange-400 font-mono">σ = {d.variance.toFixed(2)}</span>
-                      </div>
-                    ))
-                  }
-                </div>
+            ) : arenaData.tasks.length === 0 ? (
+              <div className="text-center py-20 text-gray-500">
+                <Target className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>No common tasks found between selected models</p>
+                <p className="text-sm mt-2">Try selecting different models</p>
               </div>
-            </div>
+            ) : (
+              <>
+                {/* Task Navigation */}
+                <div className="flex items-center justify-between bg-black/20 rounded-xl p-4 border border-white/10">
+                  <button
+                    onClick={() => setArenaTaskIndex(Math.max(0, arenaTaskIndex - 1))}
+                    disabled={arenaTaskIndex === 0}
+                    className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <div className="text-center">
+                    <div className="text-lg font-mono text-white">{arenaData.tasks[arenaTaskIndex]}</div>
+                    <div className="text-sm text-gray-500">Task {arenaTaskIndex + 1} of {arenaData.tasks.length}</div>
+                  </div>
+                  <button
+                    onClick={() => setArenaTaskIndex(Math.min(arenaData.tasks.length - 1, arenaTaskIndex + 1))}
+                    disabled={arenaTaskIndex === arenaData.tasks.length - 1}
+                    className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Side-by-side Comparison */}
+                <div className={`grid gap-4 ${arenaData.modelData.length === 2 ? 'grid-cols-2' : arenaData.modelData.length === 3 ? 'grid-cols-3' : 'grid-cols-4'}`}>
+                  {arenaData.modelData.map((model) => {
+                    const example = model.examples.find(e => e.info?.task_id === arenaData.tasks[arenaTaskIndex]);
+                    if (!example) return null;
+
+                    return (
+                      <div
+                        key={model.model}
+                        className="bg-black/20 rounded-xl border border-white/10 overflow-hidden"
+                      >
+                        {/* Model Header */}
+                        <div
+                          className="p-4 border-b border-white/10"
+                          style={{ backgroundColor: `${providerColors[model.provider]}10` }}
+                        >
+                          <div className="flex items-center gap-2 mb-2">
+                            <div
+                              className="w-3 h-3 rounded-full"
+                              style={{ backgroundColor: providerColors[model.provider] }}
+                            />
+                            <span className="font-medium text-white">{model.name.split('-').slice(0, 2).join('-')}</span>
+                          </div>
+                          <div className="flex items-center gap-4 text-sm">
+                            <span className={example.score_correctness > 0.5 ? 'text-emerald-400' : 'text-red-400'}>
+                              {example.score_correctness > 0.5 ? '✓ Correct' : '✗ Wrong'}
+                            </span>
+                            <span className="text-gray-400">Reward: {example.reward.toFixed(2)}</span>
+                          </div>
+                        </div>
+
+                        {/* Stats */}
+                        <div className="p-4 grid grid-cols-2 gap-2 text-sm border-b border-white/10">
+                          <div className="bg-black/30 rounded p-2">
+                            <div className="text-gray-500 text-xs">Correctness</div>
+                            <div className="text-white font-mono">{(example.score_correctness * 100).toFixed(0)}%</div>
+                          </div>
+                          <div className="bg-black/30 rounded p-2">
+                            <div className="text-gray-500 text-xs">Efficiency</div>
+                            <div className="text-white font-mono">{(example.score_efficiency * 100).toFixed(0)}%</div>
+                          </div>
+                          <div className="bg-black/30 rounded p-2">
+                            <div className="text-gray-500 text-xs">Time</div>
+                            <div className="text-white font-mono">{((example.generation_ms || 0) / 1000).toFixed(1)}s</div>
+                          </div>
+                          <div className="bg-black/30 rounded p-2">
+                            <div className="text-gray-500 text-xs">Answer</div>
+                            <div className="text-white font-mono truncate">{example.answer}</div>
+                          </div>
+                        </div>
+
+                        {/* Code Response */}
+                        <div className="p-4 max-h-64 overflow-y-auto">
+                          <div className="text-xs text-gray-500 mb-2">Response:</div>
+                          {example.completion.slice(0, 3).map((msg, idx) => (
+                            <div key={idx} className={`text-xs p-2 rounded mb-2 ${
+                              msg.role === 'assistant' ? 'bg-emerald-500/10 border-l-2 border-emerald-500' : 'bg-gray-800'
+                            }`}>
+                              <pre className="whitespace-pre-wrap font-mono text-gray-300 overflow-hidden">
+                                {msg.content.length > 300 ? msg.content.slice(0, 300) + '...' : msg.content}
+                              </pre>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Task Details */}
+                <div className="bg-black/20 rounded-xl p-4 border border-white/10">
+                  <h4 className="text-sm font-medium text-gray-400 mb-2">Task Prompt:</h4>
+                  <div className="bg-black/30 rounded-lg p-4">
+                    <pre className="text-sm text-gray-300 whitespace-pre-wrap font-mono">
+                      {arenaData.modelData[0]?.examples.find(e => e.info?.task_id === arenaData.tasks[arenaTaskIndex])?.prompt.find(p => p.role === 'user')?.content || 'No prompt available'}
+                    </pre>
+                  </div>
+                </div>
+              </>
+            )}
+              </>
+            )}
           </div>
         )}
 
-      </main>
+        {/* Race Tab */}
+        {activeTab === 'race' && <ModelRace />}
 
-      {/* Footer */}
-      <footer className="relative border-t border-white/5 mt-12">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
-            <p>AnalyticsBench © 2025 • Open benchmark for analytics agents</p>
-            <div className="flex items-center gap-4">
-              <a href="#" className="hover:text-emerald-400 transition-colors">Submit Model</a>
-              <a href="#" className="hover:text-emerald-400 transition-colors">API</a>
-              <a href="#" className="hover:text-emerald-400 transition-colors">Discord</a>
+        {/* Trajectory Viewer Tab */}
+        {activeTab === 'examples' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="p-6 rounded-2xl bg-black/30 border border-white/10">
+              <h3 className="text-lg font-bold text-white mb-4">Select Example</h3>
+              <div className="space-y-2 max-h-[600px] overflow-y-auto">
+                {benchmarkData.models.flatMap(model =>
+                  model.examples.filter(ex => ex.info).map((ex, i) => (
+                    <button
+                      key={`${model.model}-${i}`}
+                      onClick={() => setSelectedExample(ex)}
+                      className={`w-full p-3 rounded-lg text-left text-sm transition-all ${
+                        selectedExample === ex
+                          ? 'bg-emerald-500/20 border border-emerald-500/30'
+                          : 'bg-black/20 border border-white/10 hover:border-white/20'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-white font-mono">{ex.info.task_id}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded ${
+                          ex.score_correctness > 0.5 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
+                        }`}>
+                          {ex.reward.toFixed(1)}
+                        </span>
+                      </div>
+                      <div className="text-xs text-gray-500">{model.name} - {ex.info.level}</div>
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+
+            <div className="lg:col-span-2 p-6 rounded-2xl bg-black/30 border border-white/10">
+              <h3 className="text-lg font-bold text-white mb-4">Trajectory Replay</h3>
+              {selectedExample && selectedExample.info ? (
+                <div className="space-y-4">
+                  <div className="p-4 rounded-lg bg-black/30 border border-white/10">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-emerald-400 font-mono">{selectedExample.info.task_id}</span>
+                      <span className="text-gray-500">{selectedExample.info.level}</span>
+                    </div>
+                    <div className="text-sm text-gray-400">
+                      Expected: <span className="text-white font-mono">{selectedExample.info.expected}</span>
+                      {' | '}
+                      Got: <span className={`font-mono ${selectedExample.score_correctness > 0.5 ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {selectedExample.answer}
+                      </span>
+                    </div>
+                  </div>
+
+                  {selectedExample.prompt.map((msg, i) => (
+                    <div key={i} className={`p-4 rounded-lg ${
+                      msg.role === 'system' ? 'bg-blue-500/10 border border-blue-500/20' :
+                      msg.role === 'user' ? 'bg-purple-500/10 border border-purple-500/20' :
+                      'bg-gray-500/10 border border-gray-500/20'
+                    }`}>
+                      <div className="text-xs text-gray-500 mb-2 uppercase">{msg.role}</div>
+                      <pre className="text-sm text-gray-300 whitespace-pre-wrap font-mono overflow-x-auto">
+                        {msg.content.slice(0, 500)}{msg.content.length > 500 ? '...' : ''}
+                      </pre>
+                    </div>
+                  ))}
+
+                  {selectedExample.completion.map((msg, i) => (
+                    <div key={i} className={`p-4 rounded-lg ${
+                      msg.role === 'assistant' ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-gray-500/10 border border-gray-500/20'
+                    }`}>
+                      <div className="text-xs text-gray-500 mb-2 uppercase">{msg.role} - Turn {Math.floor(i/2) + 1}</div>
+                      <pre className="text-sm text-gray-300 whitespace-pre-wrap font-mono overflow-x-auto">{msg.content}</pre>
+                    </div>
+                  ))}
+
+                  <div className="flex gap-4 pt-4 border-t border-white/10">
+                    <div className="p-3 rounded-lg bg-black/30">
+                      <div className="text-xs text-gray-500">Correctness</div>
+                      <div className="text-lg font-mono text-emerald-400">{(selectedExample.score_correctness * 100).toFixed(0)}%</div>
+                    </div>
+                    <div className="p-3 rounded-lg bg-black/30">
+                      <div className="text-xs text-gray-500">Efficiency</div>
+                      <div className="text-lg font-mono text-blue-400">{(selectedExample.score_efficiency * 100).toFixed(0)}%</div>
+                    </div>
+                    <div className="p-3 rounded-lg bg-black/30">
+                      <div className="text-xs text-gray-500">Time</div>
+                      <div className="text-lg font-mono text-purple-400">{((selectedExample.generation_ms || 0) / 1000).toFixed(1)}s</div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-[400px] text-gray-500">
+                  Select an example to view its trajectory
+                </div>
+              )}
             </div>
           </div>
-        </div>
-      </footer>
+        )}
+      </main>
+
+      {/* Scenario Builder Modal */}
+      <ScenarioBuilder
+        isOpen={showScenarioBuilder}
+        onClose={() => setShowScenarioBuilder(false)}
+      />
     </div>
   );
 }
