@@ -3,8 +3,8 @@
 import { useState, useMemo } from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-  ScatterChart, Scatter, Cell, ComposedChart, ReferenceLine, RadarChart, PolarGrid,
-  PolarAngleAxis, PolarRadiusAxis, Radar, LabelList
+  ScatterChart, Scatter, Cell, ReferenceLine, RadarChart, PolarGrid,
+  PolarAngleAxis, PolarRadiusAxis, Radar, LabelList, ZAxis, ReferenceArea, PieChart, Pie
 } from 'recharts';
 
 // Complete model data with all metrics including COST
@@ -12,11 +12,11 @@ const rawData = [
   { model: "claude-opus-4.5", name: "Claude Opus 4.5", shortName: "Claude", provider: "Anthropic", color: "#D97706",
     total: 61.3, reward: 0.578, time: 33.6, cost: 0.89,
     correct: 46, partial: 2, wrong: 27, total_n: 75, perfect: 13, zero: 8,
-    L5: 66.7, L6: 56.7 },
+    L5: 66.7, L6: 56.7, isLeader: true },
   { model: "qwen3-max", name: "Qwen3 Max", shortName: "Qwen3", provider: "Qwen", color: "#7C3AED",
     total: 46.7, reward: 0.473, time: 22.8, cost: 0.12,
     correct: 35, partial: 8, wrong: 32, total_n: 75, perfect: 7, zero: 10,
-    L5: 57.1, L6: 33.3 },
+    L5: 57.1, L6: 33.3, isBestValue: true },
   { model: "mistral-large", name: "Mistral Large", shortName: "Mistral-L", provider: "Mistral", color: "#DC2626",
     total: 42.7, reward: 0.424, time: 29.0, cost: 0.18,
     correct: 32, partial: 2, wrong: 41, total_n: 75, perfect: 5, zero: 8,
@@ -50,98 +50,174 @@ const rawData = [
 // Enriched data with derived metrics
 const enrichedModels = rawData.map(m => ({
   ...m,
-  costPer100: m.cost * 100,
-  accuracyPerDollar: m.total / m.cost,
-  consistencyScore: (m.perfect / 25) * 100,
-  failureRate: (m.zero / 25) * 100,
-  accuracyWithPartial: ((m.correct + m.partial) / m.total_n * 100),
-  partialBoost: ((m.correct + m.partial) / m.total_n * 100) - m.total,
+  costPerCorrect: m.correct > 0 ? (m.cost * 75) / m.correct : 999,
+  speedScore: Math.max(0, 100 - m.time / 2),
+  consistencyScore: (m.perfect / 13) * 100, // normalized to Claude's 13
+  consistencyColor: m.perfect >= 10 ? '#22C55E' : m.perfect >= 5 ? '#F59E0B' : '#EF4444',
+  speedTier: m.time < 30 ? 'fast' : m.time < 60 ? 'medium' : 'slow',
+  costTier: m.cost < 0.10 ? 'cheap' : m.cost < 0.30 ? 'mid' : 'expensive',
+  accTier: m.total > 40 ? 'high' : m.total > 20 ? 'mid' : 'low',
+  successRate: (m.correct / 75) * 100,
+  failureRate: (m.wrong / 75) * 100,
 }));
 
-// Averages for reference lines
-const avgAccuracy = rawData.reduce((a, m) => a + m.total, 0) / rawData.length;
-const avgCost = rawData.reduce((a, m) => a + m.cost, 0) / rawData.length;
-const avgTime = rawData.reduce((a, m) => a + m.time, 0) / rawData.length;
+// Thresholds for quadrants
+const COST_THRESHOLD = 0.20;
+const ACC_THRESHOLD = 35;
 
-// Custom scatter label
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CustomScatterLabel = (props: any) => {
   const { x, y, value } = props;
   if (typeof x !== 'number' || typeof y !== 'number') return null;
   return (
-    <text x={x} y={y - 12} fill="#fff" fontSize={9} textAnchor="middle" fontWeight="bold">
+    <text x={x} y={y - 14} fill="#fff" fontSize={10} textAnchor="middle" fontWeight="600">
       {value}
     </text>
   );
 };
 
+// Get quadrant zone for a model
+const getQuadrantZone = (cost: number, acc: number) => {
+  if (cost < COST_THRESHOLD && acc >= ACC_THRESHOLD) return { zone: 'VALUE PICK', color: '#22C55E' };
+  if (cost >= COST_THRESHOLD && acc >= ACC_THRESHOLD) return { zone: 'PREMIUM', color: '#D97706' };
+  if (cost < COST_THRESHOLD && acc < ACC_THRESHOLD) return { zone: 'BUDGET', color: '#6B7280' };
+  return { zone: 'AVOID', color: '#EF4444' };
+};
+
+type AxisKey = 'cost' | 'total' | 'time' | 'correct' | 'L5' | 'L6' | 'perfect';
+type SizeKey = 'speedScore' | 'correct' | 'perfect' | 'costPerCorrect';
+
+const axisOptions: { value: AxisKey; label: string }[] = [
+  { value: 'cost', label: 'Cost ($)' },
+  { value: 'total', label: 'Accuracy (%)' },
+  { value: 'time', label: 'Time (s)' },
+  { value: 'correct', label: 'Correct (#)' },
+  { value: 'L5', label: 'L5 Hard (%)' },
+  { value: 'L6', label: 'L6 Harder (%)' },
+  { value: 'perfect', label: 'Perfect Tasks' },
+];
+
+const sizeOptions: { value: SizeKey; label: string }[] = [
+  { value: 'speedScore', label: 'Speed' },
+  { value: 'correct', label: 'Correct Answers' },
+  { value: 'perfect', label: 'Perfect Tasks' },
+  { value: 'costPerCorrect', label: 'Value (inverted)' },
+];
+
 export default function DeepMetrics() {
   const [activeTab, setActiveTab] = useState('overview');
+  const [vizOption, setVizOption] = useState(1);
 
-  // Cost efficiency data
-  const costData = useMemo(() => enrichedModels.map(d => ({
-    name: d.shortName,
-    cost: d.cost,
-    accuracy: d.total,
-    value: d.accuracyPerDollar,
-  })).sort((a, b) => b.value - a.value), []);
+  // Filter states
+  const [xAxis, setXAxis] = useState<AxisKey>('cost');
+  const [yAxis, setYAxis] = useState<AxisKey>('total');
+  const [bubbleSize, setBubbleSize] = useState<SizeKey>('speedScore');
+  const [showOnlyTop, setShowOnlyTop] = useState(false);
+  const [reliabilityView, setReliabilityView] = useState<'scatter' | 'breakdown' | 'comparison'>('scatter');
 
-  // Rollout breakdown data
-  const rolloutData = useMemo(() => rawData.map(d => ({
-    name: d.shortName,
-    Correct: d.correct,
-    Partial: d.partial,
-    Wrong: d.wrong,
-  })), []);
+  const filteredModels = useMemo(() => {
+    if (showOnlyTop) {
+      return enrichedModels.filter(m => m.total >= 30);
+    }
+    return enrichedModels;
+  }, [showOnlyTop]);
 
-  // Consistency data
-  const consistencyData = useMemo(() => rawData.map(d => ({
-    name: d.shortName,
-    'Perfect (3/3)': d.perfect,
-    'Zero (0/3)': d.zero,
-    'Mixed': 25 - d.perfect - d.zero,
-  })), []);
+  const claudeData = enrichedModels[0];
+  const qwenData = enrichedModels[1];
 
-  // Radar data for top 4 models
-  const radarData = useMemo(() => [
-    { metric: 'Accuracy', Claude: 61.3, Qwen3: 46.7, Mistral: 42.7, Llama: 36.0 },
-    { metric: 'Value', Claude: 69, Qwen3: 100, Mistral: 79, Llama: 100 },
-    { metric: 'Speed', Claude: 66, Qwen3: 77, Mistral: 71, Llama: 79 },
-    { metric: 'Consistency', Claude: 52, Qwen3: 28, Mistral: 20, Llama: 12 },
-    { metric: 'L6 Hard', Claude: 57, Qwen3: 33, Mistral: 40, Llama: 33 },
-  ], []);
+  // Radar data for leader comparison
+  const leaderRadar = useMemo(() => [
+    { metric: 'Accuracy', Claude: 100, Qwen3: (qwenData.total / claudeData.total) * 100, avg: 30 },
+    { metric: 'Value', Claude: (qwenData.costPerCorrect / claudeData.costPerCorrect) * 100, Qwen3: 100, avg: 50 },
+    { metric: 'Speed', Claude: (qwenData.time / claudeData.time) * 100, Qwen3: 100, avg: 60 },
+    { metric: 'Consistency', Claude: 100, Qwen3: (qwenData.perfect / claudeData.perfect) * 100, avg: 25 },
+    { metric: 'L6 Hard', Claude: 100, Qwen3: (qwenData.L6 / claudeData.L6) * 100, avg: 20 },
+  ], [claudeData, qwenData]);
 
   const tabs = [
     { id: 'overview', label: 'Overview' },
-    { id: 'cost', label: 'Cost Analysis' },
-    { id: 'quadrants', label: 'Quadrants' },
+    { id: 'explore', label: 'Explore' },
     { id: 'reliability', label: 'Reliability' },
-    { id: 'details', label: 'Details' },
+    { id: 'insights', label: 'Insights' },
+  ];
+
+  const vizOptions = [
+    { id: 1, label: '3D Bubble' },
+    { id: 2, label: 'Consistency Map' },
+    { id: 3, label: 'Quadrant Zones' },
   ];
 
   return (
     <div className="space-y-6">
-      {/* Key Stats Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
-        <div className="p-4 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-600/10 border border-orange-500/30">
-          <div className="text-2xl font-bold text-orange-400">61.3%</div>
-          <div className="text-xs text-gray-400 mt-1">Best Accuracy</div>
-          <div className="text-xs text-orange-300/70">Claude Opus 4.5</div>
+      {/* HERO: Leader Spotlight */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-900/30 via-black/60 to-purple-900/30 border border-orange-500/20 p-6">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/5 rounded-full blur-3xl" />
+
+        <div className="relative grid md:grid-cols-2 gap-6">
+          {/* Claude - The Leader */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-3 rounded-full bg-orange-500 animate-pulse" />
+              <span className="text-orange-400 text-xs font-medium uppercase tracking-wider">Performance Leader</span>
+            </div>
+            <h2 className="text-3xl font-bold text-white">Claude Opus 4.5</h2>
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <div className="text-3xl font-bold text-orange-400">{claudeData.total}%</div>
+                <div className="text-xs text-gray-500">Accuracy</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-orange-300">{claudeData.perfect}</div>
+                <div className="text-xs text-gray-500">Perfect Tasks</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-orange-200">{claudeData.L6}%</div>
+                <div className="text-xs text-gray-500">L6 Hardest</div>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <span className="px-2 py-1 rounded text-xs bg-orange-500/20 text-orange-300 border border-orange-500/30">Most Accurate</span>
+              <span className="px-2 py-1 rounded text-xs bg-orange-500/20 text-orange-300 border border-orange-500/30">Most Consistent</span>
+              <span className="px-2 py-1 rounded text-xs bg-orange-500/20 text-orange-300 border border-orange-500/30">Best on Hard Tasks</span>
+            </div>
+          </div>
+
+          {/* Qwen - Best Value */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-3 rounded-full bg-purple-500" />
+              <span className="text-purple-400 text-xs font-medium uppercase tracking-wider">Best Value</span>
+            </div>
+            <h2 className="text-3xl font-bold text-white">Qwen3 Max</h2>
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <div className="text-3xl font-bold text-purple-400">{qwenData.total}%</div>
+                <div className="text-xs text-gray-500">Accuracy</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-purple-300">${qwenData.cost}</div>
+                <div className="text-xs text-gray-500">Per Task</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-emerald-400">${qwenData.costPerCorrect.toFixed(2)}</div>
+                <div className="text-xs text-gray-500">Per Correct</div>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <span className="px-2 py-1 rounded text-xs bg-purple-500/20 text-purple-300 border border-purple-500/30">7x Cheaper than Claude</span>
+              <span className="px-2 py-1 rounded text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Best $/Accuracy Ratio</span>
+            </div>
+          </div>
         </div>
-        <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 border border-emerald-500/30">
-          <div className="text-2xl font-bold text-emerald-400">$0.01</div>
-          <div className="text-xs text-gray-400 mt-1">Cheapest</div>
-          <div className="text-xs text-emerald-300/70">Gemini Flash</div>
-        </div>
-        <div className="p-4 rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-600/10 border border-purple-500/30">
-          <div className="text-2xl font-bold text-purple-400">389%/$</div>
-          <div className="text-xs text-gray-400 mt-1">Best Value</div>
-          <div className="text-xs text-purple-300/70">Qwen3 Max</div>
-        </div>
-        <div className="p-4 rounded-xl bg-gradient-to-br from-cyan-500/20 to-cyan-600/10 border border-cyan-500/30">
-          <div className="text-2xl font-bold text-cyan-400">20.7s</div>
-          <div className="text-xs text-gray-400 mt-1">Fastest</div>
-          <div className="text-xs text-cyan-300/70">Llama 4</div>
+
+        {/* Quick comparison bar */}
+        <div className="mt-6 pt-4 border-t border-white/5">
+          <div className="flex items-center justify-between text-xs text-gray-400">
+            <span>Claude leads by <span className="text-orange-400 font-bold">+14.6%</span> accuracy</span>
+            <span>Qwen costs <span className="text-purple-400 font-bold">86%</span> less per task</span>
+            <span>9 models tested • 675 total rollouts</span>
+          </div>
         </div>
       </div>
 
@@ -153,8 +229,8 @@ export default function DeepMetrics() {
             onClick={() => setActiveTab(tab.id)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               activeTab === tab.id
-                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                : 'bg-black/30 text-gray-400 hover:text-white border border-white/10'
+                ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                : 'bg-black/40 text-gray-500 hover:text-gray-300 border border-white/5'
             }`}
           >
             {tab.label}
@@ -165,430 +241,640 @@ export default function DeepMetrics() {
       {/* OVERVIEW TAB */}
       {activeTab === 'overview' && (
         <div className="space-y-4">
-          {/* Cost vs Accuracy - THE KEY CHART */}
-          <div className="p-4 rounded-xl bg-black/30 border border-white/10">
-            <h3 className="text-sm font-medium text-white mb-1">Cost vs Accuracy</h3>
-            <p className="text-xs text-gray-500 mb-4">The fundamental trade-off: How much accuracy per dollar?</p>
-            <div className="h-96">
-              <ResponsiveContainer width="100%" height="100%">
-                <ScatterChart margin={{ top: 30, right: 30, bottom: 50, left: 60 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis
-                    type="number"
-                    dataKey="cost"
-                    name="Cost"
-                    unit="$"
-                    domain={[0, 1]}
-                    stroke="#9CA3AF"
-                    fontSize={11}
-                    tickFormatter={(v) => `$${v.toFixed(2)}`}
-                  />
-                  <YAxis
-                    type="number"
-                    dataKey="total"
-                    name="Accuracy"
-                    unit="%"
-                    domain={[0, 70]}
-                    stroke="#9CA3AF"
-                    fontSize={11}
-                  />
-                  <ReferenceLine x={avgCost} stroke="#6B7280" strokeDasharray="5 5" label={{ value: 'Avg Cost', position: 'top', fill: '#6B7280', fontSize: 10 }} />
-                  <ReferenceLine y={avgAccuracy} stroke="#6B7280" strokeDasharray="5 5" label={{ value: 'Avg Acc', position: 'right', fill: '#6B7280', fontSize: 10 }} />
-                  <Tooltip
-                    content={({ active, payload }) => {
-                      if (active && payload && payload.length) {
-                        const d = payload[0].payload;
-                        return (
-                          <div className="bg-gray-800 p-3 rounded-lg border border-gray-600 text-xs shadow-xl">
-                            <p className="font-bold text-white">{d.name}</p>
-                            <p className="text-emerald-400">Cost: ${d.cost.toFixed(2)}/task</p>
-                            <p className="text-blue-400">Accuracy: {d.total}%</p>
-                            <p className="text-purple-400">Value: {d.accuracyPerDollar.toFixed(0)}%/$</p>
-                          </div>
-                        );
-                      }
-                      return null;
-                    }}
-                  />
-                  <Scatter data={enrichedModels} fill="#8B5CF6">
-                    {enrichedModels.map((entry, index) => (
-                      <Cell key={index} fill={entry.color} stroke="#fff" strokeWidth={2} />
-                    ))}
-                    <LabelList dataKey="shortName" content={CustomScatterLabel} />
-                  </Scatter>
-                </ScatterChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="mt-4 grid grid-cols-3 gap-3 text-xs">
-              <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-                <div className="text-emerald-400 font-bold">Best Overall</div>
-                <div className="text-white">Claude: 61% @ $0.89</div>
-                <div className="text-gray-400">Highest accuracy</div>
+          {/* Leader Comparison Radar */}
+          <div className="p-4 rounded-xl bg-black/40 border border-white/5">
+            <h3 className="text-sm font-medium text-gray-300 mb-1">Leader Comparison: Claude vs Qwen3</h3>
+            <p className="text-xs text-gray-600 mb-4">Normalized scores (100 = best in category)</p>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RadarChart data={leaderRadar}>
+                    <PolarGrid stroke="#374151" />
+                    <PolarAngleAxis dataKey="metric" tick={{ fill: '#9CA3AF', fontSize: 11 }} />
+                    <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: '#6B7280', fontSize: 9 }} />
+                    <Radar name="Claude Opus 4.5" dataKey="Claude" stroke="#D97706" fill="#D97706" fillOpacity={0.3} strokeWidth={2} />
+                    <Radar name="Qwen3 Max" dataKey="Qwen3" stroke="#7C3AED" fill="#7C3AED" fillOpacity={0.3} strokeWidth={2} />
+                    <Legend wrapperStyle={{ fontSize: 10 }} />
+                  </RadarChart>
+                </ResponsiveContainer>
               </div>
-              <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
-                <div className="text-purple-400 font-bold">Best Value</div>
-                <div className="text-white">Qwen3: 47% @ $0.12</div>
-                <div className="text-gray-400">389% per dollar</div>
-              </div>
-              <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-                <div className="text-red-400 font-bold">Worst Value</div>
-                <div className="text-white">Claude: 69% per dollar</div>
-                <div className="text-gray-400">Most expensive</div>
+              <div className="space-y-3">
+                <div className="p-3 rounded-lg bg-orange-500/10 border border-orange-500/20">
+                  <div className="flex justify-between items-center">
+                    <span className="text-orange-400 font-medium">Claude Opus 4.5</span>
+                    <span className="text-xs text-gray-500">Premium Choice</span>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1">Dominates accuracy, consistency, and hard tasks. Worth the premium for mission-critical work.</p>
+                </div>
+                <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                  <div className="flex justify-between items-center">
+                    <span className="text-purple-400 font-medium">Qwen3 Max</span>
+                    <span className="text-xs text-gray-500">Value Champion</span>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1">76% of Claude&apos;s accuracy at 13% of the cost. Best ROI for high-volume workloads.</p>
+                </div>
+                <div className="p-3 rounded-lg bg-gray-800/50 border border-gray-700/30">
+                  <div className="text-xs text-gray-500">Recommendation</div>
+                  <p className="text-xs text-gray-300 mt-1">Use <span className="text-orange-400">Claude</span> for complex L6 tasks, <span className="text-purple-400">Qwen3</span> for bulk L5 processing.</p>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Accuracy + Cost Bar Chart */}
-          <div className="p-4 rounded-xl bg-black/30 border border-white/10">
-            <h3 className="text-sm font-medium text-white mb-3">Accuracy vs Cost per Task</h3>
-            <div className="h-72">
+          {/* All Models Quick View */}
+          <div className="p-4 rounded-xl bg-black/40 border border-white/5">
+            <h3 className="text-sm font-medium text-gray-300 mb-3">All Models at a Glance</h3>
+            <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={enrichedModels} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis type="number" stroke="#9CA3AF" fontSize={10} />
+                <BarChart data={enrichedModels} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
+                  <XAxis type="number" domain={[0, 70]} stroke="#6B7280" fontSize={10} />
                   <YAxis type="category" dataKey="shortName" width={70} tick={{ fill: '#9CA3AF', fontSize: 10 }} />
-                  <Tooltip contentStyle={{ backgroundColor: '#1F2937', border: 'none', fontSize: 11 }} />
-                  <Legend wrapperStyle={{ fontSize: 10 }} />
-                  <Bar dataKey="total" name="Accuracy %" fill="#3B82F6" />
-                  <Bar dataKey="costPer100" name="Cost (¢/task)" fill="#F59E0B" />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* COST ANALYSIS TAB */}
-      {activeTab === 'cost' && (
-        <div className="space-y-4">
-          {/* Value Ranking */}
-          <div className="p-4 rounded-xl bg-black/30 border border-white/10">
-            <h3 className="text-sm font-medium text-white mb-1">Accuracy per Dollar (Value Ranking)</h3>
-            <p className="text-xs text-gray-500 mb-4">Higher = better value for money</p>
-            <div className="h-72">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={costData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis type="number" stroke="#9CA3AF" fontSize={10} />
-                  <YAxis type="category" dataKey="name" width={70} tick={{ fill: '#9CA3AF', fontSize: 10 }} />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#1F2937', border: 'none', fontSize: 11 }}
-                    formatter={(value) => [`${typeof value === 'number' ? value.toFixed(0) : value}%/$`, 'Value']}
+                    contentStyle={{ backgroundColor: '#111827', border: '1px solid #374151', fontSize: 11 }}
+                    formatter={(value) => [`${value}%`, 'Accuracy']}
                   />
-                  <Bar dataKey="value" fill="#8B5CF6">
-                    {costData.map((entry, index) => (
-                      <Cell key={index} fill={index === 0 ? '#22C55E' : index < 3 ? '#3B82F6' : '#6B7280'} />
+                  <Bar dataKey="total" fill="#6366F1">
+                    {enrichedModels.map((entry, index) => (
+                      <Cell key={index} fill={entry.color} fillOpacity={index < 2 ? 1 : 0.6} />
                     ))}
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
-
-          {/* Cost Table */}
-          <div className="p-4 rounded-xl bg-black/30 border border-white/10">
-            <h3 className="text-sm font-medium text-white mb-3">Cost Breakdown</h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs">
-                <thead>
-                  <tr className="text-gray-400 border-b border-white/10">
-                    <th className="text-left py-2 px-2">Model</th>
-                    <th className="text-center py-2 px-2 text-emerald-400">$/Task</th>
-                    <th className="text-center py-2 px-2 text-blue-400">Accuracy</th>
-                    <th className="text-center py-2 px-2 text-purple-400">%/$</th>
-                    <th className="text-center py-2 px-2">$/75 runs</th>
-                    <th className="text-center py-2 px-2">Verdict</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {enrichedModels.map((d, i) => (
-                    <tr key={i} className="border-b border-white/5">
-                      <td className="py-2 px-2 font-medium text-white">{d.shortName}</td>
-                      <td className="text-center py-2 px-2 text-emerald-400 font-mono">${d.cost.toFixed(2)}</td>
-                      <td className="text-center py-2 px-2 text-blue-400 font-mono">{d.total}%</td>
-                      <td className="text-center py-2 px-2 text-purple-400 font-mono">{d.accuracyPerDollar.toFixed(0)}</td>
-                      <td className="text-center py-2 px-2 font-mono text-gray-400">${(d.cost * 75).toFixed(2)}</td>
-                      <td className="text-center py-2 px-2">
-                        {d.accuracyPerDollar > 300 ? <span className="text-emerald-400">Great</span> :
-                         d.accuracyPerDollar > 100 ? <span className="text-blue-400">Good</span> :
-                         <span className="text-yellow-400">Pricey</span>}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
         </div>
       )}
 
-      {/* QUADRANTS TAB */}
-      {activeTab === 'quadrants' && (
+      {/* EXPLORE TAB - Interactive Visualizations */}
+      {activeTab === 'explore' && (
         <div className="space-y-4">
-          {/* Cost vs Accuracy Quadrant */}
-          <div className="p-4 rounded-xl bg-black/30 border border-white/10">
-            <h3 className="text-sm font-medium text-white mb-1">Cost × Accuracy Quadrant</h3>
-            <div className="grid grid-cols-4 gap-2 mb-4 text-xs">
-              <div className="p-2 rounded text-center bg-emerald-500/20 border border-emerald-500/30">
-                <div className="text-emerald-400 font-bold">Premium</div>
-                <div className="text-gray-400">High Cost, High Acc</div>
-              </div>
-              <div className="p-2 rounded text-center bg-purple-500/20 border border-purple-500/30">
-                <div className="text-purple-400 font-bold">Value</div>
-                <div className="text-gray-400">Low Cost, High Acc</div>
-              </div>
-              <div className="p-2 rounded text-center bg-yellow-500/20 border border-yellow-500/30">
-                <div className="text-yellow-400 font-bold">Budget</div>
-                <div className="text-gray-400">Low Cost, Low Acc</div>
-              </div>
-              <div className="p-2 rounded text-center bg-red-500/20 border border-red-500/30">
-                <div className="text-red-400 font-bold">Avoid</div>
-                <div className="text-gray-400">High Cost, Low Acc</div>
-              </div>
+          {/* Viz Selector + Filters */}
+          <div className="flex flex-wrap items-center gap-4 p-3 rounded-lg bg-black/30 border border-white/5">
+            <div className="flex gap-2">
+              {vizOptions.map(opt => (
+                <button
+                  key={opt.id}
+                  onClick={() => setVizOption(opt.id)}
+                  className={`px-3 py-1.5 rounded text-xs font-medium transition-all ${
+                    vizOption === opt.id
+                      ? 'bg-blue-500/30 text-blue-300 border border-blue-500/40'
+                      : 'bg-black/40 text-gray-500 hover:text-gray-300 border border-white/5'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
             </div>
-            <div className="h-96">
-              <ResponsiveContainer width="100%" height="100%">
-                <ScatterChart margin={{ top: 30, right: 30, bottom: 50, left: 60 }}>
-                  {/* Background quadrants - FIXED positioning */}
-                  <defs>
-                    <linearGradient id="premiumGrad" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stopColor="#D97706" stopOpacity={0.15} />
-                      <stop offset="100%" stopColor="#D97706" stopOpacity={0.05} />
-                    </linearGradient>
-                    <linearGradient id="valueGrad" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stopColor="#22C55E" stopOpacity={0.15} />
-                      <stop offset="100%" stopColor="#22C55E" stopOpacity={0.05} />
-                    </linearGradient>
-                    <linearGradient id="budgetGrad" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stopColor="#EAB308" stopOpacity={0.15} />
-                      <stop offset="100%" stopColor="#EAB308" stopOpacity={0.05} />
-                    </linearGradient>
-                    <linearGradient id="avoidGrad" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stopColor="#EF4444" stopOpacity={0.15} />
-                      <stop offset="100%" stopColor="#EF4444" stopOpacity={0.05} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis
-                    type="number"
-                    dataKey="cost"
-                    name="Cost"
-                    domain={[0, 1]}
-                    stroke="#9CA3AF"
-                    fontSize={11}
-                    tickFormatter={(v) => `$${v.toFixed(2)}`}
-                    label={{ value: '← Cheaper | Cost per Task | Expensive →', position: 'bottom', fill: '#6B7280', fontSize: 10, dy: 15 }}
-                  />
-                  <YAxis
-                    type="number"
-                    dataKey="total"
-                    name="Accuracy"
-                    domain={[0, 70]}
-                    stroke="#9CA3AF"
-                    fontSize={11}
-                    label={{ value: 'Accuracy %', angle: -90, position: 'insideLeft', fill: '#6B7280', fontSize: 10, dx: -10 }}
-                  />
-                  <ReferenceLine x={avgCost} stroke="#fff" strokeWidth={2} strokeDasharray="8 4" />
-                  <ReferenceLine y={avgAccuracy} stroke="#fff" strokeWidth={2} strokeDasharray="8 4" />
-                  <Tooltip
-                    content={({ active, payload }) => {
-                      if (active && payload && payload.length) {
-                        const d = payload[0].payload;
-                        return (
-                          <div className="bg-gray-900 p-3 rounded-lg border border-gray-600 text-xs shadow-xl">
-                            <p className="font-bold text-white text-sm">{d.name}</p>
-                            <p className="text-gray-400">{d.provider}</p>
-                            <div className="mt-2 space-y-1">
-                              <p className="text-emerald-400">Cost: ${d.cost.toFixed(2)}/task</p>
-                              <p className="text-blue-400">Accuracy: {d.total}%</p>
-                              <p className="text-purple-400">Value: {d.accuracyPerDollar.toFixed(0)}%/$</p>
+
+            <div className="h-4 w-px bg-gray-700" />
+
+            {/* Dynamic Axis Controls for 3D Bubble */}
+            {vizOption === 1 && (
+              <div className="flex flex-wrap items-center gap-3 text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-500">X:</span>
+                  <select
+                    value={xAxis}
+                    onChange={(e) => setXAxis(e.target.value as AxisKey)}
+                    className="bg-black/60 border border-gray-700 rounded px-2 py-1 text-gray-300"
+                  >
+                    {axisOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                  </select>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-500">Y:</span>
+                  <select
+                    value={yAxis}
+                    onChange={(e) => setYAxis(e.target.value as AxisKey)}
+                    className="bg-black/60 border border-gray-700 rounded px-2 py-1 text-gray-300"
+                  >
+                    {axisOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                  </select>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-500">Size:</span>
+                  <select
+                    value={bubbleSize}
+                    onChange={(e) => setBubbleSize(e.target.value as SizeKey)}
+                    className="bg-black/60 border border-gray-700 rounded px-2 py-1 text-gray-300"
+                  >
+                    {sizeOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                  </select>
+                </div>
+              </div>
+            )}
+
+            <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer ml-auto">
+              <input
+                type="checkbox"
+                checked={showOnlyTop}
+                onChange={(e) => setShowOnlyTop(e.target.checked)}
+                className="rounded border-gray-600 bg-black/60"
+              />
+              Show only top performers (&gt;30%)
+            </label>
+          </div>
+
+          {/* OPTION 1: Dynamic 3D Bubble */}
+          {vizOption === 1 && (
+            <div className="p-4 rounded-xl bg-black/40 border border-white/5">
+              <h3 className="text-sm font-medium text-gray-300 mb-1">3D Bubble Explorer</h3>
+              <p className="text-xs text-gray-600 mb-4">
+                X: {axisOptions.find(a => a.value === xAxis)?.label} | Y: {axisOptions.find(a => a.value === yAxis)?.label} | Size: {sizeOptions.find(s => s.value === bubbleSize)?.label}
+              </p>
+              <div className="h-96">
+                <ResponsiveContainer width="100%" height="100%">
+                  <ScatterChart margin={{ top: 30, right: 40, bottom: 50, left: 60 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
+                    <XAxis
+                      type="number"
+                      dataKey={xAxis}
+                      stroke="#6B7280"
+                      fontSize={10}
+                      tickFormatter={(v) => xAxis === 'cost' ? `$${v.toFixed(2)}` : `${v}`}
+                      label={{ value: axisOptions.find(a => a.value === xAxis)?.label, position: 'bottom', fill: '#6B7280', fontSize: 10, dy: 15 }}
+                    />
+                    <YAxis
+                      type="number"
+                      dataKey={yAxis}
+                      stroke="#6B7280"
+                      fontSize={10}
+                      label={{ value: axisOptions.find(a => a.value === yAxis)?.label, angle: -90, position: 'insideLeft', fill: '#6B7280', fontSize: 10 }}
+                    />
+                    <ZAxis type="number" dataKey={bubbleSize} range={[100, 800]} />
+                    <Tooltip
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const d = payload[0].payload;
+                          return (
+                            <div className="bg-gray-900 p-3 rounded-lg border border-gray-700 text-xs">
+                              <p className="font-bold text-white">{d.name}</p>
+                              <p className="text-blue-400">{axisOptions.find(a => a.value === xAxis)?.label}: {xAxis === 'cost' ? `$${d[xAxis].toFixed(2)}` : d[xAxis]}</p>
+                              <p className="text-emerald-400">{axisOptions.find(a => a.value === yAxis)?.label}: {d[yAxis]}{yAxis !== 'correct' && yAxis !== 'perfect' ? '%' : ''}</p>
+                              <p className="text-purple-400">{sizeOptions.find(s => s.value === bubbleSize)?.label}: {typeof d[bubbleSize] === 'number' ? d[bubbleSize].toFixed(1) : d[bubbleSize]}</p>
                             </div>
-                          </div>
-                        );
-                      }
-                      return null;
-                    }}
-                  />
-                  <Scatter data={enrichedModels}>
-                    {enrichedModels.map((entry, index) => (
-                      <Cell key={index} fill={entry.color} stroke="#fff" strokeWidth={2} r={12} />
-                    ))}
-                    <LabelList dataKey="shortName" content={CustomScatterLabel} />
-                  </Scatter>
-                </ScatterChart>
-              </ResponsiveContainer>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Scatter data={filteredModels}>
+                      {filteredModels.map((entry, index) => (
+                        <Cell key={index} fill={entry.color} fillOpacity={0.7} stroke={entry.color} strokeWidth={2} />
+                      ))}
+                      <LabelList dataKey="shortName" content={CustomScatterLabel} />
+                    </Scatter>
+                  </ScatterChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2 justify-center">
+                {filteredModels.map(m => (
+                  <div key={m.model} className="flex items-center gap-1.5 text-xs px-2 py-1 rounded bg-black/30">
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: m.color }} />
+                    <span className="text-gray-400">{m.shortName}</span>
+                    {m.isLeader && <span className="text-orange-400 text-[10px]">★</span>}
+                    {m.isBestValue && <span className="text-purple-400 text-[10px]">$</span>}
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="mt-4 flex flex-wrap gap-2 justify-center">
-              {enrichedModels.map(m => (
-                <div key={m.model} className="flex items-center gap-1.5 text-xs px-2 py-1 rounded bg-black/30">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: m.color }} />
-                  <span className="text-gray-300">{m.shortName}</span>
+          )}
+
+          {/* OPTION 2: Consistency Map (Bubble + Color) */}
+          {vizOption === 2 && (
+            <div className="p-4 rounded-xl bg-black/40 border border-white/5">
+              <h3 className="text-sm font-medium text-gray-300 mb-1">Consistency Map</h3>
+              <p className="text-xs text-gray-600 mb-4">X: Cost | Y: Accuracy | Size: Correct Answers | Color: Consistency (green = reliable)</p>
+              <div className="h-96">
+                <ResponsiveContainer width="100%" height="100%">
+                  <ScatterChart margin={{ top: 30, right: 40, bottom: 50, left: 60 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
+                    <XAxis
+                      type="number"
+                      dataKey="cost"
+                      domain={[0, 1]}
+                      stroke="#6B7280"
+                      fontSize={10}
+                      tickFormatter={(v) => `$${v.toFixed(2)}`}
+                      label={{ value: 'Cost per Task ($)', position: 'bottom', fill: '#6B7280', fontSize: 10, dy: 15 }}
+                    />
+                    <YAxis
+                      type="number"
+                      dataKey="total"
+                      domain={[0, 70]}
+                      stroke="#6B7280"
+                      fontSize={10}
+                      label={{ value: 'Accuracy %', angle: -90, position: 'insideLeft', fill: '#6B7280', fontSize: 10 }}
+                    />
+                    <ZAxis type="number" dataKey="correct" range={[80, 600]} />
+                    <Tooltip
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const d = payload[0].payload;
+                          return (
+                            <div className="bg-gray-900 p-3 rounded-lg border border-gray-700 text-xs">
+                              <p className="font-bold text-white">{d.name}</p>
+                              <p className="text-blue-400">Cost: ${d.cost.toFixed(2)}</p>
+                              <p className="text-emerald-400">Accuracy: {d.total}%</p>
+                              <p className="text-orange-400">Correct: {d.correct}/75</p>
+                              <p style={{ color: d.consistencyColor }}>Perfect Tasks: {d.perfect}/25</p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Scatter data={filteredModels}>
+                      {filteredModels.map((entry, index) => (
+                        <Cell key={index} fill={entry.consistencyColor} fillOpacity={0.6} stroke={entry.consistencyColor} strokeWidth={2} />
+                      ))}
+                      <LabelList dataKey="shortName" content={CustomScatterLabel} />
+                    </Scatter>
+                  </ScatterChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="mt-3 flex gap-4 justify-center text-xs">
+                <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-emerald-500" /> Reliable (10+ perfect)</div>
+                <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-amber-500" /> Mixed (5-9 perfect)</div>
+                <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-red-500" /> Unreliable (&lt;5 perfect)</div>
+              </div>
+            </div>
+          )}
+
+          {/* OPTION 3: Quadrant Zones */}
+          {vizOption === 3 && (
+            <div className="p-4 rounded-xl bg-black/40 border border-white/5">
+              <h3 className="text-sm font-medium text-gray-300 mb-1">Quadrant Decision Map</h3>
+              <p className="text-xs text-gray-600 mb-4">
+                Thresholds: Cost ${COST_THRESHOLD} | Accuracy {ACC_THRESHOLD}% | Dot color = Speed tier
+              </p>
+              <div className="h-96">
+                <ResponsiveContainer width="100%" height="100%">
+                  <ScatterChart margin={{ top: 30, right: 40, bottom: 50, left: 60 }}>
+                    {/* Quadrant zone backgrounds */}
+                    <ReferenceArea x1={0} x2={COST_THRESHOLD} y1={ACC_THRESHOLD} y2={70} fill="#22C55E" fillOpacity={0.08} />
+                    <ReferenceArea x1={COST_THRESHOLD} x2={1} y1={ACC_THRESHOLD} y2={70} fill="#D97706" fillOpacity={0.08} />
+                    <ReferenceArea x1={0} x2={COST_THRESHOLD} y1={0} y2={ACC_THRESHOLD} fill="#6B7280" fillOpacity={0.08} />
+                    <ReferenceArea x1={COST_THRESHOLD} x2={1} y1={0} y2={ACC_THRESHOLD} fill="#EF4444" fillOpacity={0.08} />
+
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
+                    <XAxis
+                      type="number"
+                      dataKey="cost"
+                      domain={[0, 1]}
+                      stroke="#6B7280"
+                      fontSize={10}
+                      tickFormatter={(v) => `$${v.toFixed(2)}`}
+                      label={{ value: 'Cost per Task ($)', position: 'bottom', fill: '#6B7280', fontSize: 10, dy: 15 }}
+                    />
+                    <YAxis
+                      type="number"
+                      dataKey="total"
+                      domain={[0, 70]}
+                      stroke="#6B7280"
+                      fontSize={10}
+                      label={{ value: 'Accuracy %', angle: -90, position: 'insideLeft', fill: '#6B7280', fontSize: 10 }}
+                    />
+                    <ReferenceLine x={COST_THRESHOLD} stroke="#fff" strokeWidth={2} strokeDasharray="8 4" />
+                    <ReferenceLine y={ACC_THRESHOLD} stroke="#fff" strokeWidth={2} strokeDasharray="8 4" />
+
+                    <Tooltip
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const d = payload[0].payload;
+                          const zone = getQuadrantZone(d.cost, d.total);
+                          return (
+                            <div className="bg-gray-900 p-3 rounded-lg border border-gray-700 text-xs">
+                              <p className="font-bold text-white">{d.name}</p>
+                              <p style={{ color: zone.color }} className="font-medium">{zone.zone}</p>
+                              <p className="text-gray-400 mt-1">Cost: ${d.cost.toFixed(2)} | Acc: {d.total}%</p>
+                              <p className="text-gray-400">Speed: {d.time.toFixed(0)}s ({d.speedTier})</p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Scatter data={filteredModels}>
+                      {filteredModels.map((entry, index) => {
+                        const speedColor = entry.speedTier === 'fast' ? '#22C55E' : entry.speedTier === 'medium' ? '#F59E0B' : '#EF4444';
+                        return <Cell key={index} fill={speedColor} stroke="#fff" strokeWidth={2} />;
+                      })}
+                      <LabelList dataKey="shortName" content={CustomScatterLabel} />
+                    </Scatter>
+                  </ScatterChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="mt-4 grid grid-cols-4 gap-2 text-xs">
+                <div className="p-2 rounded text-center bg-emerald-500/10 border border-emerald-500/20">
+                  <div className="text-emerald-400 font-bold">VALUE PICK</div>
+                  <div className="text-gray-500">Cheap + Accurate</div>
+                  <div className="text-emerald-300 text-[10px] mt-1">Qwen3, Mistral-L</div>
+                </div>
+                <div className="p-2 rounded text-center bg-orange-500/10 border border-orange-500/20">
+                  <div className="text-orange-400 font-bold">PREMIUM</div>
+                  <div className="text-gray-500">High Cost, High Acc</div>
+                  <div className="text-orange-300 text-[10px] mt-1">Claude Opus</div>
+                </div>
+                <div className="p-2 rounded text-center bg-gray-500/10 border border-gray-500/20">
+                  <div className="text-gray-400 font-bold">BUDGET</div>
+                  <div className="text-gray-500">Cheap but Weak</div>
+                  <div className="text-gray-300 text-[10px] mt-1">Llama, DeepSeek</div>
+                </div>
+                <div className="p-2 rounded text-center bg-red-500/10 border border-red-500/20">
+                  <div className="text-red-400 font-bold">AVOID</div>
+                  <div className="text-gray-500">Pricey + Weak</div>
+                  <div className="text-red-300 text-[10px] mt-1">Gemini Pro, Intellect</div>
+                </div>
+              </div>
+              <div className="mt-3 flex justify-center gap-4 text-xs">
+                <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-emerald-500" /> Fast (&lt;30s)</div>
+                <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-amber-500" /> Medium (30-60s)</div>
+                <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-red-500" /> Slow (&gt;60s)</div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* RELIABILITY TAB - Engaging Format */}
+      {activeTab === 'reliability' && (
+        <div className="space-y-4">
+          {/* View Selector */}
+          <div className="flex gap-2">
+            {[
+              { id: 'scatter', label: 'Success vs Failure' },
+              { id: 'breakdown', label: 'Outcome Breakdown' },
+              { id: 'comparison', label: 'Consistency Battle' },
+            ].map(v => (
+              <button
+                key={v.id}
+                onClick={() => setReliabilityView(v.id as typeof reliabilityView)}
+                className={`px-3 py-1.5 rounded text-xs font-medium transition-all ${
+                  reliabilityView === v.id
+                    ? 'bg-blue-500/30 text-blue-300 border border-blue-500/40'
+                    : 'bg-black/40 text-gray-500 hover:text-gray-300 border border-white/5'
+                }`}
+              >
+                {v.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Success vs Failure Scatter */}
+          {reliabilityView === 'scatter' && (
+            <div className="p-4 rounded-xl bg-black/40 border border-white/5">
+              <h3 className="text-sm font-medium text-gray-300 mb-1">Success Rate vs Failure Rate</h3>
+              <p className="text-xs text-gray-600 mb-4">Upper-left = best (high success, low failure). Size = partial answers.</p>
+              <div className="h-96">
+                <ResponsiveContainer width="100%" height="100%">
+                  <ScatterChart margin={{ top: 30, right: 40, bottom: 50, left: 60 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
+                    <XAxis
+                      type="number"
+                      dataKey="failureRate"
+                      domain={[0, 100]}
+                      stroke="#6B7280"
+                      fontSize={10}
+                      label={{ value: 'Failure Rate %', position: 'bottom', fill: '#EF4444', fontSize: 10, dy: 15 }}
+                    />
+                    <YAxis
+                      type="number"
+                      dataKey="successRate"
+                      domain={[0, 70]}
+                      stroke="#6B7280"
+                      fontSize={10}
+                      label={{ value: 'Success Rate %', angle: -90, position: 'insideLeft', fill: '#22C55E', fontSize: 10 }}
+                    />
+                    <ZAxis type="number" dataKey="partial" range={[80, 400]} />
+                    <ReferenceLine x={50} stroke="#6B7280" strokeDasharray="4 4" />
+                    <ReferenceLine y={30} stroke="#6B7280" strokeDasharray="4 4" />
+                    <Tooltip
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const d = payload[0].payload;
+                          return (
+                            <div className="bg-gray-900 p-3 rounded-lg border border-gray-700 text-xs">
+                              <p className="font-bold text-white">{d.name}</p>
+                              <p className="text-emerald-400">Success: {d.correct}/75 ({d.successRate.toFixed(1)}%)</p>
+                              <p className="text-red-400">Failures: {d.wrong}/75 ({d.failureRate.toFixed(1)}%)</p>
+                              <p className="text-amber-400">Partials: {d.partial}/75</p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Scatter data={enrichedModels}>
+                      {enrichedModels.map((entry, index) => (
+                        <Cell key={index} fill={entry.color} fillOpacity={0.7} stroke={entry.color} strokeWidth={2} />
+                      ))}
+                      <LabelList dataKey="shortName" content={CustomScatterLabel} />
+                    </Scatter>
+                  </ScatterChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          )}
+
+          {/* Outcome Breakdown - Pie Charts */}
+          {reliabilityView === 'breakdown' && (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {enrichedModels.slice(0, 6).map(m => (
+                <div key={m.model} className="p-4 rounded-xl bg-black/40 border border-white/5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: m.color }} />
+                    <span className="text-sm font-medium text-white">{m.shortName}</span>
+                    {m.isLeader && <span className="text-orange-400 text-xs">★ Leader</span>}
+                  </div>
+                  <div className="h-32">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={[
+                            { name: 'Correct', value: m.correct, fill: '#166534' },
+                            { name: 'Partial', value: m.partial, fill: '#854D0E' },
+                            { name: 'Wrong', value: m.wrong, fill: '#7F1D1D' },
+                          ]}
+                          dataKey="value"
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={25}
+                          outerRadius={45}
+                          strokeWidth={0}
+                        />
+                        <Tooltip contentStyle={{ backgroundColor: '#111827', border: '1px solid #374151', fontSize: 10 }} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="flex justify-around text-xs mt-2">
+                    <span className="text-emerald-500">{m.correct}</span>
+                    <span className="text-amber-500">{m.partial}</span>
+                    <span className="text-red-500">{m.wrong}</span>
+                  </div>
                 </div>
               ))}
             </div>
-          </div>
+          )}
 
-          {/* Speed vs Accuracy Quadrant */}
-          <div className="p-4 rounded-xl bg-black/30 border border-white/10">
-            <h3 className="text-sm font-medium text-white mb-4">Speed × Accuracy Quadrant</h3>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <ScatterChart margin={{ top: 30, right: 30, bottom: 50, left: 60 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis
-                    type="number"
-                    dataKey="time"
-                    name="Time"
-                    domain={[0, 200]}
-                    stroke="#9CA3AF"
-                    fontSize={11}
-                    label={{ value: '← Faster | Generation Time (s) | Slower →', position: 'bottom', fill: '#6B7280', fontSize: 10, dy: 15 }}
-                  />
-                  <YAxis
-                    type="number"
-                    dataKey="total"
-                    name="Accuracy"
-                    domain={[0, 70]}
-                    stroke="#9CA3AF"
-                    fontSize={11}
-                    label={{ value: 'Accuracy %', angle: -90, position: 'insideLeft', fill: '#6B7280', fontSize: 10, dx: -10 }}
-                  />
-                  <ReferenceLine x={avgTime} stroke="#fff" strokeWidth={2} strokeDasharray="8 4" />
-                  <ReferenceLine y={avgAccuracy} stroke="#fff" strokeWidth={2} strokeDasharray="8 4" />
-                  <Tooltip
-                    content={({ active, payload }) => {
-                      if (active && payload && payload.length) {
-                        const d = payload[0].payload;
-                        return (
-                          <div className="bg-gray-900 p-3 rounded-lg border border-gray-600 text-xs shadow-xl">
-                            <p className="font-bold text-white text-sm">{d.name}</p>
-                            <div className="mt-2 space-y-1">
-                              <p className="text-cyan-400">Time: {d.time.toFixed(1)}s</p>
-                              <p className="text-blue-400">Accuracy: {d.total}%</p>
-                            </div>
-                          </div>
-                        );
-                      }
-                      return null;
-                    }}
-                  />
-                  <Scatter data={enrichedModels}>
-                    {enrichedModels.map((entry, index) => (
-                      <Cell key={index} fill={entry.color} stroke="#fff" strokeWidth={2} r={12} />
-                    ))}
-                    <LabelList dataKey="shortName" content={CustomScatterLabel} />
-                  </Scatter>
-                </ScatterChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Radar Comparison */}
-          <div className="p-4 rounded-xl bg-black/30 border border-white/10">
-            <h3 className="text-sm font-medium text-white mb-4">Multi-Dimensional Comparison (Top 4)</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Consistency Battle */}
+          {reliabilityView === 'comparison' && (
+            <div className="p-4 rounded-xl bg-black/40 border border-white/5">
+              <h3 className="text-sm font-medium text-gray-300 mb-1">Consistency Battle: Perfect vs Zero Tasks</h3>
+              <p className="text-xs text-gray-600 mb-4">How many tasks did each model ace (3/3) vs completely fail (0/3)?</p>
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
-                  <RadarChart data={radarData}>
-                    <PolarGrid stroke="#374151" />
-                    <PolarAngleAxis dataKey="metric" tick={{ fill: '#9CA3AF', fontSize: 11 }} />
-                    <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: '#6B7280', fontSize: 9 }} />
-                    <Radar name="Claude" dataKey="Claude" stroke="#D97706" fill="#D97706" fillOpacity={0.3} strokeWidth={2} />
-                    <Radar name="Qwen3" dataKey="Qwen3" stroke="#7C3AED" fill="#7C3AED" fillOpacity={0.3} strokeWidth={2} />
-                    <Radar name="Mistral" dataKey="Mistral" stroke="#DC2626" fill="#DC2626" fillOpacity={0.3} strokeWidth={2} />
-                    <Radar name="Llama" dataKey="Llama" stroke="#0891B2" fill="#0891B2" fillOpacity={0.3} strokeWidth={2} />
-                    <Legend wrapperStyle={{ fontSize: 11 }} />
-                  </RadarChart>
+                  <ScatterChart margin={{ top: 30, right: 40, bottom: 50, left: 60 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
+                    <XAxis
+                      type="number"
+                      dataKey="zero"
+                      domain={[0, 25]}
+                      stroke="#6B7280"
+                      fontSize={10}
+                      label={{ value: 'Zero Tasks (0/3 correct)', position: 'bottom', fill: '#EF4444', fontSize: 10, dy: 15 }}
+                    />
+                    <YAxis
+                      type="number"
+                      dataKey="perfect"
+                      domain={[0, 15]}
+                      stroke="#6B7280"
+                      fontSize={10}
+                      label={{ value: 'Perfect Tasks (3/3 correct)', angle: -90, position: 'insideLeft', fill: '#22C55E', fontSize: 10 }}
+                    />
+                    <ReferenceLine x={10} stroke="#EF4444" strokeDasharray="4 4" strokeOpacity={0.5} />
+                    <ReferenceLine y={5} stroke="#22C55E" strokeDasharray="4 4" strokeOpacity={0.5} />
+                    <Tooltip
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const d = payload[0].payload;
+                          return (
+                            <div className="bg-gray-900 p-3 rounded-lg border border-gray-700 text-xs">
+                              <p className="font-bold text-white">{d.name}</p>
+                              <p className="text-emerald-400">Perfect (3/3): {d.perfect} tasks</p>
+                              <p className="text-red-400">Zero (0/3): {d.zero} tasks</p>
+                              <p className="text-gray-400">Mixed: {25 - d.perfect - d.zero} tasks</p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Scatter data={enrichedModels}>
+                      {enrichedModels.map((entry, index) => (
+                        <Cell key={index} fill={entry.color} fillOpacity={0.8} stroke={entry.color} strokeWidth={2} />
+                      ))}
+                      <LabelList dataKey="shortName" content={CustomScatterLabel} />
+                    </Scatter>
+                  </ScatterChart>
                 </ResponsiveContainer>
               </div>
-              <div className="space-y-3 text-xs">
-                <div className="p-3 rounded-lg bg-orange-500/10 border border-orange-500/20">
-                  <div className="text-orange-400 font-bold">Claude Opus 4.5</div>
-                  <div className="text-gray-300">Best accuracy but expensive</div>
-                </div>
-                <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
-                  <div className="text-purple-400 font-bold">Qwen3 Max</div>
-                  <div className="text-gray-300">Best value: good accuracy, low cost</div>
-                </div>
-                <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-                  <div className="text-red-400 font-bold">Mistral Large</div>
-                  <div className="text-gray-300">Balanced mid-tier option</div>
-                </div>
-                <div className="p-3 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
-                  <div className="text-cyan-400 font-bold">Llama 4</div>
-                  <div className="text-gray-300">Fastest and cheapest tier</div>
-                </div>
+              <div className="mt-4 text-center text-xs text-gray-500">
+                Upper-left quadrant = most consistent (many perfect, few zeros). Claude leads with 13 perfect tasks.
               </div>
             </div>
-          </div>
+          )}
         </div>
       )}
 
-      {/* RELIABILITY TAB */}
-      {activeTab === 'reliability' && (
+      {/* INSIGHTS TAB */}
+      {activeTab === 'insights' && (
         <div className="space-y-4">
-          {/* Rollouts Stacked Bar */}
-          <div className="p-4 rounded-xl bg-black/30 border border-white/10">
-            <h3 className="text-sm font-medium text-white mb-4">Rollout Outcomes (75 per model)</h3>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={rolloutData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis type="number" domain={[0, 75]} stroke="#9CA3AF" fontSize={10} />
-                  <YAxis type="category" dataKey="name" width={70} tick={{ fill: '#9CA3AF', fontSize: 10 }} />
-                  <Tooltip contentStyle={{ backgroundColor: '#1F2937', border: 'none', fontSize: 11 }} />
-                  <Legend wrapperStyle={{ fontSize: 10 }} />
-                  <Bar dataKey="Correct" stackId="a" fill="#22C55E" />
-                  <Bar dataKey="Partial" stackId="a" fill="#EAB308" />
-                  <Bar dataKey="Wrong" stackId="a" fill="#EF4444" />
-                </BarChart>
-              </ResponsiveContainer>
+          {/* Key Findings */}
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="p-4 rounded-xl bg-gradient-to-br from-orange-900/20 to-black/40 border border-orange-500/20">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-orange-400 text-lg">★</span>
+                <h3 className="text-sm font-medium text-orange-400">Finding #1: Claude Dominates Hard Tasks</h3>
+              </div>
+              <p className="text-xs text-gray-400 mb-3">Claude Opus 4.5 achieves 56.7% on L6 (hardest) tasks, while most competitors struggle below 40%.</p>
+              <div className="flex items-center gap-4 text-xs">
+                <div><span className="text-orange-400 font-bold">56.7%</span> L6</div>
+                <div><span className="text-gray-500">vs</span></div>
+                <div><span className="text-purple-400">33.3%</span> Qwen3</div>
+                <div><span className="text-red-400">0%</span> Gemini Pro</div>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-xl bg-gradient-to-br from-purple-900/20 to-black/40 border border-purple-500/20">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-purple-400 text-lg">$</span>
+                <h3 className="text-sm font-medium text-purple-400">Finding #2: Qwen3 is 7x Better Value</h3>
+              </div>
+              <p className="text-xs text-gray-400 mb-3">At $0.26/correct vs Claude&apos;s $1.45/correct, Qwen3 Max delivers exceptional ROI for high-volume work.</p>
+              <div className="flex items-center gap-4 text-xs">
+                <div><span className="text-purple-400 font-bold">$0.26</span>/correct</div>
+                <div><span className="text-gray-500">vs</span></div>
+                <div><span className="text-orange-400">$1.45</span>/correct</div>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-xl bg-gradient-to-br from-red-900/20 to-black/40 border border-red-500/20">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-red-400 text-lg">!</span>
+                <h3 className="text-sm font-medium text-red-400">Finding #3: Avoid Gemini 3 Pro</h3>
+              </div>
+              <p className="text-xs text-gray-400 mb-3">Despite $0.35/task cost, Gemini 3 Pro scores 0% on L6 tasks and 28% overall - poor value proposition.</p>
+              <div className="flex items-center gap-4 text-xs">
+                <div><span className="text-red-400 font-bold">$1.25</span>/correct</div>
+                <div><span className="text-gray-500">92s avg</span></div>
+                <div><span className="text-red-400">0% L6</span></div>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-900/20 to-black/40 border border-emerald-500/20">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-emerald-400 text-lg">✓</span>
+                <h3 className="text-sm font-medium text-emerald-400">Finding #4: Consistency Matters</h3>
+              </div>
+              <p className="text-xs text-gray-400 mb-3">Claude achieves 13 perfect tasks (3/3 correct) vs next best of 7. Reliability is as important as accuracy.</p>
+              <div className="flex items-center gap-4 text-xs">
+                <div><span className="text-emerald-400 font-bold">13</span> perfect</div>
+                <div><span className="text-amber-400">8</span> zeros</div>
+                <div><span className="text-gray-500">= 52% consistent</span></div>
+              </div>
             </div>
           </div>
 
-          {/* Consistency Stacked Bar */}
-          <div className="p-4 rounded-xl bg-black/30 border border-white/10">
-            <h3 className="text-sm font-medium text-white mb-4">Task Consistency (25 tasks × 3 runs)</h3>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={consistencyData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis type="number" domain={[0, 25]} stroke="#9CA3AF" fontSize={10} />
-                  <YAxis type="category" dataKey="name" width={70} tick={{ fill: '#9CA3AF', fontSize: 10 }} />
-                  <Tooltip contentStyle={{ backgroundColor: '#1F2937', border: 'none', fontSize: 11 }} />
-                  <Legend wrapperStyle={{ fontSize: 10 }} />
-                  <Bar dataKey="Perfect (3/3)" stackId="a" fill="#22C55E" />
-                  <Bar dataKey="Mixed" stackId="a" fill="#6366F1" />
-                  <Bar dataKey="Zero (0/3)" stackId="a" fill="#EF4444" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Partial Impact Table */}
-          <div className="p-4 rounded-xl bg-black/30 border border-white/10">
-            <h3 className="text-sm font-medium text-white mb-3">Partial Score Impact</h3>
+          {/* Recommendation Matrix */}
+          <div className="p-4 rounded-xl bg-black/40 border border-white/5">
+            <h3 className="text-sm font-medium text-gray-300 mb-4">Recommendation Matrix</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>
-                  <tr className="text-gray-400 border-b border-white/10">
-                    <th className="text-left py-2 px-2">Model</th>
-                    <th className="text-center py-2 px-2">Partials</th>
-                    <th className="text-center py-2 px-2">Current</th>
-                    <th className="text-center py-2 px-2">If Counted</th>
-                    <th className="text-center py-2 px-2 text-yellow-400">Boost</th>
+                  <tr className="text-gray-500 border-b border-gray-800">
+                    <th className="text-left py-2 px-3">Use Case</th>
+                    <th className="text-center py-2 px-3">Recommended</th>
+                    <th className="text-center py-2 px-3">Alternative</th>
+                    <th className="text-left py-2 px-3">Rationale</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {enrichedModels.filter(d => d.partial > 0).map((d, i) => (
-                    <tr key={i} className="border-b border-white/5">
-                      <td className="py-2 px-2 text-white">{d.shortName}</td>
-                      <td className="text-center py-2 px-2 text-yellow-400 font-mono">{d.partial}</td>
-                      <td className="text-center py-2 px-2 font-mono text-gray-300">{d.total}%</td>
-                      <td className="text-center py-2 px-2 font-mono text-emerald-400">{d.accuracyWithPartial.toFixed(1)}%</td>
-                      <td className="text-center py-2 px-2 font-mono text-yellow-400">+{d.partialBoost.toFixed(1)}%</td>
-                    </tr>
-                  ))}
+                  <tr className="border-b border-gray-800/50">
+                    <td className="py-3 px-3 text-white">Mission-critical analysis</td>
+                    <td className="py-3 px-3 text-center"><span className="px-2 py-1 rounded bg-orange-500/20 text-orange-400">Claude</span></td>
+                    <td className="py-3 px-3 text-center"><span className="text-gray-500">-</span></td>
+                    <td className="py-3 px-3 text-gray-400">Highest accuracy + consistency</td>
+                  </tr>
+                  <tr className="border-b border-gray-800/50">
+                    <td className="py-3 px-3 text-white">High-volume processing</td>
+                    <td className="py-3 px-3 text-center"><span className="px-2 py-1 rounded bg-purple-500/20 text-purple-400">Qwen3</span></td>
+                    <td className="py-3 px-3 text-center"><span className="px-2 py-1 rounded bg-red-500/20 text-red-400">Mistral-L</span></td>
+                    <td className="py-3 px-3 text-gray-400">Best cost/accuracy ratio</td>
+                  </tr>
+                  <tr className="border-b border-gray-800/50">
+                    <td className="py-3 px-3 text-white">Budget-constrained</td>
+                    <td className="py-3 px-3 text-center"><span className="px-2 py-1 rounded bg-cyan-500/20 text-cyan-400">Llama-4</span></td>
+                    <td className="py-3 px-3 text-center"><span className="px-2 py-1 rounded bg-pink-500/20 text-pink-400">Mistral-S</span></td>
+                    <td className="py-3 px-3 text-gray-400">$0.08/task, fastest response</td>
+                  </tr>
+                  <tr className="border-b border-gray-800/50">
+                    <td className="py-3 px-3 text-white">L6 complex reasoning</td>
+                    <td className="py-3 px-3 text-center"><span className="px-2 py-1 rounded bg-orange-500/20 text-orange-400">Claude</span></td>
+                    <td className="py-3 px-3 text-center"><span className="px-2 py-1 rounded bg-pink-500/20 text-pink-400">Mistral-S</span></td>
+                    <td className="py-3 px-3 text-gray-400">Only 2 models &gt;50% on L6</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -596,53 +882,8 @@ export default function DeepMetrics() {
         </div>
       )}
 
-      {/* DETAILS TAB */}
-      {activeTab === 'details' && (
-        <div className="p-4 rounded-xl bg-black/30 border border-white/10">
-          <h3 className="text-sm font-medium text-white mb-3">Complete Metrics</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="text-gray-400 border-b border-white/10">
-                  <th className="text-left py-2 px-1">Model</th>
-                  <th className="text-center py-2 px-1 text-blue-400">Acc%</th>
-                  <th className="text-center py-2 px-1 text-emerald-400">$/Task</th>
-                  <th className="text-center py-2 px-1 text-purple-400">%/$</th>
-                  <th className="text-center py-2 px-1">Time</th>
-                  <th className="text-center py-2 px-1 text-emerald-400">✓</th>
-                  <th className="text-center py-2 px-1 text-yellow-400">½</th>
-                  <th className="text-center py-2 px-1 text-red-400">✗</th>
-                  <th className="text-center py-2 px-1">L5</th>
-                  <th className="text-center py-2 px-1">L6</th>
-                  <th className="text-center py-2 px-1">3/3</th>
-                  <th className="text-center py-2 px-1">0/3</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rawData.map((d, i) => (
-                  <tr key={i} className={`border-b border-white/5 ${i === 0 ? 'bg-orange-500/10' : ''}`}>
-                    <td className="py-2 px-1 font-medium text-white">{d.shortName}</td>
-                    <td className="text-center py-2 px-1 font-bold text-blue-400">{d.total}</td>
-                    <td className="text-center py-2 px-1 text-emerald-400">${d.cost.toFixed(2)}</td>
-                    <td className="text-center py-2 px-1 text-purple-400">{(d.total / d.cost).toFixed(0)}</td>
-                    <td className="text-center py-2 px-1 text-gray-400">{d.time.toFixed(0)}s</td>
-                    <td className="text-center py-2 px-1 text-emerald-400">{d.correct}</td>
-                    <td className="text-center py-2 px-1 text-yellow-400">{d.partial}</td>
-                    <td className="text-center py-2 px-1 text-red-400">{d.wrong}</td>
-                    <td className="text-center py-2 px-1 text-yellow-300">{d.L5}</td>
-                    <td className="text-center py-2 px-1 text-red-300">{d.L6}</td>
-                    <td className="text-center py-2 px-1 text-emerald-400">{d.perfect}</td>
-                    <td className="text-center py-2 px-1 text-red-400">{d.zero}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      <div className="text-center text-gray-500 text-xs">
-        CodeBlue Final 25 • 9 Models • 75 rollouts each • Cost estimates based on API pricing
+      <div className="text-center text-gray-600 text-xs">
+        CodeBlue Final 25 Benchmark • 9 Models • 25 Tasks • 675 Total Rollouts
       </div>
     </div>
   );
