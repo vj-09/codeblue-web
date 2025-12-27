@@ -6,6 +6,8 @@ import {
   ScatterChart, Scatter, Cell, ReferenceLine, RadarChart, PolarGrid,
   PolarAngleAxis, PolarRadiusAxis, Radar, LabelList, ZAxis, ReferenceArea, PieChart, Pie
 } from 'recharts';
+import { useTheme } from '@/context/ThemeContext';
+import { Sun, Moon } from 'lucide-react';
 
 // Complete model data with all metrics including COST
 const rawData = [
@@ -97,6 +99,22 @@ export default function DeepMetrics() {
   const [activeTab, setActiveTab] = useState('overview');
   const [vizOption, setVizOption] = useState(1);
   const [isMobile, setIsMobile] = useState(false);
+  const { theme, toggleTheme, isDark } = useTheme();
+
+  // Theme-aware colors
+  const colors = useMemo(() => ({
+    background: isDark ? '#0a0a0a' : '#f8fafc',
+    cardBg: isDark ? '#111827' : '#ffffff',
+    cardBorder: isDark ? '#1f2937' : '#e2e8f0',
+    text: isDark ? '#ededed' : '#1e293b',
+    textMuted: isDark ? '#9ca3af' : '#64748b',
+    textDim: isDark ? '#6b7280' : '#94a3b8',
+    grid: isDark ? '#1f2937' : '#e2e8f0',
+    chartGrid: isDark ? '#374151' : '#cbd5e1',
+    tooltipBg: isDark ? '#111827' : '#ffffff',
+    tooltipBorder: isDark ? '#374151' : '#e2e8f0',
+    hoverBg: isDark ? 'rgba(16, 185, 129, 0.1)' : 'rgba(5, 150, 105, 0.1)',
+  }), [isDark]);
 
   // Detect mobile
   useEffect(() => {
@@ -160,7 +178,7 @@ export default function DeepMetrics() {
     if (typeof x !== 'number' || typeof y !== 'number') return null;
     if (isMobile) return null; // Hide labels on mobile
     return (
-      <text x={x} y={y - 12} fill="#fff" fontSize={10} textAnchor="middle" fontWeight="600">
+      <text x={x} y={y - 12} fill={colors.text} fontSize={10} textAnchor="middle" fontWeight="600">
         {value}
       </text>
     );
@@ -168,8 +186,27 @@ export default function DeepMetrics() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
+      {/* Theme Toggle */}
+      <div className="flex justify-end">
+        <button
+          onClick={toggleTheme}
+          className={`p-2 rounded-lg transition-all ${
+            isDark
+              ? 'bg-gray-800 hover:bg-gray-700 text-yellow-400'
+              : 'bg-white hover:bg-gray-100 text-gray-700 shadow-md border border-gray-200'
+          }`}
+          aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+        >
+          {isDark ? <Sun size={18} /> : <Moon size={18} />}
+        </button>
+      </div>
+
       {/* HERO: Leader Spotlight */}
-      <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-orange-900/30 via-black/60 to-purple-900/30 border border-orange-500/20 p-3 sm:p-6">
+      <div className={`relative overflow-hidden rounded-xl sm:rounded-2xl border p-3 sm:p-6 ${
+        isDark
+          ? 'bg-gradient-to-br from-orange-900/30 via-black/60 to-purple-900/30 border-orange-500/20'
+          : 'bg-gradient-to-br from-orange-100 via-white to-purple-100 border-orange-300/40 shadow-lg'
+      }`}>
         <div className="absolute top-0 right-0 w-32 sm:w-64 h-32 sm:h-64 bg-orange-500/5 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-24 sm:w-48 h-24 sm:h-48 bg-purple-500/5 rounded-full blur-3xl" />
 
@@ -180,7 +217,7 @@ export default function DeepMetrics() {
               <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-orange-500 animate-pulse flex-shrink-0" />
               <span className="text-orange-400 text-[10px] sm:text-xs font-medium uppercase tracking-wider truncate">Performance Leader</span>
             </div>
-            <h2 className="text-lg sm:text-3xl font-bold text-white">Claude Opus 4.5</h2>
+            <h2 className={`text-lg sm:text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Claude Opus 4.5</h2>
             <div className="grid grid-cols-3 gap-2 sm:gap-4">
               <div className="min-w-0">
                 <div className="text-lg sm:text-3xl font-bold text-orange-400">{claudeData.total}%</div>
@@ -207,7 +244,7 @@ export default function DeepMetrics() {
               <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-purple-500 flex-shrink-0" />
               <span className="text-purple-400 text-[10px] sm:text-xs font-medium uppercase tracking-wider truncate">Best Value</span>
             </div>
-            <h2 className="text-lg sm:text-3xl font-bold text-white">Qwen3 Max</h2>
+            <h2 className={`text-lg sm:text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Qwen3 Max</h2>
             <div className="grid grid-cols-3 gap-2 sm:gap-4">
               <div className="min-w-0">
                 <div className="text-lg sm:text-3xl font-bold text-purple-400">{qwenData.total}%</div>
@@ -248,7 +285,9 @@ export default function DeepMetrics() {
             className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-[11px] sm:text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 ${
               activeTab === tab.id
                 ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                : 'bg-black/40 text-gray-500 hover:text-gray-300 border border-white/5'
+                : isDark
+                  ? 'bg-black/40 text-gray-500 hover:text-gray-300 border border-white/5'
+                  : 'bg-white text-gray-500 hover:text-gray-700 border border-gray-200 shadow-sm'
             }`}
           >
             {tab.label}
@@ -260,16 +299,16 @@ export default function DeepMetrics() {
       {activeTab === 'overview' && (
         <div className="space-y-4">
           {/* Leader Comparison Radar */}
-          <div className="p-3 sm:p-4 rounded-xl bg-black/40 border border-white/5">
-            <h3 className="text-xs sm:text-sm font-medium text-gray-300 mb-1">Claude vs Qwen3</h3>
-            <p className="text-[9px] sm:text-xs text-gray-600 mb-2 sm:mb-4">Normalized (100 = best)</p>
+          <div className={`p-3 sm:p-4 rounded-xl border ${isDark ? 'bg-black/40 border-white/5' : 'bg-white border-gray-200 shadow-md'}`}>
+            <h3 className={`text-xs sm:text-sm font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Claude vs Qwen3</h3>
+            <p className={`text-[9px] sm:text-xs mb-2 sm:mb-4 ${isDark ? 'text-gray-600' : 'text-gray-500'}`}>Normalized (100 = best)</p>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div className="h-48 sm:h-72 min-h-[180px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <RadarChart data={leaderRadar} margin={isMobile ? { top: 20, right: 20, bottom: 20, left: 20 } : { top: 20, right: 40, bottom: 20, left: 40 }}>
-                    <PolarGrid stroke="#374151" />
-                    <PolarAngleAxis dataKey="metric" tick={{ fill: '#9CA3AF', fontSize: isMobile ? 8 : 11 }} />
-                    <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: '#6B7280', fontSize: isMobile ? 7 : 9 }} tickCount={3} />
+                    <PolarGrid stroke={colors.chartGrid} />
+                    <PolarAngleAxis dataKey="metric" tick={{ fill: colors.textMuted, fontSize: isMobile ? 8 : 11 }} />
+                    <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: colors.textDim, fontSize: isMobile ? 7 : 9 }} tickCount={3} />
                     <Radar name="Claude" dataKey="Claude" stroke="#D97706" fill="#D97706" fillOpacity={0.3} strokeWidth={2} />
                     <Radar name="Qwen3" dataKey="Qwen3" stroke="#7C3AED" fill="#7C3AED" fillOpacity={0.3} strokeWidth={2} />
                     <Legend wrapperStyle={{ fontSize: isMobile ? 9 : 11 }} />
@@ -299,16 +338,16 @@ export default function DeepMetrics() {
           </div>
 
           {/* All Models Quick View */}
-          <div className="p-3 sm:p-4 rounded-xl bg-black/40 border border-white/5">
+          <div className="p-3 sm:p-4 rounded-xl border ${isDark ? 'bg-black/40 border-white/5' : 'bg-white border-gray-200 shadow-md'}">
             <h3 className="text-xs sm:text-sm font-medium text-gray-300 mb-2">All Models</h3>
             <div className="h-48 sm:h-64 min-h-[180px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={enrichedModels} layout="vertical" margin={isMobile ? { left: 0, right: 5, top: 5, bottom: 5 } : { left: 0, right: 15, top: 5, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" horizontal={true} vertical={false} />
-                  <XAxis type="number" domain={[0, 70]} stroke="#6B7280" fontSize={isMobile ? 8 : 10} tickCount={isMobile ? 4 : 8} />
+                  <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} horizontal={true} vertical={false} />
+                  <XAxis type="number" domain={[0, 70]} stroke={colors.textDim} fontSize={isMobile ? 8 : 10} tickCount={isMobile ? 4 : 8} />
                   <YAxis type="category" dataKey="shortName" width={isMobile ? 45 : 60} tick={{ fill: '#9CA3AF', fontSize: isMobile ? 8 : 10 }} />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#111827', border: '1px solid #374151', fontSize: 10 }}
+                    contentStyle={{ backgroundColor: colors.tooltipBg, border: `1px solid ${colors.tooltipBorder}`, fontSize: 10 }}
                     formatter={(value) => [`${value}%`, 'Accuracy']}
                   />
                   <Bar dataKey="total" fill="#6366F1" radius={[0, 4, 4, 0]}>
@@ -327,7 +366,7 @@ export default function DeepMetrics() {
       {activeTab === 'explore' && (
         <div className="space-y-3">
           {/* Viz Selector + Filters */}
-          <div className="flex flex-col gap-2 p-2 sm:p-3 rounded-lg bg-black/30 border border-white/5">
+          <div className="flex flex-col gap-2 p-2 sm:p-3 rounded-lg border ${isDark ? 'bg-black/30 border-white/5' : 'bg-gray-50 border-gray-200'}">
             {/* Viz buttons */}
             <div className="flex gap-1 overflow-x-auto scrollbar-hide">
               {vizOptions.map(opt => (
@@ -353,7 +392,7 @@ export default function DeepMetrics() {
                   <select
                     value={xAxis}
                     onChange={(e) => setXAxis(e.target.value as AxisKey)}
-                    className="w-full bg-black/60 border border-gray-700 rounded px-1 py-0.5 sm:px-2 sm:py-1 text-gray-300 text-[10px] sm:text-xs"
+                    className="w-full ${isDark ? 'bg-black/60 border-gray-700' : 'bg-white border-gray-300'} border rounded px-1 py-0.5 sm:px-2 sm:py-1 text-gray-300 text-[10px] sm:text-xs"
                   >
                     {axisOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.shortLabel}</option>)}
                   </select>
@@ -363,7 +402,7 @@ export default function DeepMetrics() {
                   <select
                     value={yAxis}
                     onChange={(e) => setYAxis(e.target.value as AxisKey)}
-                    className="w-full bg-black/60 border border-gray-700 rounded px-1 py-0.5 sm:px-2 sm:py-1 text-gray-300 text-[10px] sm:text-xs"
+                    className="w-full ${isDark ? 'bg-black/60 border-gray-700' : 'bg-white border-gray-300'} border rounded px-1 py-0.5 sm:px-2 sm:py-1 text-gray-300 text-[10px] sm:text-xs"
                   >
                     {axisOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.shortLabel}</option>)}
                   </select>
@@ -373,7 +412,7 @@ export default function DeepMetrics() {
                   <select
                     value={bubbleSize}
                     onChange={(e) => setBubbleSize(e.target.value as SizeKey)}
-                    className="w-full bg-black/60 border border-gray-700 rounded px-1 py-0.5 sm:px-2 sm:py-1 text-gray-300 text-[10px] sm:text-xs"
+                    className="w-full ${isDark ? 'bg-black/60 border-gray-700' : 'bg-white border-gray-300'} border rounded px-1 py-0.5 sm:px-2 sm:py-1 text-gray-300 text-[10px] sm:text-xs"
                   >
                     {sizeOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.shortLabel}</option>)}
                   </select>
@@ -395,7 +434,7 @@ export default function DeepMetrics() {
 
           {/* OPTION 1: 3D Bubble */}
           {vizOption === 1 && (
-            <div className="p-2 sm:p-4 rounded-xl bg-black/40 border border-white/5">
+            <div className="p-2 sm:p-4 rounded-xl border ${isDark ? 'bg-black/40 border-white/5' : 'bg-white border-gray-200 shadow-md'}">
               <h3 className="text-[11px] sm:text-sm font-medium text-gray-300 mb-0.5">3D Bubble Explorer</h3>
               <p className="text-[9px] sm:text-xs text-gray-600 mb-2">
                 X: {axisOptions.find(a => a.value === xAxis)?.shortLabel} | Y: {axisOptions.find(a => a.value === yAxis)?.shortLabel} | Size: {sizeOptions.find(s => s.value === bubbleSize)?.shortLabel}
@@ -403,11 +442,11 @@ export default function DeepMetrics() {
               <div className="h-56 sm:h-96 min-h-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <ScatterChart margin={chartMargin}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
+                    <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
                     <XAxis
                       type="number"
                       dataKey={xAxis}
-                      stroke="#6B7280"
+                      stroke={colors.textDim}
                       fontSize={isMobile ? 8 : 10}
                       tickFormatter={(v) => xAxis === 'cost' ? `$${v.toFixed(1)}` : `${v}`}
                       tickCount={isMobile ? 4 : 6}
@@ -415,7 +454,7 @@ export default function DeepMetrics() {
                     <YAxis
                       type="number"
                       dataKey={yAxis}
-                      stroke="#6B7280"
+                      stroke={colors.textDim}
                       fontSize={isMobile ? 8 : 10}
                       tickCount={isMobile ? 4 : 6}
                     />
@@ -425,8 +464,8 @@ export default function DeepMetrics() {
                         if (active && payload && payload.length) {
                           const d = payload[0].payload;
                           return (
-                            <div className="bg-gray-900 p-2 rounded-lg border border-gray-700 text-[10px]">
-                              <p className="font-bold text-white">{d.shortName}</p>
+                            <div className="${isDark ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200 shadow-lg'} p-2 rounded-lg border text-[10px]">
+                              <p className={`font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{d.shortName}</p>
                               <p className="text-blue-400">{axisOptions.find(a => a.value === xAxis)?.shortLabel}: {xAxis === 'cost' ? `$${d[xAxis].toFixed(2)}` : d[xAxis]}</p>
                               <p className="text-emerald-400">{axisOptions.find(a => a.value === yAxis)?.shortLabel}: {d[yAxis]}</p>
                             </div>
@@ -458,23 +497,23 @@ export default function DeepMetrics() {
 
           {/* OPTION 2: Consistency Map */}
           {vizOption === 2 && (
-            <div className="p-2 sm:p-4 rounded-xl bg-black/40 border border-white/5">
+            <div className="p-2 sm:p-4 rounded-xl border ${isDark ? 'bg-black/40 border-white/5' : 'bg-white border-gray-200 shadow-md'}">
               <h3 className="text-[11px] sm:text-sm font-medium text-gray-300 mb-0.5">Consistency Map</h3>
               <p className="text-[9px] sm:text-xs text-gray-600 mb-2">Size: Correct | Color: Reliability</p>
               <div className="h-56 sm:h-96 min-h-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <ScatterChart margin={chartMargin}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
-                    <XAxis type="number" dataKey="cost" domain={[0, 1]} stroke="#6B7280" fontSize={isMobile ? 8 : 10} tickFormatter={(v) => `$${v.toFixed(1)}`} tickCount={isMobile ? 4 : 6} />
-                    <YAxis type="number" dataKey="total" domain={[0, 70]} stroke="#6B7280" fontSize={isMobile ? 8 : 10} tickCount={isMobile ? 4 : 6} />
+                    <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
+                    <XAxis type="number" dataKey="cost" domain={[0, 1]} stroke={colors.textDim} fontSize={isMobile ? 8 : 10} tickFormatter={(v) => `$${v.toFixed(1)}`} tickCount={isMobile ? 4 : 6} />
+                    <YAxis type="number" dataKey="total" domain={[0, 70]} stroke={colors.textDim} fontSize={isMobile ? 8 : 10} tickCount={isMobile ? 4 : 6} />
                     <ZAxis type="number" dataKey="correct" range={bubbleRange} />
                     <Tooltip
                       content={({ active, payload }) => {
                         if (active && payload && payload.length) {
                           const d = payload[0].payload;
                           return (
-                            <div className="bg-gray-900 p-2 rounded-lg border border-gray-700 text-[10px]">
-                              <p className="font-bold text-white">{d.shortName}</p>
+                            <div className="${isDark ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200 shadow-lg'} p-2 rounded-lg border text-[10px]">
+                              <p className={`font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{d.shortName}</p>
                               <p className="text-emerald-400">Acc: {d.total}%</p>
                               <p className="text-orange-400">Correct: {d.correct}/75</p>
                               <p style={{ color: d.consistencyColor }}>Perfect: {d.perfect}/25</p>
@@ -503,7 +542,7 @@ export default function DeepMetrics() {
 
           {/* OPTION 3: Quadrant Zones */}
           {vizOption === 3 && (
-            <div className="p-2 sm:p-4 rounded-xl bg-black/40 border border-white/5">
+            <div className="p-2 sm:p-4 rounded-xl border ${isDark ? 'bg-black/40 border-white/5' : 'bg-white border-gray-200 shadow-md'}">
               <h3 className="text-[11px] sm:text-sm font-medium text-gray-300 mb-0.5">Quadrant Map</h3>
               <p className="text-[9px] sm:text-xs text-gray-600 mb-2">Cost ${COST_THRESHOLD} | Acc {ACC_THRESHOLD}%</p>
               <div className="h-56 sm:h-96 min-h-[200px]">
@@ -513,9 +552,9 @@ export default function DeepMetrics() {
                     <ReferenceArea x1={COST_THRESHOLD} x2={1} y1={ACC_THRESHOLD} y2={70} fill="#D97706" fillOpacity={0.08} />
                     <ReferenceArea x1={0} x2={COST_THRESHOLD} y1={0} y2={ACC_THRESHOLD} fill="#6B7280" fillOpacity={0.08} />
                     <ReferenceArea x1={COST_THRESHOLD} x2={1} y1={0} y2={ACC_THRESHOLD} fill="#EF4444" fillOpacity={0.08} />
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
-                    <XAxis type="number" dataKey="cost" domain={[0, 1]} stroke="#6B7280" fontSize={isMobile ? 8 : 10} tickFormatter={(v) => `$${v.toFixed(1)}`} tickCount={isMobile ? 4 : 6} />
-                    <YAxis type="number" dataKey="total" domain={[0, 70]} stroke="#6B7280" fontSize={isMobile ? 8 : 10} tickCount={isMobile ? 4 : 6} />
+                    <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
+                    <XAxis type="number" dataKey="cost" domain={[0, 1]} stroke={colors.textDim} fontSize={isMobile ? 8 : 10} tickFormatter={(v) => `$${v.toFixed(1)}`} tickCount={isMobile ? 4 : 6} />
+                    <YAxis type="number" dataKey="total" domain={[0, 70]} stroke={colors.textDim} fontSize={isMobile ? 8 : 10} tickCount={isMobile ? 4 : 6} />
                     <ReferenceLine x={COST_THRESHOLD} stroke="#fff" strokeWidth={1} strokeDasharray="4 4" />
                     <ReferenceLine y={ACC_THRESHOLD} stroke="#fff" strokeWidth={1} strokeDasharray="4 4" />
                     <Tooltip
@@ -524,8 +563,8 @@ export default function DeepMetrics() {
                           const d = payload[0].payload;
                           const zone = getQuadrantZone(d.cost, d.total);
                           return (
-                            <div className="bg-gray-900 p-2 rounded-lg border border-gray-700 text-[10px]">
-                              <p className="font-bold text-white">{d.shortName}</p>
+                            <div className="${isDark ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200 shadow-lg'} p-2 rounded-lg border text-[10px]">
+                              <p className={`font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{d.shortName}</p>
                               <p style={{ color: zone.color }} className="font-medium">{zone.zone}</p>
                               <p className="text-gray-400">${d.cost.toFixed(2)} | {d.total}%</p>
                             </div>
@@ -590,25 +629,25 @@ export default function DeepMetrics() {
 
           {/* Scatter */}
           {reliabilityView === 'scatter' && (
-            <div className="p-2 sm:p-4 rounded-xl bg-black/40 border border-white/5">
+            <div className="p-2 sm:p-4 rounded-xl border ${isDark ? 'bg-black/40 border-white/5' : 'bg-white border-gray-200 shadow-md'}">
               <h3 className="text-[11px] sm:text-sm font-medium text-gray-300 mb-0.5">Success vs Failure Rate</h3>
               <p className="text-[9px] sm:text-xs text-gray-600 mb-2">Upper-left = best</p>
               <div className="h-56 sm:h-96 min-h-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <ScatterChart margin={chartMargin}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
-                    <XAxis type="number" dataKey="failureRate" domain={[0, 100]} stroke="#6B7280" fontSize={isMobile ? 8 : 10} tickCount={isMobile ? 4 : 6} />
-                    <YAxis type="number" dataKey="successRate" domain={[0, 70]} stroke="#6B7280" fontSize={isMobile ? 8 : 10} tickCount={isMobile ? 4 : 6} />
+                    <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
+                    <XAxis type="number" dataKey="failureRate" domain={[0, 100]} stroke={colors.textDim} fontSize={isMobile ? 8 : 10} tickCount={isMobile ? 4 : 6} />
+                    <YAxis type="number" dataKey="successRate" domain={[0, 70]} stroke={colors.textDim} fontSize={isMobile ? 8 : 10} tickCount={isMobile ? 4 : 6} />
                     <ZAxis type="number" dataKey="partial" range={[40, 200]} />
-                    <ReferenceLine x={50} stroke="#6B7280" strokeDasharray="4 4" />
-                    <ReferenceLine y={30} stroke="#6B7280" strokeDasharray="4 4" />
+                    <ReferenceLine x={50} stroke={colors.textDim} strokeDasharray="4 4" />
+                    <ReferenceLine y={30} stroke={colors.textDim} strokeDasharray="4 4" />
                     <Tooltip
                       content={({ active, payload }) => {
                         if (active && payload && payload.length) {
                           const d = payload[0].payload;
                           return (
-                            <div className="bg-gray-900 p-2 rounded-lg border border-gray-700 text-[10px]">
-                              <p className="font-bold text-white">{d.shortName}</p>
+                            <div className="${isDark ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200 shadow-lg'} p-2 rounded-lg border text-[10px]">
+                              <p className={`font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{d.shortName}</p>
                               <p className="text-emerald-400">Success: {d.successRate.toFixed(0)}%</p>
                               <p className="text-red-400">Fail: {d.failureRate.toFixed(0)}%</p>
                             </div>
@@ -669,15 +708,15 @@ export default function DeepMetrics() {
 
           {/* Consistency Battle */}
           {reliabilityView === 'comparison' && (
-            <div className="p-2 sm:p-4 rounded-xl bg-black/40 border border-white/5">
+            <div className="p-2 sm:p-4 rounded-xl border ${isDark ? 'bg-black/40 border-white/5' : 'bg-white border-gray-200 shadow-md'}">
               <h3 className="text-[11px] sm:text-sm font-medium text-gray-300 mb-0.5">Perfect vs Zero Tasks</h3>
               <p className="text-[9px] sm:text-xs text-gray-600 mb-2">Upper-left = most consistent</p>
               <div className="h-56 sm:h-80 min-h-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <ScatterChart margin={chartMargin}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
-                    <XAxis type="number" dataKey="zero" domain={[0, 25]} stroke="#6B7280" fontSize={isMobile ? 8 : 10} tickCount={isMobile ? 4 : 6} />
-                    <YAxis type="number" dataKey="perfect" domain={[0, 15]} stroke="#6B7280" fontSize={isMobile ? 8 : 10} tickCount={isMobile ? 4 : 6} />
+                    <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
+                    <XAxis type="number" dataKey="zero" domain={[0, 25]} stroke={colors.textDim} fontSize={isMobile ? 8 : 10} tickCount={isMobile ? 4 : 6} />
+                    <YAxis type="number" dataKey="perfect" domain={[0, 15]} stroke={colors.textDim} fontSize={isMobile ? 8 : 10} tickCount={isMobile ? 4 : 6} />
                     <ReferenceLine x={10} stroke="#EF4444" strokeDasharray="4 4" strokeOpacity={0.5} />
                     <ReferenceLine y={5} stroke="#22C55E" strokeDasharray="4 4" strokeOpacity={0.5} />
                     <Tooltip
@@ -685,8 +724,8 @@ export default function DeepMetrics() {
                         if (active && payload && payload.length) {
                           const d = payload[0].payload;
                           return (
-                            <div className="bg-gray-900 p-2 rounded-lg border border-gray-700 text-[10px]">
-                              <p className="font-bold text-white">{d.shortName}</p>
+                            <div className="${isDark ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200 shadow-lg'} p-2 rounded-lg border text-[10px]">
+                              <p className={`font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{d.shortName}</p>
                               <p className="text-emerald-400">Perfect: {d.perfect}</p>
                               <p className="text-red-400">Zero: {d.zero}</p>
                             </div>

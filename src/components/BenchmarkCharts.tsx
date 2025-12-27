@@ -15,6 +15,7 @@ import FailureInsights from './FailureInsights';
 import ModelRace from './ModelRace';
 import ABTestSimulator from './ABTestSimulator';
 import DeepMetrics from './DeepMetrics';
+import { useTheme } from '@/context/ThemeContext';
 
 // Types
 interface ModelData {
@@ -106,6 +107,7 @@ const modelCosts: Record<string, number> = {
 };
 
 export default function BenchmarkCharts() {
+  const { isDark } = useTheme();
   const [activeTab, setActiveTab] = useState('leaderboard');
   const [selectedMode, setSelectedMode] = useState('stateless_singleCsv');
   const [selectedModels, setSelectedModels] = useState<string[]>(
@@ -409,15 +411,21 @@ export default function BenchmarkCharts() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-gray-100">
+    <div className={`min-h-screen transition-colors ${
+      isDark
+        ? 'bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-gray-100'
+        : 'bg-gradient-to-br from-gray-50 via-white to-gray-100 text-gray-900'
+    }`}>
       {/* Grid background */}
-      <div className="fixed inset-0 opacity-[0.02]" style={{
-        backgroundImage: `linear-gradient(rgba(16, 185, 129, 0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(16, 185, 129, 0.5) 1px, transparent 1px)`,
+      <div className={`fixed inset-0 ${isDark ? 'opacity-[0.02]' : 'opacity-[0.03]'}`} style={{
+        backgroundImage: `linear-gradient(${isDark ? 'rgba(16, 185, 129, 0.5)' : 'rgba(16, 185, 129, 0.3)'} 1px, transparent 1px), linear-gradient(90deg, ${isDark ? 'rgba(16, 185, 129, 0.5)' : 'rgba(16, 185, 129, 0.3)'} 1px, transparent 1px)`,
         backgroundSize: '40px 40px'
       }} />
 
       {/* Header */}
-      <header className="relative border-b border-emerald-500/20 bg-black/40 backdrop-blur-xl">
+      <header className={`relative border-b backdrop-blur-xl ${
+        isDark ? 'border-emerald-500/20 bg-black/40' : 'border-emerald-300/30 bg-white/70 shadow-sm'
+      }`}>
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -427,7 +435,7 @@ export default function BenchmarkCharts() {
                 </div>
                 <h1 className="text-lg font-bold tracking-tight">
                   <span className="text-emerald-400">Code</span>
-                  <span className="text-white">Blue</span>
+                  <span className={isDark ? 'text-white' : 'text-gray-900'}>Blue</span>
                 </h1>
               </Link>
               <span className="text-gray-600">|</span>
@@ -666,7 +674,11 @@ export default function BenchmarkCharts() {
               {sortedModels.map((model, idx) => (
                 <div
                   key={model.model}
-                  className="p-4 rounded-xl bg-black/30 border border-white/10 hover:border-emerald-500/30 transition-all"
+                  className={`p-4 rounded-xl border transition-all ${
+                    isDark
+                      ? 'bg-black/30 border-white/10 hover:border-emerald-500/30'
+                      : 'bg-white border-gray-200 hover:border-emerald-400/50 shadow-sm'
+                  }`}
                 >
                   <div
                     className="flex items-center justify-between cursor-pointer"
@@ -683,7 +695,7 @@ export default function BenchmarkCharts() {
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-white">{model.name}</span>
+                          <span className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{model.name}</span>
                           <span
                             className="px-2 py-0.5 rounded text-xs"
                             style={{ backgroundColor: `${providerColors[model.provider]}20`, color: providerColors[model.provider] }}
@@ -700,7 +712,7 @@ export default function BenchmarkCharts() {
                         <div className="text-xs text-gray-500">accuracy</div>
                       </div>
                       <div className="text-right">
-                        <div className="text-lg font-mono text-gray-300">{model.avgReward.toFixed(2)}</div>
+                        <div className={`text-lg font-mono ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{model.avgReward.toFixed(2)}</div>
                         <div className="text-xs text-gray-500">avg reward</div>
                       </div>
                       {expandedModel === model.model ? <ChevronUp className="w-5 h-5 text-gray-500" /> : <ChevronDown className="w-5 h-5 text-gray-500" />}
@@ -708,12 +720,12 @@ export default function BenchmarkCharts() {
                   </div>
 
                   {expandedModel === model.model && (
-                    <div className="mt-4 pt-4 border-t border-white/10">
+                    <div className={`mt-4 pt-4 border-t ${isDark ? 'border-white/10' : 'border-gray-200'}`}>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                         {['score_correctness', 'score_efficiency', 'score_notes_usage', 'score_code_quality'].map(metric => (
-                          <div key={metric} className="p-3 rounded-lg bg-black/30">
+                          <div key={metric} className={`p-3 rounded-lg ${isDark ? 'bg-black/30' : 'bg-gray-50'}`}>
                             <div className="text-xs text-gray-500 mb-1">{metric.replace('score_', '').replace(/_/g, ' ')}</div>
-                            <div className="text-lg font-mono text-white">
+                            <div className={`text-lg font-mono ${isDark ? 'text-white' : 'text-gray-900'}`}>
                               {((model.metrics[metric] || 0) * 100).toFixed(1)}%
                             </div>
                           </div>
@@ -769,8 +781,8 @@ export default function BenchmarkCharts() {
             </div>
 
             {/* Insights Section - At Bottom */}
-            <div className="mt-8 pt-8 border-t border-white/10">
-              <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+            <div className={`mt-8 pt-8 border-t ${isDark ? 'border-white/10' : 'border-gray-200'}`}>
+              <h2 className={`text-lg font-bold mb-4 flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 <Target className="w-5 h-5 text-emerald-400" />
                 Insights
               </h2>
@@ -783,7 +795,7 @@ export default function BenchmarkCharts() {
         {activeTab === 'metrics' && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <h2 className={`text-lg font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 <BarChart3 className="w-5 h-5 text-emerald-400" />
                 Deep Metrics Analysis
               </h2>
