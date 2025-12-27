@@ -112,7 +112,7 @@ export default function BenchmarkCharts() {
   );
   const [selectedExample, setSelectedExample] = useState<ModelData['examples'][0] | null>(null);
   const [expandedModel, setExpandedModel] = useState<string | null>(null);
-  const [sortBy, setSortBy] = useState<'avgReward' | 'totalRuns' | 'score_correctness'>('score_correctness');
+  const [sortBy, setSortBy] = useState<'score_correctness' | 'bank' | 'road'>('score_correctness');
   const [quadrantX, setQuadrantX] = useState('score_efficiency');
   const [quadrantY, setQuadrantY] = useState('score_correctness');
 
@@ -197,7 +197,13 @@ export default function BenchmarkCharts() {
       if (sortBy === 'score_correctness') {
         return (b.metrics.score_correctness || 0) - (a.metrics.score_correctness || 0);
       }
-      return (b[sortBy] as number) - (a[sortBy] as number);
+      if (sortBy === 'bank') {
+        return (b.modes.bank?.metrics.score_correctness || 0) - (a.modes.bank?.metrics.score_correctness || 0);
+      }
+      if (sortBy === 'road') {
+        return (b.modes.road?.metrics.score_correctness || 0) - (a.modes.road?.metrics.score_correctness || 0);
+      }
+      return 0;
     });
   }, [sortBy, filteredModels]);
 
@@ -576,7 +582,7 @@ export default function BenchmarkCharts() {
 
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-400">Sort by:</span>
-              {(['score_correctness', 'avgReward', 'totalRuns'] as const).map(key => (
+              {(['score_correctness', 'bank', 'road'] as const).map(key => (
                 <button
                   key={key}
                   onClick={() => setSortBy(key)}
@@ -584,7 +590,7 @@ export default function BenchmarkCharts() {
                     sortBy === key ? 'bg-emerald-500/20 text-emerald-400' : 'text-gray-500 hover:text-white'
                   }`}
                 >
-                  {key === 'score_correctness' ? 'Accuracy' : key === 'avgReward' ? 'Avg Score' : 'Total Runs'}
+                  {key === 'score_correctness' ? 'Overall' : key === 'bank' ? 'Bank (19)' : 'Road (6)'}
                 </button>
               ))}
             </div>
