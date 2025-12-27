@@ -6,6 +6,7 @@ import {
   ScatterChart, Scatter, Cell, ComposedChart, ReferenceLine, RadarChart, PolarGrid,
   PolarAngleAxis, PolarRadiusAxis, Radar
 } from 'recharts';
+import QuadrantAnalysis from './QuadrantAnalysis';
 
 // Complete model data with all metrics
 const rawData = [
@@ -91,6 +92,7 @@ const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<
 
 export default function DeepMetrics() {
   const [activeTab, setActiveTab] = useState('overview');
+  const [quadrantMode, setQuadrantMode] = useState<'recharts' | 'svg'>('svg');
 
   // Reward breakdown data
   const rewardData = useMemo(() => rawData.map(d => ({
@@ -285,6 +287,37 @@ export default function DeepMetrics() {
       {/* QUADRANTS TAB */}
       {activeTab === 'quadrants' && (
         <div className="space-y-4">
+          {/* Mode Toggle */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500">Style:</span>
+            <button
+              onClick={() => setQuadrantMode('svg')}
+              className={`px-3 py-1 rounded text-xs font-medium transition-all ${
+                quadrantMode === 'svg'
+                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                  : 'bg-black/30 text-gray-400 hover:text-white border border-white/10'
+              }`}
+            >
+              Clean SVG
+            </button>
+            <button
+              onClick={() => setQuadrantMode('recharts')}
+              className={`px-3 py-1 rounded text-xs font-medium transition-all ${
+                quadrantMode === 'recharts'
+                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                  : 'bg-black/30 text-gray-400 hover:text-white border border-white/10'
+              }`}
+            >
+              Interactive
+            </button>
+          </div>
+
+          {/* SVG Quadrants */}
+          {quadrantMode === 'svg' && <QuadrantAnalysis />}
+
+          {/* Recharts Quadrants */}
+          {quadrantMode === 'recharts' && (
+          <>
           {/* Speed vs Accuracy Quadrant */}
           <div className="p-4 rounded-xl bg-black/30 border border-white/10">
             <h3 className="text-sm font-medium text-gray-400 mb-1">Speed vs Accuracy Quadrant</h3>
@@ -412,6 +445,8 @@ export default function DeepMetrics() {
               </p>
             </div>
           </div>
+          </>
+          )}
         </div>
       )}
 
