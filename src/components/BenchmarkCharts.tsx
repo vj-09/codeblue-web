@@ -71,7 +71,6 @@ const providerColors: Record<string, string> = {
 const tabs = [
   { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
   { id: 'arena', label: 'Arena', icon: Swords },
-  { id: 'race', label: 'Race', icon: Zap },
   { id: 'examples', label: 'Trajectories', icon: Play },
 ];
 
@@ -135,7 +134,7 @@ export default function BenchmarkCharts() {
   const [minCorrectness, setMinCorrectness] = useState(0);
   const [minRuns, setMinRuns] = useState(0);
   const [showScenarioBuilder, setShowScenarioBuilder] = useState(false);
-  const [arenaMode, setArenaMode] = useState<'compare' | 'abtest'>('compare');
+  const [arenaMode, setArenaMode] = useState<'compare' | 'race' | 'abtest'>('compare');
 
   // Get unique providers
   const providers = useMemo(() => {
@@ -792,7 +791,18 @@ export default function BenchmarkCharts() {
                 }`}
               >
                 <Swords className="w-4 h-4" />
-                Task Comparison
+                Compare
+              </button>
+              <button
+                onClick={() => setArenaMode('race')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  arenaMode === 'race'
+                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <Zap className="w-4 h-4" />
+                Race
               </button>
               <button
                 onClick={() => setArenaMode('abtest')}
@@ -803,9 +813,12 @@ export default function BenchmarkCharts() {
                 }`}
               >
                 <BarChart3 className="w-4 h-4" />
-                A/B Test Simulator
+                A/B Test
               </button>
             </div>
+
+            {/* Race Mode */}
+            {arenaMode === 'race' && <ModelRace />}
 
             {/* A/B Test Simulator */}
             {arenaMode === 'abtest' && <ABTestSimulator />}
@@ -851,40 +864,75 @@ export default function BenchmarkCharts() {
               </div>
             ) : (
               <>
-                {/* Task Navigation */}
-                <div className="flex items-center justify-between bg-black/20 rounded-xl p-4 border border-white/10">
-                  <button
-                    onClick={() => { setArenaTaskIndex(Math.max(0, arenaTaskIndex - 1)); setArenaRollout(0); }}
-                    disabled={arenaTaskIndex === 0}
-                    className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <ChevronLeft className="w-5 h-5" />
-                  </button>
-                  <div className="text-center">
-                    <div className="text-lg font-mono text-white">{arenaData.tasks[arenaTaskIndex]}</div>
-                    <div className="text-sm text-gray-500">Task {arenaTaskIndex + 1} of {arenaData.tasks.length}</div>
-                    <div className="flex items-center justify-center gap-2 mt-2">
-                      {[0, 1, 2].map(r => (
+                {/* Question & Context - FIRST */}
+                {(() => {
+                  const taskExamples = arenaData.modelData[0]?.examples.filter(e => e.info?.task_id === arenaData.tasks[arenaTaskIndex]);
+                  const example = taskExamples?.[arenaRollout] || taskExamples?.[0];
+                  const systemPrompt = example?.prompt.find(p => p.role === 'system')?.content;
+                  const userPrompt = example?.prompt.find(p => p.role === 'user')?.content;
+                  return (
+                    <div className="bg-black/20 rounded-xl border border-white/10 overflow-hidden">
+                      {/* Task Navigation Header */}
+                      <div className="flex items-center justify-between p-3 border-b border-white/10 bg-black/30">
                         <button
-                          key={r}
-                          onClick={() => setArenaRollout(r)}
-                          className={`px-3 py-1 rounded text-xs ${
-                            arenaRollout === r ? 'bg-emerald-500 text-white' : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
-                          }`}
+                          onClick={() => { setArenaTaskIndex(Math.max(0, arenaTaskIndex - 1)); setArenaRollout(0); }}
+                          disabled={arenaTaskIndex === 0}
+                          className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          Run {r + 1}
+                          <ChevronLeft className="w-4 h-4" />
                         </button>
-                      ))}
+                        <div className="text-center flex-1">
+                          <div className="flex items-center justify-center gap-3">
+                            <span className="text-xs text-gray-500 font-mono">{arenaData.tasks[arenaTaskIndex]}</span>
+                            <span className="text-xs text-gray-600">|</span>
+                            <span className="text-xs text-gray-500">Task {arenaTaskIndex + 1}/{arenaData.tasks.length}</span>
+                          </div>
+                          <div className="flex items-center justify-center gap-2 mt-1">
+                            {[0, 1, 2].map(r => (
+                              <button
+                                key={r}
+                                onClick={() => setArenaRollout(r)}
+                                className={`px-2 py-0.5 rounded text-xs ${
+                                  arenaRollout === r ? 'bg-emerald-500 text-white' : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+                                }`}
+                              >
+                                Run {r + 1}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => { setArenaTaskIndex(Math.min(arenaData.tasks.length - 1, arenaTaskIndex + 1)); setArenaRollout(0); }}
+                          disabled={arenaTaskIndex === arenaData.tasks.length - 1}
+                          className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      {/* Question - Prominent */}
+                      <div className="p-4 bg-emerald-500/5 border-b border-emerald-500/20">
+                        <div className="text-xs text-emerald-400 font-medium mb-2">QUESTION:</div>
+                        <div className="text-sm text-white whitespace-pre-wrap">
+                          {userPrompt || 'No question available'}
+                        </div>
+                      </div>
+
+                      {/* System Prompt - Collapsible */}
+                      <details className="group">
+                        <summary className="p-3 text-xs text-gray-500 cursor-pointer hover:text-gray-400 hover:bg-black/20 flex items-center gap-2">
+                          <ChevronRight className="w-3 h-3 group-open:rotate-90 transition-transform" />
+                          System Prompt ({systemPrompt?.length || 0} chars)
+                        </summary>
+                        <div className="p-4 bg-black/30 border-t border-white/5 max-h-64 overflow-y-auto">
+                          <pre className="text-xs text-gray-400 whitespace-pre-wrap font-mono">
+                            {systemPrompt || 'No system prompt'}
+                          </pre>
+                        </div>
+                      </details>
                     </div>
-                  </div>
-                  <button
-                    onClick={() => { setArenaTaskIndex(Math.min(arenaData.tasks.length - 1, arenaTaskIndex + 1)); setArenaRollout(0); }}
-                    disabled={arenaTaskIndex === arenaData.tasks.length - 1}
-                    className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <ChevronRight className="w-5 h-5" />
-                  </button>
-                </div>
+                  );
+                })()}
 
                 {/* Side-by-side Comparison */}
                 <div className={`grid gap-4 ${arenaData.modelData.length === 2 ? 'grid-cols-2' : arenaData.modelData.length === 3 ? 'grid-cols-3' : 'grid-cols-4'}`}>
@@ -958,34 +1006,20 @@ export default function BenchmarkCharts() {
                   })}
                 </div>
 
-                {/* Task Details */}
-                <div className="bg-black/20 rounded-xl p-4 border border-white/10 space-y-4">
+                {/* Expected Answer */}
+                <div className="bg-black/20 rounded-xl p-4 border border-white/10">
                   {(() => {
                     const taskExamples = arenaData.modelData[0]?.examples.filter(e => e.info?.task_id === arenaData.tasks[arenaTaskIndex]);
                     const example = taskExamples?.[arenaRollout] || taskExamples?.[0];
-                    const systemPrompt = example?.prompt.find(p => p.role === 'system')?.content;
-                    const userPrompt = example?.prompt.find(p => p.role === 'user')?.content;
                     return (
-                      <>
-                        <div>
-                          <h4 className="text-sm font-medium text-gray-400 mb-2">Question:</h4>
-                          <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4">
-                            <pre className="text-sm text-emerald-300 whitespace-pre-wrap font-mono">
-                              {userPrompt || 'No question available'}
-                            </pre>
-                          </div>
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm text-gray-400">
+                          Expected Answer: <span className="text-white font-mono ml-2">{String(example?.info?.expected || 'N/A')}</span>
                         </div>
-                        <details className="group">
-                          <summary className="text-sm font-medium text-gray-500 cursor-pointer hover:text-gray-400">
-                            System Prompt (click to expand)
-                          </summary>
-                          <div className="mt-2 bg-black/30 rounded-lg p-4 max-h-64 overflow-y-auto">
-                            <pre className="text-xs text-gray-400 whitespace-pre-wrap font-mono">
-                              {systemPrompt || 'No system prompt'}
-                            </pre>
-                          </div>
-                        </details>
-                      </>
+                        <div className="text-xs text-gray-500">
+                          Level: {example?.info?.level || 'N/A'}
+                        </div>
+                      </div>
                     );
                   })()}
                 </div>
