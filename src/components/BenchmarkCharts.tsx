@@ -426,32 +426,32 @@ export default function BenchmarkCharts() {
       <header className={`relative border-b backdrop-blur-xl ${
         isDark ? 'border-emerald-500/20 bg-black/40' : 'border-emerald-300/30 bg-white/70 shadow-sm'
       }`}>
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link href="/" className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
-                  <Database className="w-5 h-5 text-white" />
-                </div>
-                <h1 className="text-lg font-bold tracking-tight">
-                  <span className="text-emerald-400">Code</span>
-                  <span className={isDark ? 'text-white' : 'text-gray-900'}>Blue</span>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex items-center justify-between gap-2">
+            <Link href="/" className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
+                <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+              </div>
+              <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-2">
+                <h1 className="text-sm sm:text-lg font-bold tracking-tight whitespace-nowrap">
+                  <span className="text-emerald-400">Analytics</span>
+                  <span className={isDark ? 'text-white' : 'text-gray-900'}> RL</span>
                 </h1>
-              </Link>
-              <span className="text-gray-600">|</span>
-              <span className="text-emerald-400 font-medium">Benchmark</span>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="text-xs text-gray-500">
-                {benchmarkData.totalRuns} runs | {benchmarkData.models.length} models
+                <span className="text-[10px] sm:text-xs text-gray-500 hidden sm:inline">Code Blue</span>
+              </div>
+            </Link>
+            <div className="flex items-center gap-2 sm:gap-4">
+              <span className="text-[10px] sm:text-xs text-gray-500 hidden sm:inline whitespace-nowrap">
+                {benchmarkData.totalRuns} runs
               </span>
-              <Link href="/final25" className="flex items-center gap-2 text-sm text-emerald-400 hover:text-emerald-300 transition-colors">
-                Final 25
-                <ArrowRight className="w-4 h-4" />
+              <Link href="/final25" className="flex items-center gap-1 text-xs sm:text-sm text-emerald-400 hover:text-emerald-300 transition-colors whitespace-nowrap">
+                <span className="hidden sm:inline">Final 25</span>
+                <span className="sm:hidden">F25</span>
+                <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
               </Link>
-              <Link href="/" className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
-                <ArrowLeft className="w-4 h-4" />
-                Home
+              <Link href="/" className="flex items-center gap-1 text-xs sm:text-sm text-gray-400 hover:text-white transition-colors">
+                <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Home</span>
               </Link>
             </div>
           </div>

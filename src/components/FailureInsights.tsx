@@ -47,7 +47,7 @@ const levelColors: Record<string, string> = {
 };
 
 export default function FailureInsights() {
-  const [expandedSection, setExpandedSection] = useState<string | null>('hardest');
+  const [expandedSection, setExpandedSection] = useState<string | null>(null); // collapsed by default
 
   // Analyze task difficulty
   const taskAnalysis = useMemo(() => {

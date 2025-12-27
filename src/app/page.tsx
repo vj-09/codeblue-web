@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Database, TrendingUp, Upload, ArrowRight, Github, BarChart3, Zap, Brain } from "lucide-react";
+import { TrendingUp, Upload, ArrowRight, Github, BarChart3, Zap, Brain } from "lucide-react";
+import FloatingActionButton from "@/components/FloatingActionButton";
 
 export default function Home() {
   return (
@@ -12,34 +13,30 @@ export default function Home() {
 
       {/* Header */}
       <header className="relative border-b border-emerald-500/20 bg-black/40 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
-                <Database className="w-5 h-5 text-white" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
+                <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
-              <div>
-                <h1 className="text-lg font-bold tracking-tight">
-                  <span className="text-emerald-400">Code</span>
-                  <span className="text-white">Blue</span>
+              <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-2">
+                <h1 className="text-sm sm:text-lg font-bold tracking-tight">
+                  <span className="text-emerald-400">Analytics</span>
+                  <span className="text-white"> RL</span>
                 </h1>
+                <span className="text-[10px] sm:text-xs text-gray-500">Code Blue</span>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Link href="/benchmark" className="text-sm text-gray-400 hover:text-white transition-colors">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Link href="/benchmark" className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors">
                 Benchmark
               </Link>
-              <Link href="/finetune" className="text-sm text-gray-400 hover:text-white transition-colors">
+              <Link href="/finetune" className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors hidden sm:inline">
                 Fine-tune
               </Link>
-              <Link href="/demo" className="text-sm text-gray-400 hover:text-white transition-colors">
+              <Link href="/demo" className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors hidden sm:inline">
                 Demo
               </Link>
-
-              <a href="https://github.com/vj-09/codeblue-env" className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm hover:bg-emerald-500/20 transition-colors">
-                <Github className="w-4 h-4" />
-                <span className="hidden sm:inline">GitHub</span>
-              </a>
             </div>
           </div>
         </div>
@@ -59,7 +56,7 @@ export default function Home() {
         </h1>
 
         <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed">
-          CodeBlue is a comprehensive benchmark for evaluating LLM agents on data analytics tasks.
+          Analytics RL is a comprehensive benchmark for evaluating LLM agents on data analytics tasks.
           Multi-turn conversations, complex joins, and adversarial challenges.
         </p>
 
@@ -94,7 +91,7 @@ export default function Home() {
       <section className="relative max-w-7xl mx-auto px-6 py-16">
         <h2 className="text-3xl font-bold text-center text-white mb-4">Three Core Products</h2>
         <p className="text-gray-400 text-center mb-12 max-w-xl mx-auto">
-          From benchmarking to deployment, CodeBlue covers the full lifecycle of analytics agents.
+          From benchmarking to deployment, Analytics RL covers the full lifecycle of analytics agents.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -149,7 +146,7 @@ export default function Home() {
 
       {/* How It Works */}
       <section className="relative max-w-7xl mx-auto px-6 py-16">
-        <h2 className="text-3xl font-bold text-center text-white mb-12">How CodeBlue Works</h2>
+        <h2 className="text-3xl font-bold text-center text-white mb-12">How Analytics RL Works</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
@@ -187,7 +184,7 @@ export default function Home() {
       <footer className="relative border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
-            <p>CodeBlue © 2025 • Open-source benchmark for analytics agents</p>
+            <p>Analytics RL © 2025 • Open-source benchmark for analytics agents</p>
             <div className="flex items-center gap-4">
               <a href="https://github.com/vj-09/codeblue-env" className="hover:text-emerald-400 transition-colors">GitHub</a>
               <Link href="/benchmark" className="hover:text-emerald-400 transition-colors">Leaderboard</Link>
@@ -195,6 +192,9 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* Floating Action Button */}
+      <FloatingActionButton />
     </div>
   );
 }

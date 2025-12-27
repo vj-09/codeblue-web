@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CodeBlue | Analytics Agent Benchmark",
+  title: "Analytics RL | Code Blue Benchmark",
   description: "Comprehensive benchmark for evaluating LLM agents on data analytics tasks. Multi-turn conversations, complex joins, and adversarial challenges.",
   icons: {
     icon: "/favicon.svg",
