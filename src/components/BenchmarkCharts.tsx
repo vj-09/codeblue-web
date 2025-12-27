@@ -849,15 +849,16 @@ export default function BenchmarkCharts() {
                           </div>
                         </div>
 
-                        {/* Code Response */}
-                        <div className="p-4 max-h-64 overflow-y-auto">
-                          <div className="text-xs text-gray-500 mb-2">Response:</div>
-                          {example.completion.slice(0, 3).map((msg, idx) => (
+                        {/* Full Trace */}
+                        <div className="p-4 max-h-96 overflow-y-auto">
+                          <div className="text-xs text-gray-500 mb-2">Full Trace ({example.completion.length} turns):</div>
+                          {example.completion.map((msg, idx) => (
                             <div key={idx} className={`text-xs p-2 rounded mb-2 ${
-                              msg.role === 'assistant' ? 'bg-emerald-500/10 border-l-2 border-emerald-500' : 'bg-gray-800'
+                              msg.role === 'assistant' ? 'bg-emerald-500/10 border-l-2 border-emerald-500' : 'bg-blue-500/10 border-l-2 border-blue-500'
                             }`}>
+                              <div className="text-xs text-gray-500 mb-1">Turn {Math.floor(idx/2) + 1} - {msg.role}</div>
                               <pre className="whitespace-pre-wrap font-mono text-gray-300 overflow-hidden">
-                                {msg.content.length > 300 ? msg.content.slice(0, 300) + '...' : msg.content}
+                                {msg.content.length > 500 ? msg.content.slice(0, 500) + '...' : msg.content}
                               </pre>
                             </div>
                           ))}
