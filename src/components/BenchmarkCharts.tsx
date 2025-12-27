@@ -88,7 +88,6 @@ const axisOptions = [
   { value: 'score_notes_usage', label: 'Notes Usage' },
   { value: 'score_code_quality', label: 'Code Quality' },
   { value: 'avgReward', label: 'Avg Reward' },
-  { value: 'bestReward', label: 'Best Reward' },
   { value: 'totalRuns', label: 'Total Runs' },
 ];
 
@@ -113,7 +112,7 @@ export default function BenchmarkCharts() {
   );
   const [selectedExample, setSelectedExample] = useState<ModelData['examples'][0] | null>(null);
   const [expandedModel, setExpandedModel] = useState<string | null>(null);
-  const [sortBy, setSortBy] = useState<'bestReward' | 'avgReward' | 'totalRuns'>('bestReward');
+  const [sortBy, setSortBy] = useState<'avgReward' | 'totalRuns' | 'score_correctness'>('score_correctness');
   const [quadrantX, setQuadrantX] = useState('score_efficiency');
   const [quadrantY, setQuadrantY] = useState('score_correctness');
 
@@ -194,7 +193,12 @@ export default function BenchmarkCharts() {
 
   // Sorted models (using filtered)
   const sortedModels = useMemo(() => {
-    return [...filteredModels].sort((a, b) => b[sortBy] - a[sortBy]);
+    return [...filteredModels].sort((a, b) => {
+      if (sortBy === 'score_correctness') {
+        return (b.metrics.score_correctness || 0) - (a.metrics.score_correctness || 0);
+      }
+      return (b[sortBy] as number) - (a[sortBy] as number);
+    });
   }, [sortBy, filteredModels]);
 
   // Quadrant data
@@ -220,8 +224,8 @@ export default function BenchmarkCharts() {
     return benchmarkData.models.map(m => ({
       ...m,
       cost: modelCosts[m.model] || 1.0,
-      performance: m.bestReward,
-      efficiency: m.bestReward / (modelCosts[m.model] || 1.0),
+      performance: m.avgReward,
+      efficiency: m.avgReward / (modelCosts[m.model] || 1.0),
     })).sort((a, b) => b.efficiency - a.efficiency);
   }, []);
 
@@ -572,7 +576,7 @@ export default function BenchmarkCharts() {
 
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-400">Sort by:</span>
-              {(['bestReward', 'avgReward', 'totalRuns'] as const).map(key => (
+              {(['score_correctness', 'avgReward', 'totalRuns'] as const).map(key => (
                 <button
                   key={key}
                   onClick={() => setSortBy(key)}
@@ -580,7 +584,7 @@ export default function BenchmarkCharts() {
                     sortBy === key ? 'bg-emerald-500/20 text-emerald-400' : 'text-gray-500 hover:text-white'
                   }`}
                 >
-                  {key === 'bestReward' ? 'Best Score' : key === 'avgReward' ? 'Avg Score' : 'Total Runs'}
+                  {key === 'score_correctness' ? 'Accuracy' : key === 'avgReward' ? 'Avg Score' : 'Total Runs'}
                 </button>
               ))}
             </div>
@@ -619,12 +623,12 @@ export default function BenchmarkCharts() {
                     </div>
                     <div className="flex items-center gap-6">
                       <div className="text-right">
-                        <div className="text-lg font-bold text-emerald-400">{model.bestReward.toFixed(2)}</div>
-                        <div className="text-xs text-gray-500">best</div>
+                        <div className="text-lg font-bold text-emerald-400">{((model.metrics.score_correctness || 0) * 100).toFixed(1)}%</div>
+                        <div className="text-xs text-gray-500">accuracy</div>
                       </div>
                       <div className="text-right">
                         <div className="text-lg font-mono text-gray-300">{model.avgReward.toFixed(2)}</div>
-                        <div className="text-xs text-gray-500">avg</div>
+                        <div className="text-xs text-gray-500">avg reward</div>
                       </div>
                       {expandedModel === model.model ? <ChevronUp className="w-5 h-5 text-gray-500" /> : <ChevronDown className="w-5 h-5 text-gray-500" />}
                     </div>
