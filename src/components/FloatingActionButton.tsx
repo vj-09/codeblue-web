@@ -1,41 +1,22 @@
 'use client';
 
 import { useState } from 'react';
-import { MessageCircle, Github, X, ExternalLink, FileText, Bug, MessageSquare } from 'lucide-react';
+import { MessageCircle, Github, X, ExternalLink, MessageSquare, Handshake } from 'lucide-react';
 import FeedbackModal from './FeedbackModal';
-
-const links = [
-  {
-    id: 'github',
-    label: 'GitHub Repo',
-    icon: Github,
-    href: 'https://github.com/vj-09/codeblue-env',
-    color: 'bg-gray-700 hover:bg-gray-600',
-    description: 'View source code'
-  },
-  {
-    id: 'issues',
-    label: 'Report Issue',
-    icon: Bug,
-    href: 'https://github.com/vj-09/codeblue-env/issues',
-    color: 'bg-red-600/80 hover:bg-red-600',
-    description: 'Report bugs on GitHub'
-  },
-  {
-    id: 'docs',
-    label: 'Documentation',
-    icon: FileText,
-    href: 'https://github.com/vj-09/codeblue-env#readme',
-    color: 'bg-blue-600/80 hover:bg-blue-600',
-    description: 'Read the docs'
-  },
-];
 
 export default function FloatingActionButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackType, setFeedbackType] = useState<'feedback' | 'collab'>('feedback');
 
   const handleFeedbackClick = () => {
+    setFeedbackType('feedback');
+    setIsOpen(false);
+    setShowFeedback(true);
+  };
+
+  const handleCollabClick = () => {
+    setFeedbackType('collab');
     setIsOpen(false);
     setShowFeedback(true);
   };
@@ -48,10 +29,10 @@ export default function FloatingActionButton() {
           isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
         }`}>
           <div className="flex flex-col gap-2 items-end">
-            {/* Feedback button - opens modal */}
+            {/* Collaborate / Work With Us */}
             <button
-              onClick={handleFeedbackClick}
-              className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-emerald-600/80 hover:bg-emerald-600 text-white shadow-lg transition-all duration-200"
+              onClick={handleCollabClick}
+              className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-purple-600/80 hover:bg-purple-600 text-white shadow-lg transition-all duration-200"
               style={{
                 transitionDelay: isOpen ? '0ms' : '0ms',
                 transform: isOpen ? 'translateX(0)' : 'translateX(20px)',
@@ -59,34 +40,48 @@ export default function FloatingActionButton() {
               }}
             >
               <div className="flex flex-col items-end">
-                <span className="text-sm font-medium whitespace-nowrap">Send Feedback</span>
-                <span className="text-[10px] text-white/70 whitespace-nowrap">Share your thoughts</span>
+                <span className="text-sm font-medium whitespace-nowrap">Work With Us</span>
+                <span className="text-[10px] text-white/70 whitespace-nowrap">Partnerships & services</span>
+              </div>
+              <Handshake className="w-5 h-5 flex-shrink-0" />
+            </button>
+
+            {/* Feedback button */}
+            <button
+              onClick={handleFeedbackClick}
+              className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-emerald-600/80 hover:bg-emerald-600 text-white shadow-lg transition-all duration-200"
+              style={{
+                transitionDelay: isOpen ? '50ms' : '0ms',
+                transform: isOpen ? 'translateX(0)' : 'translateX(20px)',
+                opacity: isOpen ? 1 : 0,
+              }}
+            >
+              <div className="flex flex-col items-end">
+                <span className="text-sm font-medium whitespace-nowrap">Feedback</span>
+                <span className="text-[10px] text-white/70 whitespace-nowrap">Bugs & suggestions</span>
               </div>
               <MessageSquare className="w-5 h-5 flex-shrink-0" />
             </button>
 
-            {/* External links */}
-            {links.map((link, idx) => (
-              <a
-                key={link.id}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl ${link.color} text-white shadow-lg transition-all duration-200 group`}
-                style={{
-                  transitionDelay: isOpen ? `${(idx + 1) * 50}ms` : '0ms',
-                  transform: isOpen ? 'translateX(0)' : 'translateX(20px)',
-                  opacity: isOpen ? 1 : 0,
-                }}
-              >
-                <div className="flex flex-col items-end">
-                  <span className="text-sm font-medium whitespace-nowrap">{link.label}</span>
-                  <span className="text-[10px] text-white/70 whitespace-nowrap">{link.description}</span>
-                </div>
-                <link.icon className="w-5 h-5 flex-shrink-0" />
-                <ExternalLink className="w-3 h-3 opacity-50 flex-shrink-0" />
-              </a>
-            ))}
+            {/* GitHub */}
+            <a
+              href="https://github.com/vj-09/codeblue-env"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-gray-700 hover:bg-gray-600 text-white shadow-lg transition-all duration-200"
+              style={{
+                transitionDelay: isOpen ? '100ms' : '0ms',
+                transform: isOpen ? 'translateX(0)' : 'translateX(20px)',
+                opacity: isOpen ? 1 : 0,
+              }}
+            >
+              <div className="flex flex-col items-end">
+                <span className="text-sm font-medium whitespace-nowrap">GitHub</span>
+                <span className="text-[10px] text-white/70 whitespace-nowrap">View source code</span>
+              </div>
+              <Github className="w-5 h-5 flex-shrink-0" />
+              <ExternalLink className="w-3 h-3 opacity-50 flex-shrink-0" />
+            </a>
           </div>
         </div>
 
@@ -117,7 +112,11 @@ export default function FloatingActionButton() {
       </div>
 
       {/* Feedback Modal */}
-      <FeedbackModal isOpen={showFeedback} onClose={() => setShowFeedback(false)} />
+      <FeedbackModal
+        isOpen={showFeedback}
+        onClose={() => setShowFeedback(false)}
+        defaultType={feedbackType === 'collab' ? 'collab' : 'feedback'}
+      />
     </>
   );
 }
