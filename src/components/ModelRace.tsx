@@ -53,6 +53,7 @@ interface RacerState {
 export default function ModelRace() {
   const [selectedModels, setSelectedModels] = useState<string[]>([]);
   const [selectedTask, setSelectedTask] = useState<string | null>(null);
+  const [selectedRollout, setSelectedRollout] = useState(0);
   const [isRacing, setIsRacing] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
@@ -98,6 +99,7 @@ export default function ModelRace() {
       return [...prev, modelId];
     });
     setSelectedTask(null);
+    setSelectedRollout(0);
     resetRace();
   };
 
@@ -121,7 +123,9 @@ export default function ModelRace() {
       .filter(Boolean) as ModelData[];
 
     const initialRacers: RacerState[] = models.map(model => {
-      const example = model.examples.find(e => e.info?.task_id === selectedTask)!;
+      // Get all examples for this task, pick the selected rollout
+      const taskExamples = model.examples.filter(e => e.info?.task_id === selectedTask);
+      const example = taskExamples[selectedRollout] || taskExamples[0];
       return {
         model,
         example,
@@ -254,14 +258,35 @@ export default function ModelRace() {
       {/* Task Selection */}
       {selectedModels.length >= 2 && (
         <div className="bg-black/20 rounded-xl p-4 border border-white/10">
-          <h3 className="text-sm font-medium text-gray-400 mb-3">
-            Select a task ({commonTasks.length} common tasks):
-          </h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-medium text-gray-400">
+              Select a task ({commonTasks.length} tasks × 3 rollouts):
+            </h3>
+            {selectedTask && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-500">Rollout:</span>
+                {[0, 1, 2].map(r => (
+                  <button
+                    key={r}
+                    onClick={() => { setSelectedRollout(r); resetRace(); }}
+                    disabled={isRacing}
+                    className={`px-2 py-1 rounded text-xs ${
+                      selectedRollout === r
+                        ? 'bg-emerald-500 text-white'
+                        : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+                    } ${isRacing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    Run {r + 1}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
             {commonTasks.map((task) => (
               <button
                 key={task.taskId}
-                onClick={() => { setSelectedTask(task.taskId); resetRace(); }}
+                onClick={() => { setSelectedTask(task.taskId); setSelectedRollout(0); resetRace(); }}
                 disabled={isRacing}
                 className={`px-3 py-1.5 rounded-lg text-sm font-mono transition-all ${
                   selectedTask === task.taskId

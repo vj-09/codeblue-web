@@ -930,31 +930,45 @@ export default function BenchmarkCharts() {
         {activeTab === 'examples' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="p-6 rounded-2xl bg-black/30 border border-white/10">
-              <h3 className="text-lg font-bold text-white mb-4">Select Example</h3>
+              <h3 className="text-lg font-bold text-white mb-2">Select Example</h3>
+              <p className="text-xs text-gray-500 mb-4">{benchmarkData.models.length} models × 25 tasks × 3 rollouts</p>
               <div className="space-y-2 max-h-[600px] overflow-y-auto">
-                {benchmarkData.models.flatMap(model =>
-                  model.examples.filter(ex => ex.info).map((ex, i) => (
-                    <button
-                      key={`${model.model}-${i}`}
-                      onClick={() => setSelectedExample(ex)}
-                      className={`w-full p-3 rounded-lg text-left text-sm transition-all ${
-                        selectedExample === ex
-                          ? 'bg-emerald-500/20 border border-emerald-500/30'
-                          : 'bg-black/20 border border-white/10 hover:border-white/20'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-white font-mono">{ex.info.task_id}</span>
-                        <span className={`text-xs px-2 py-0.5 rounded ${
-                          ex.score_correctness > 0.5 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
-                        }`}>
-                          {ex.reward.toFixed(1)}
-                        </span>
-                      </div>
-                      <div className="text-xs text-gray-500">{model.name} - {ex.info.level}</div>
-                    </button>
-                  ))
-                )}
+                {benchmarkData.models.flatMap(model => {
+                  // Group examples by task_id to show rollout numbers
+                  const taskGroups: Record<string, typeof model.examples> = {};
+                  model.examples.filter(ex => ex.info).forEach(ex => {
+                    const tid = ex.info!.task_id;
+                    if (!taskGroups[tid]) taskGroups[tid] = [];
+                    taskGroups[tid].push(ex);
+                  });
+
+                  return Object.entries(taskGroups).flatMap(([taskId, exs]) =>
+                    exs.map((ex, rolloutIdx) => (
+                      <button
+                        key={`${model.model}-${taskId}-${rolloutIdx}`}
+                        onClick={() => setSelectedExample(ex)}
+                        className={`w-full p-3 rounded-lg text-left text-sm transition-all ${
+                          selectedExample === ex
+                            ? 'bg-emerald-500/20 border border-emerald-500/30'
+                            : 'bg-black/20 border border-white/10 hover:border-white/20'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-white font-mono text-xs">{ex.info!.task_id}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500">Run {rolloutIdx + 1}</span>
+                            <span className={`text-xs px-2 py-0.5 rounded ${
+                              ex.score_correctness > 0.5 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
+                            }`}>
+                              {ex.score_correctness > 0.5 ? '✓' : '✗'}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="text-xs text-gray-500">{model.name.split('-').slice(0, 2).join('-')} - {ex.info!.level}</div>
+                      </button>
+                    ))
+                  );
+                })}
               </div>
             </div>
 
